@@ -1,0 +1,170 @@
+// ========================================
+// VARIABILI
+// ========================================
+$taskbar-height: 30px;
+$blue-gradient: linear-gradient(to bottom, #2A5AE9, #1C3B8F);
+$blue-hover: linear-gradient(to bottom, #5A9BEF, #3C7AD0);
+$blue-active: linear-gradient(to bottom, #3C6AC0, #4A8BE0);
+$blue-current: linear-gradient(to bottom, #6AABFF, #4C8AFF);
+$tray-gradient: linear-gradient(to bottom, #0F87FF, #0A5DB9);
+$white: #fff;
+
+// ========================================
+// MIXIN
+// ========================================
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+}
+
+@mixin inset-shadow {
+  box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.2),
+    inset -1px -1px 0 rgba(0, 0, 0, 0.2);
+}
+
+// ========================================
+// TASKBAR
+// ========================================
+.taskbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: $taskbar-height;
+  background: $blue-gradient;
+  @include flex-center;
+  padding: 0;
+  border-top: 1px solid #3C6AF5;
+}
+
+// ========================================
+// START BUTTON
+// ========================================
+.start-button {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  @include flex-center;
+  justify-content: center;
+  height: 40px;
+  width: 124px;
+  overflow: hidden;
+  margin-left: -10px;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  span {
+    color: $white;
+    font-weight: bold;
+    margin-left: 5px;
+    font-size: 14px;
+  }
+
+  &:hover {
+    filter: brightness(1.1);
+  }
+
+  &:active {
+    filter: brightness(0.9);
+  }
+}
+
+// ========================================
+// TASKBAR ICONS
+// ========================================
+.taskbar-icons {
+  display: flex;
+  flex-grow: 1;
+  overflow-x: auto;
+}
+
+.taskbar-icon {
+  @include flex-center;
+  background: linear-gradient(to bottom, #4A8BE0, #2C6AC0);
+  border: 1px solid #1C3B8F;
+  border-radius: 3px;
+  padding: 2px 8px;
+  margin: 0 2px;
+  height: $taskbar-height;
+  cursor: pointer;
+  color: $white;
+  font-size: 12px;
+  transition: background 0.2s;
+  width: 150px;
+
+  img {
+    width: 16px;
+    height: 16px;
+    margin-right: 5px;
+  }
+
+  .window-title {
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &:hover {
+    background: $blue-hover;
+  }
+
+  &:active {
+    background: $blue-active;
+  }
+
+  &.active {
+    background: $blue-current;
+  }
+}
+
+.taskbar-spacer {
+  flex-grow: 1;
+}
+
+// ========================================
+// SYSTEM TRAY
+// ========================================
+.system-tray {
+  @include flex-center;
+  background: $tray-gradient;
+  border-left: 1px solid #5980FF;
+  height: 100%;
+  padding: 0 5px;
+  @include inset-shadow;
+}
+
+.volume-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  margin: 0 5px;
+
+  img {
+    width: 16px;
+    height: 16px;
+  }
+
+  &:hover {
+    filter: brightness(1.2);
+  }
+}
+
+.clock {
+  @include flex-center;
+  justify-content: center;
+  padding: 0 10px;
+  color: $white;
+  font-size: 14px;
+  font-weight: bold;
+  background: $tray-gradient;
+  height: 100%;
+  min-width: 80px;
+  @include inset-shadow;
+}

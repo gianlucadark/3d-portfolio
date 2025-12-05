@@ -1,0 +1,575 @@
+// ========================================
+// VARIABILI WINDOWS XP
+// ========================================
+$xp-blue: #0054E3;
+$xp-blue-light: #2683FF;
+$xp-gray: #ECE9D8;
+$xp-border: #7A96DF;
+$xp-btn-bg: #D1D2D4;
+$xp-btn-hover: #E5E5E5;
+$xp-btn-active: #B0B0B0;
+$prompt-bg: #000;
+$prompt-green: #00FF00;
+$white: #fff;
+$black: #000;
+
+// ========================================
+// MIXIN
+// ========================================
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+}
+
+@mixin xp-button {
+  border: none;
+  background-color: $xp-btn-bg;
+  cursor: pointer;
+
+  &:hover {
+    background-color: $xp-btn-hover;
+  }
+
+  &:active {
+    background-color: $xp-btn-active;
+  }
+}
+
+@mixin resize-handle($position) {
+  position: absolute;
+  background: transparent;
+  z-index: 10;
+
+  @if $position =='top' {
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 5px;
+    cursor: n-resize;
+  }
+
+  @else if $position =='right' {
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 5px;
+    cursor: e-resize;
+  }
+
+  @else if $position =='bottom' {
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 5px;
+    cursor: s-resize;
+  }
+
+  @else if $position =='left' {
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 5px;
+    cursor: w-resize;
+  }
+}
+
+@mixin resize-corner($corner) {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: transparent;
+  z-index: 10;
+
+  @if $corner =='top-left' {
+    top: 0;
+    left: 0;
+    cursor: nw-resize;
+  }
+
+  @else if $corner =='top-right' {
+    top: 0;
+    right: 0;
+    cursor: ne-resize;
+  }
+
+  @else if $corner =='bottom-left' {
+    bottom: 0;
+    left: 0;
+    cursor: sw-resize;
+  }
+
+  @else if $corner =='bottom-right' {
+    bottom: 0;
+    right: 0;
+    cursor: se-resize;
+  }
+}
+
+@mixin xp-scrollbar {
+  &::-webkit-scrollbar {
+    width: 16px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background-color: #F1F1F1;
+    border: 1px solid #C1C1C1;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: #C1C1C1;
+    border: 1px solid #A1A1A1;
+
+    &:hover {
+      background-color: #A1A1A1;
+    }
+  }
+}
+
+// ========================================
+// WINDOW BASE
+// ========================================
+.window {
+  position: absolute;
+  background-color: $xp-gray;
+  border: 1px solid $xp-blue;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+  min-width: 200px;
+  min-height: 100px;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  transform-origin: bottom center;
+  box-sizing: border-box;
+  margin: 0;
+
+  &.fullscreen {
+    position: fixed;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: calc(100vh - 30px) !important;
+    z-index: 9999;
+  }
+
+  &.minimized {
+    transform: translateY(100%) scale(0.1);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  // Resize handles
+  .resize-handle {
+    &.top {
+      @include resize-handle('top');
+    }
+
+    &.right {
+      @include resize-handle('right');
+    }
+
+    &.bottom {
+      @include resize-handle('bottom');
+    }
+
+    &.left {
+      @include resize-handle('left');
+    }
+
+    &.top-left {
+      @include resize-corner('top-left');
+    }
+
+    &.top-right {
+      @include resize-corner('top-right');
+    }
+
+    &.bottom-left {
+      @include resize-corner('bottom-left');
+    }
+
+    &.bottom-right {
+      @include resize-corner('bottom-right');
+    }
+  }
+}
+
+// ========================================
+// TITLE BAR
+// ========================================
+.title-bar {
+  background: linear-gradient(to right, $xp-blue, $xp-blue-light);
+  padding: 2px 5px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: $white;
+  font-weight: bold;
+  cursor: move;
+  border-radius: 8px 8px 0 0;
+  height: 35px;
+
+  &-text {
+    @include flex-center;
+  }
+
+  &-controls {
+    display: flex;
+
+    button {
+      width: 24px;
+      height: 24px;
+      margin-left: 2px;
+      @include xp-button;
+      background-size: cover;
+
+      &.minimize-btn {
+        background-image: url('/assets/icons/minimize-icon.png');
+      }
+
+      &.maximize-btn {
+        background-image: url('/assets/icons/maximize-icon.png');
+      }
+
+      &.close-btn {
+        background-image: url('/assets/icons/close-icon.png');
+      }
+    }
+  }
+}
+
+.title-icon {
+  width: 16px;
+  height: 16px;
+  margin-right: 5px;
+}
+
+// ========================================
+// NAVIGATION & ADDRESS BAR
+// ========================================
+.navigation-bar {
+  @include flex-center;
+  background-color: $xp-gray;
+  padding: 2px 5px;
+  border-bottom: 1px solid $xp-border;
+}
+
+.nav-button {
+  @include flex-center;
+  height: 36px;
+  padding: 0 5px;
+  margin-right: 2px;
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+
+  &:hover {
+    background-color: $xp-btn-hover;
+  }
+
+  &:active {
+    background-color: $xp-btn-active;
+  }
+
+  &[disabled] {
+    cursor: not-allowed;
+
+    .nav-icon {
+      filter: grayscale(100%);
+    }
+  }
+}
+
+.nav-separator {
+  width: 1px;
+  height: 24px;
+  background-color: $xp-border;
+  margin: 0 10px;
+}
+
+.nav-icon {
+  width: 30px;
+  height: 30px;
+  margin-right: 5px;
+}
+
+.nav-text {
+  font-size: 14px;
+  color: $black;
+}
+
+.folder-path {
+  background-color: $white;
+  border-bottom: 1px solid $xp-border;
+  padding: 5px;
+  font-family: 'Tahoma', sans-serif;
+  font-size: 11px;
+}
+
+.address-bar {
+  @include flex-center;
+  background-color: $white;
+  border: 1px solid $xp-border;
+  height: 22px;
+}
+
+.address-label {
+  @include flex-center;
+  background-color: #EBECEE;
+  color: $black;
+  padding: 0 5px;
+  height: 100%;
+  border-right: 1px solid $xp-border;
+}
+
+.address-content {
+  @include flex-center;
+  padding-left: 5px;
+  flex-grow: 1;
+}
+
+.folder-icon {
+  width: 16px;
+  height: 16px;
+  margin-right: 5px;
+}
+
+.path-text {
+  color: $black;
+  margin-right: 5px;
+}
+
+.avanti-icon {
+  width: 25px;
+  height: 25px;
+  margin-left: auto;
+  cursor: pointer;
+}
+
+.folder-path-item {
+  cursor: pointer;
+  color: #0000FF;
+  text-decoration: underline;
+  @include flex-center;
+
+  &:hover {
+    color: #FF0000;
+  }
+
+  &::before {
+    content: '';
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    margin-right: 4px;
+    background: url('/assets/icons/folder-icon.png') no-repeat center/contain;
+  }
+}
+
+.folder-path-separator {
+  margin: 0 5px;
+  color: $black;
+}
+
+.desktop-icon::before {
+  background-image: url('/assets/icons/desktop-icon.png') !important;
+}
+
+// ========================================
+// PROMPT STYLES
+// ========================================
+.window {
+  &.prompt-title-bar {
+    .title-bar {
+      background: linear-gradient(to right, #000080, #1084d0);
+    }
+  }
+
+  &.prompt-window {
+    background-color: $prompt-bg;
+  }
+}
+
+.prompt-content {
+  background-color: $prompt-bg;
+  color: $white;
+  font-family: 'Courier New', monospace;
+  padding: 10px;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.prompt-input {
+  @include flex-center;
+  background-color: $prompt-bg;
+  width: 100%;
+  padding: 10px;
+
+  input {
+    background-color: $prompt-bg;
+    color: $prompt-green;
+    border: none;
+    outline: none;
+    font-family: 'Courier New', monospace;
+    width: 100%;
+  }
+}
+
+.prompt-output,
+.ascii-art {
+  color: $white;
+  font-family: 'Courier New', monospace;
+}
+
+.prompt-output {
+  margin-top: 10px;
+}
+
+.ascii-art {
+  margin-bottom: 10px;
+}
+
+// ========================================
+// README CONTENT
+// ========================================
+.readme-content {
+  font-family: 'Tahoma', 'Arial', sans-serif;
+  font-size: 16px;
+  color: $black;
+  background-color: $white;
+  padding: 10px;
+  flex-grow: 1;
+  overflow-y: auto;
+  height: 100%;
+  margin-bottom: 35px;
+  @include xp-scrollbar;
+
+  h1,
+  h2 {
+    font-size: 18px;
+    font-weight: bold;
+    color: #003399;
+  }
+
+  h1 {
+    margin-bottom: 10px;
+  }
+
+  h2 {
+    margin-top: 15px;
+    margin-bottom: 8px;
+  }
+
+  p {
+    margin-bottom: 8px;
+    line-height: 1.25;
+  }
+
+  ul,
+  ol {
+    margin-left: 20px;
+    margin-bottom: 8px;
+  }
+
+  li {
+    margin-bottom: 4px;
+  }
+
+  a {
+    color: #0000FF;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+
+    &:visited {
+      color: #800080;
+    }
+  }
+}
+
+// ========================================
+// WINDOW BODY & ICONS
+// ========================================
+.window-body {
+  height: 90%;
+  background-color: $white;
+
+  .icon {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    width: 90px;
+    height: 90px;
+    cursor: pointer;
+    padding: 5px;
+    border: 1px solid transparent;
+
+    img {
+      width: 64px;
+      height: 64px;
+      margin-bottom: 5px;
+    }
+
+    span {
+      font-size: 14px;
+      color: $black;
+      word-wrap: break-word;
+    }
+
+    &:hover {
+      background-color: rgba(0, 0, 255, 0.3);
+      border: 1px dotted $black;
+    }
+  }
+}
+
+// ========================================
+// NOTEPAD
+// ========================================
+.notepad-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.notepad-textarea {
+  flex-grow: 1;
+  width: 100%;
+  border: none;
+  padding: 10px;
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  resize: none;
+  box-sizing: border-box;
+}
+
+// ========================================
+// MENU BAR
+// ========================================
+.menu-bar {
+  display: flex;
+  background-color: $xp-gray;
+  border-bottom: 1px solid $xp-border;
+  padding: 2px 5px;
+}
+
+.menu-item {
+  background-color: transparent;
+  border: none;
+  margin-right: 10px;
+  padding: 3px 10px;
+  cursor: pointer;
+  font-family: 'Tahoma', sans-serif;
+  font-size: 13px;
+  color: $black;
+
+  &:hover {
+    background-color: $xp-btn-bg;
+  }
+
+  &:active {
+    background-color: $xp-btn-active;
+  }
+}

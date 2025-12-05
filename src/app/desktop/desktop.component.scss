@@ -1,0 +1,369 @@
+// ========================================
+// VARIABILI
+// ========================================
+$xp-blue: #0054E3;
+$xp-blue-light: #2683FF;
+$xp-blue-dark: #003399;
+$xp-menu-blue: #0044aa;
+$xp-menu-blue-light: #0071e3;
+$xp-gray: #ECE9D8;
+$white: #fff;
+$black: #000;
+
+// ========================================
+// MIXIN
+// ========================================
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+}
+
+@mixin icon-base {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  cursor: pointer;
+  padding: 5px;
+  border: 1px solid transparent;
+
+  &:hover,
+  &.selected {
+    background-color: rgba(0, 0, 255, 0.3);
+    border: 1px dotted $white;
+  }
+}
+
+@mixin icon-text-shadow {
+  color: $white;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+// ========================================
+// OVERLAY & DESKTOP
+// ========================================
+.desktop-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: transparent;
+}
+
+.desktop-container {
+  display: flex;
+}
+
+.sidebar {
+  width: 50px;
+  background-color: #f0f0f0;
+  @include flex-center;
+  justify-content: center;
+  border-right: 1px solid $black;
+
+  span {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+  }
+}
+
+.desktop {
+  width: 100%;
+  height: 100vh;
+  background: url('/assets/icons/wallpaper.png') center/cover;
+  position: relative;
+  overflow: hidden;
+  flex-grow: 1;
+}
+
+// ========================================
+// CLOSE BUTTON
+// ========================================
+.close-desktop-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 10000;
+  background: linear-gradient(180deg, #f0f0f0, #d4d4d4);
+  border: 2px solid #003c74;
+  border-radius: 4px;
+  padding: 8px 16px;
+  cursor: pointer;
+  @include flex-center;
+  gap: 8px;
+  font-family: 'Tahoma', sans-serif;
+  font-weight: bold;
+  color: $black;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s ease;
+
+  .close-icon {
+    font-size: 18px;
+    color: #d32f2f;
+    font-weight: bold;
+  }
+
+  .close-text {
+    font-size: 14px;
+    letter-spacing: 0.5px;
+  }
+
+  &:hover {
+    background: linear-gradient(180deg, $white, #e0e0e0);
+    border-color: #0055a5;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    background: linear-gradient(180deg, #d4d4d4, #c0c0c0);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    transform: translateY(0);
+  }
+}
+
+// ========================================
+// ICONS
+// ========================================
+.icons-container {
+  position: absolute;
+  inset: 0 0 40px 0;
+}
+
+.icon {
+  position: absolute;
+  @include icon-base;
+  width: 90px;
+  height: 90px;
+  cursor: default;
+
+  img {
+    width: 64px;
+    height: 64px;
+    margin-bottom: 5px;
+  }
+
+  span {
+    font-size: 12px;
+    @include icon-text-shadow;
+    word-wrap: break-word;
+  }
+}
+
+.recycle-bin {
+  position: fixed;
+  bottom: 40px;
+  right: 30px;
+  @include icon-base;
+  width: 64px;
+
+  img {
+    width: 52px;
+    height: 52px;
+    margin-bottom: 5px;
+  }
+
+  span {
+    font-size: 12px;
+    @include icon-text-shadow;
+  }
+}
+
+// ========================================
+// START MENU
+// ========================================
+.start-menu {
+  position: fixed;
+  bottom: 40px;
+  left: 0;
+  width: 300px;
+  background: linear-gradient(to bottom, $xp-menu-blue, $xp-menu-blue-light);
+  color: $white;
+  border: 1px solid #1C3A80;
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+}
+
+.start-menu-header {
+  background-color: #1C3A80;
+  padding: 10px;
+  @include flex-center;
+
+  img {
+    width: 75px;
+    height: 48px;
+    margin-right: 10px;
+    border-radius: 50%;
+  }
+
+  span {
+    font-size: 18px;
+    font-weight: bold;
+    color: $white;
+  }
+}
+
+.start-menu-items {
+  flex-grow: 1;
+  padding: 10px;
+  background-color: #e0e7ef;
+  color: $black;
+}
+
+.start-menu-item {
+  @include flex-center;
+  padding: 5px;
+  cursor: pointer;
+  font-family: 'Tahoma', sans-serif;
+  font-size: 14px;
+  color: $black;
+
+  img {
+    width: 32px;
+    height: 32px;
+    margin-right: 10px;
+  }
+
+  &:hover {
+    background-color: #2C5BB3;
+    border-radius: 5px;
+  }
+}
+
+.start-menu-separator {
+  height: 1px;
+  background-color: #2C5BB3;
+  margin: 5px 0;
+}
+
+.start-menu-footer {
+  padding: 10px;
+  background-color: $xp-menu-blue;
+  border-top: 1px solid $xp-blue-dark;
+  text-align: center;
+
+  .start-menu-item {
+    color: $white;
+    justify-content: center;
+  }
+
+  img {
+    margin-right: 10px;
+  }
+}
+
+// ========================================
+// MISC
+// ========================================
+.centered-text {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'Tahoma', sans-serif;
+  @include icon-text-shadow;
+  padding: 5px 10px;
+  border-radius: 4px;
+}
+
+.vertical-text {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-family: Tahoma, sans-serif;
+  font-size: 12px;
+  color: $white;
+}
+
+.small-icon,
+img {
+  width: 32px;
+  height: auto;
+}
+
+// ========================================
+// CDK DRAG
+// ========================================
+.cdk-y-placeholder {
+  opacity: 0;
+}
+
+.cdk-drag-animating {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.cdk-drag-dragging {
+  cursor: default !important;
+}
+
+div[cdkDrag] {
+  position: absolute;
+}
+
+// ========================================
+// TASKBAR
+// ========================================
+.taskbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 40px;
+  background-color: #333;
+  @include flex-center;
+  padding: 0 10px;
+}
+
+.start-button {
+  background-color: #0078D7;
+  color: $white;
+  border: none;
+  padding: 5px 15px;
+  cursor: pointer;
+}
+
+// ========================================
+// EMAIL WINDOW
+// ========================================
+.email-window {
+  .title-bar {
+    background: linear-gradient(to right, $xp-blue, $xp-blue-light);
+    color: $white;
+    padding: 2px 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .window-body {
+    padding: 10px;
+    background-color: $xp-gray;
+  }
+
+  textarea {
+    width: 100%;
+    height: 150px;
+    margin-bottom: 10px;
+    font-family: 'Courier New', monospace;
+  }
+
+  button {
+    background-color: $xp-blue;
+    color: $white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+
+    &:hover {
+      background-color: $xp-blue-light;
+    }
+  }
+}

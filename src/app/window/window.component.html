@@ -1,0 +1,153 @@
+<div class="window" *ngIf="isVisible"
+  [ngClass]="{'minimized': isMinimized, 'prompt-window': windowType === 'prompt', 'fullscreen': isFullscreen}"
+  [ngStyle]="{'top.px': position.y, 'left.px': position.x, 'width.px': size.width, 'height.px': size.height, 'z-index': zIndex}"
+  (mousedown)="onWindowClick()">
+
+  <div class="title-bar" (mousedown)="onDragStart($event)" [ngClass]="{'prompt-title-bar': windowType === 'prompt'}">
+    <div class="title-bar-text">
+      <img [src]="icon" alt="Icon" class="title-icon">
+      {{ title }}
+    </div>
+    <div class="title-bar-controls">
+      <button class="minimize-btn" [attr.aria-label]="'common.minimize' | translate" (click)="onMinimize()"></button>
+      <button class="maximize-btn" [attr.aria-label]="'common.maximize' | translate"
+        (click)="toggleFullscreen()"></button>
+      <button class="close-btn" [attr.aria-label]="'common.close' | translate" (click)="onClose()"></button>
+    </div>
+  </div>
+
+  <!-- Barra di menu -->
+  <div class="menu-bar" *ngIf="windowType !== 'prompt'">
+    <button class="menu-item">{{ 'menu.file' | translate }}</button>
+    <button class="menu-item">{{ 'menu.edit' | translate }}</button>
+    <button class="menu-item">{{ 'menu.view' | translate }}</button>
+    <button class="menu-item">{{ 'menu.favorites' | translate }}</button>
+    <button class="menu-item">{{ 'menu.tools' | translate }}</button>
+    <button class="menu-item">{{ 'menu.help' | translate }}</button>
+  </div>
+
+  <!-- Nuova sezione per i tasti di navigazione -->
+  <div class="navigation-bar" *ngIf="windowType !== 'prompt'">
+    <button class="nav-button" [attr.aria-label]="'common.back' | translate" disabled>
+      <img src="assets/icons/back.png" [alt]="'common.back' | translate" class="nav-icon">
+      <span class="nav-text">{{ 'common.back' | translate }}</span>
+    </button>
+    <button class="nav-button" [attr.aria-label]="'common.forward' | translate" disabled>
+      <img src="assets/icons/avanti.png" [alt]="'common.forward' | translate" class="nav-icon">
+    </button>
+    <div class="nav-separator"></div>
+    <button class="nav-button" [attr.aria-label]="'common.search' | translate">
+      <img src="assets/icons/cerca.png" [alt]="'common.search' | translate" class="nav-icon">
+      <span class="nav-text">{{ 'common.search' | translate }}</span>
+    </button>
+    <button class="nav-button" [attr.aria-label]="'common.folders' | translate">
+      <img src="assets/icons/folder.png" [alt]="'common.folders' | translate" class="nav-icon">
+      <span class="nav-text">{{ 'common.folders' | translate }}</span>
+    </button>
+  </div>
+
+  <div class="folder-path" *ngIf="folderPath.length > 0 && (windowType !== 'cv' && windowType !== 'prompt')">
+    <div class="address-bar">
+      <span class="address-label">{{ 'common.address' | translate }}</span>
+      <div class="address-content">
+        <img src="assets/icons/folder.png" alt="Folder" class="folder-icon">
+        <span class="path-text">{{ folderPath.join('\\') }}</span>
+        <img src="assets/icons/avanti.png" [alt]="'common.forward' | translate" class="avanti-icon">
+      </div>
+    </div>
+  </div>
+  <div class="window-body">
+    <ng-container *ngIf="windowType === 'cv'">
+      <ng-container *ngIf="pdfSrc; else noPdf">
+        <iframe [src]="pdfSrc" width="100%" height="100%" frameborder="0"></iframe>
+      </ng-container>
+      <ng-template #noPdf>
+        <p>{{ 'common.error' | translate }}: {{ pdfSrc }}</p>
+      </ng-template>
+    </ng-container>
+    <ng-container *ngIf="windowType === 'readme'">
+      <div class="readme-content">
+        <h1>{{ 'readme.title' | translate }}</h1>
+
+        <p><strong>{{ 'readme.noteLabel' | translate }}:</strong> {{ 'readme.warning' | translate }}</p>
+
+        <p>{{ 'readme.intro' | translate }}</p>
+
+        <!-- Aggiungi il link per aprire la finestra del CV -->
+        <p style="text-align: center; padding-top: 10px;">
+          <a href="#" (click)="openCvWindow($event)" style="font-size: 18px; color: blue; text-decoration: underline;">
+            {{ 'readme.cvLink' | translate }}
+          </a>
+        </p>
+      </div>
+    </ng-container>
+    <ng-container *ngIf="windowType === 'prompt'">
+      <div class="prompt-content">
+        <pre class="ascii-art">
+  ______ _             _
+ / _____|_)           | |
+| /  ___ _  ____ ____ | |_   _  ____ ____
+| | (___) |/ _  |  _ \| | | | |/ ___) _  |
+| \____/| ( ( | | | | | | |_| ( (__( ( | |
+ \_____/|_|\_||_|_| |_|_|\____|\_(____)_||_|
+
+ {{ 'prompt.help' | translate }}
+
+</pre>
+        <div *ngFor="let line of output" class="prompt-output">
+          {{ line }}
+        </div>
+        <div class="prompt-input" style="margin-top: 10px;">
+          <span>C:\></span>
+          <input [(ngModel)]="currentInput" (keydown.enter)="onEnter()" autofocus>
+        </div>
+      </div>
+    </ng-container>
+    <ng-container *ngIf="windowType === 'computer'">
+      <div class="icon" (click)="selectIcon($event)">
+        <img src="assets/icons/disco.png" [alt]="'diskInfo.localDisk' | translate">
+        <span>{{ 'diskInfo.localDisk' | translate }}</span>
+      </div>
+    </ng-container>
+    <ng-container *ngIf="windowType === 'recycle-bin'">
+      <div class="recycle-bin-icons">
+        <div class="icon" (click)="selectIcon($event)">
+          <img src="assets/icons/sperlonga.png" alt="Foto">
+          <span>sperlonga.png</span>
+        </div>
+      </div>
+    </ng-container>
+    <ng-container *ngIf="windowType === 'documenti'">
+      <!-- <app-documenti></app-documenti> -->
+    </ng-container>
+    <ng-container *ngIf="windowType === 'paint'">
+      <app-paint></app-paint>
+    </ng-container>
+    <ng-container *ngIf="windowType === 'notepad'">
+      <div class="notepad-content">
+        <textarea [(ngModel)]="notepadText" class="notepad-textarea"></textarea>
+      </div>
+    </ng-container>
+    <ng-container
+      *ngIf="windowType !== 'cv' && windowType !== 'readme' && windowType !== 'prompt' && windowType !== 'computer' && windowType !== 'recycle-bin' && windowType !== 'documenti' && windowType !== 'paint'">
+      <ng-content></ng-content>
+    </ng-container>
+  </div>
+  <div class="output">
+    <div *ngFor="let line of output">{{ line }}</div>
+  </div>
+  <div class="resize-handle top" (mousedown)="onResizeStart($event, 'top')"></div>
+  <div class="resize-handle right" (mousedown)="onResizeStart($event, 'right')"></div>
+  <div class="resize-handle bottom" (mousedown)="onResizeStart($event, 'bottom')"></div>
+  <div class="resize-handle left" (mousedown)="onResizeStart($event, 'left')"></div>
+  <div class="resize-handle top-left" (mousedown)="onResizeStart($event, 'top left')"></div>
+  <div class="resize-handle top-right" (mousedown)="onResizeStart($event, 'top right')"></div>
+  <div class="resize-handle bottom-left" (mousedown)="onResizeStart($event, 'bottom left')"></div>
+  <div class="resize-handle bottom-right" (mousedown)="onResizeStart($event, 'bottom right')"></div>
+</div>
+
+<div *ngIf="showHelp" class="help-commands">
+  <ul>
+    <li *ngFor="let command of helpCommands">{{ command }}</li>
+  </ul>
+</div>

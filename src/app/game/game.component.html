@@ -1,0 +1,29 @@
+<div class="arcade-overlay">
+    <div class="arcade-cabinet">
+        <div class="arcade-header">
+            <span class="score">1UP: {{ score | number:'2.0-0' }}</span>
+            <span class="title">PAC-MAN</span>
+            <span class="high-score">HIGH: {{ highScore }}</span>
+        </div>
+
+        <div class="game-screen">
+            <canvas #gameCanvas width="400" height="400"></canvas>
+
+            <div class="game-overlay" *ngIf="!isPlaying">
+                <h1 *ngIf="gameOver">GAME OVER</h1>
+                <h1 *ngIf="gameWon" class="win">YOU WIN!</h1>
+                <p class="blink">{{ gameOver || gameWon ? 'PRESS START TO RESTART' : 'PRESS START TO PLAY' }}</p>
+            </div>
+        </div>
+
+        <div class="arcade-controls">
+            <div class="joystick">
+                <div class="stick"></div>
+            </div>
+            <div class="buttons">
+                <button class="action-btn red" (click)="onClose()">EXIT</button>
+                <button class="action-btn blue" (click)="startGame()">START</button>
+            </div>
+        </div>
+    </div>
+</div>

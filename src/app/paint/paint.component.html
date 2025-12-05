@@ -1,0 +1,25 @@
+<div class="container">
+    <div class="toolbar toolbar-xp">
+        <button (click)="selectTool('pencil')" [class.active]="selectedTool === 'pencil'">
+            <img src="assets/icons/matita.png" alt="Pennello" />
+        </button>
+        <button (click)="selectTool('eraser')" [class.active]="selectedTool === 'eraser'">
+            <img src="assets/icons/gomma.png" alt="Gomma" />
+        </button>
+        <button (click)="selectTool('line')" [class.active]="selectedTool === 'line'">
+            <img src="assets/icons/linea.png" alt="Linea" />
+        </button>
+        <button (click)="selectTool('rect')" [class.active]="selectedTool === 'rect'">
+            <img src="assets/icons/rect.png" alt="Rettangolo" />
+        </button>
+        <button (click)="selectTool('ellipse')" [class.active]="selectedTool === 'ellipse'">
+            <img src="assets/icons/ellipse.png" alt="Cerchio" />
+        </button>
+        <input type="color" (input)="selectColor($event)" [value]="color" />
+        <button class="xp-button" (click)="clearCanvas()">Pulisci</button>
+    </div>
+    <div class="palette-xp">
+        <div *ngFor="let c of paletteColors" class="color-swatch" [style.background]="c" (click)="setColor(c)"></div>
+    </div>
+    <canvas #canvas width="800" height="600"></canvas>
+</div>

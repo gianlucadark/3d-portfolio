@@ -1,0 +1,16 @@
+{
+  "TITLE": "Titolo",
+  "MINIMIZE": "Minimizza",
+  "MAXIMIZE": "Massimizza",
+  "CLOSE": "Chiudi",
+  "BACK": "Indietro",
+  "FORWARD": "Avanti",
+  "SEARCH": "Cerca",
+  "ADDRESS": "Indirizzo",
+  "ERROR_LOADING_PDF": "Errore nel caricamento del PDF. URL: {{ pdfSrc }}",
+  "WELCOME": "Benvenuti nel mio Portfolio XP 🚀",
+  "INTRO": "Premessa: Non è ottimizzato per mobile! D'altronde...è pur sempre Windows XP!",
+  "HELLO": "Ciao! Sono Gianluca D'Arcangelo, nato nel 1997 e cresciuto con il suono d'avvio di Windows XP e le prime connessioni a 56k. Questo portfolio è un tributo al sistema operativo che ha segnato l'inizio della mia passione per la tecnologia e la creatività digitale.",
+  "WHY_XP": "Perché Windows XP?",
+  "WHY_XP_DESC": "Ho scelto di ispirare il design del mio portfolio a Windows XP perché rappresenta il punto di partenza del mio viaggio digitale. È un omaggio nostalgico ai primi esperimenti su Paint e alle lunghe sessioni di Minesweeper. Nonostante oggi lavori con tecnologie avanzate, XP resta un simbolo delle mie radici. Il design fonde passato e futuro, con un'estetica vintage che accompagna competenze moderne e progetti innovativi. Ogni elemento richiama quel periodo, ricordando che il mio percorso è iniziato lì, ma guarda avanti."
+}

@@ -1,0 +1,218 @@
+// ========================================
+// VARIABILI
+// ========================================
+$arcade-bg: #222;
+$arcade-border: #111;
+$screen-bg: #000;
+$red: #ff0000;
+$blue: #0000ff;
+$yellow: #ffff00;
+$white: #fff;
+
+// ========================================
+// MIXIN
+// ========================================
+@mixin flex-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+@mixin scanlines {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%),
+        linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+    background-size: 100% 2px, 3px 100%;
+    pointer-events: none;
+    z-index: 10;
+}
+
+// ========================================
+// ARCADE OVERLAY
+// ========================================
+.arcade-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.9);
+    z-index: 2000;
+    @include flex-center;
+    font-family: 'Press Start 2P', cursive, monospace;
+    animation: turnOn 0.5s ease-out;
+}
+
+// ========================================
+// ARCADE CABINET
+// ========================================
+.arcade-cabinet {
+    width: 800px;
+    height: 600px;
+    background: $arcade-bg;
+    border: 20px solid $arcade-border;
+    border-radius: 10px;
+    box-shadow: 0 0 50px rgba(0, 0, 255, 0.2);
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    position: relative;
+
+    &::before {
+        @include scanlines;
+    }
+}
+
+// ========================================
+// HEADER
+// ========================================
+.arcade-header {
+    display: flex;
+    justify-content: space-between;
+    color: $white;
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px $red;
+}
+
+// ========================================
+// GAME SCREEN
+// ========================================
+.game-screen {
+    flex: 1;
+    background: $screen-bg;
+    border: 4px solid #444;
+    border-radius: 4px;
+    @include flex-center;
+    position: relative;
+    overflow: hidden;
+
+    canvas {
+        background: $screen-bg;
+        box-shadow: 0 0 20px rgba(0, 0, 255, 0.2);
+        image-rendering: pixelated;
+    }
+}
+
+.game-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    @include flex-center;
+    flex-direction: column;
+    color: $red;
+    text-align: center;
+    z-index: 10;
+
+    h1 {
+        font-size: 3rem;
+        margin-bottom: 20px;
+        text-shadow: 4px 4px $blue;
+
+        &.win {
+            color: $yellow;
+            text-shadow: 4px 4px $red;
+        }
+    }
+
+    p {
+        color: $yellow;
+        font-size: 1.2rem;
+        margin-top: 20px;
+    }
+}
+
+.blink {
+    animation: blink 1s infinite;
+}
+
+// ========================================
+// CONTROLS
+// ========================================
+.arcade-controls {
+    height: 100px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 50px;
+    margin-top: 20px;
+    background: #333;
+    border-radius: 5px;
+}
+
+.joystick {
+    width: 80px;
+    height: 80px;
+    background: $arcade-border;
+    border-radius: 50%;
+    position: relative;
+    box-shadow: inset 0 0 10px $screen-bg;
+
+    .stick {
+        width: 40px;
+        height: 40px;
+        background: $red;
+        border-radius: 50%;
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.5);
+    }
+}
+
+.action-btn {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    color: $white;
+    box-shadow: 0 5px 0 $screen-bg;
+    transition: transform 0.1s, box-shadow 0.1s;
+
+    &:active {
+        transform: translateY(5px);
+        box-shadow: none;
+    }
+
+    &.red {
+        background: $red;
+    }
+
+    &.blue {
+        background: $blue;
+        margin-left: 20px;
+    }
+}
+
+// ========================================
+// ANIMATIONS
+// ========================================
+@keyframes blink {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0;
+    }
+}
+
+@keyframes turnOn {
+    0% {
+        transform: scaleY(0.005) scaleX(0);
+        opacity: 0;
+    }
+
+    50% {
+        transform: scaleY(0.005) scaleX(1);
+        opacity: 1;
+    }
+
+    100% {
+        transform: scaleY(1) scaleX(1);
+        opacity: 1;
+    }
+}

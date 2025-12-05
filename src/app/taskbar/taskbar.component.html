@@ -1,0 +1,22 @@
+<div class="taskbar">
+  <button class="start-button" (click)="onStartClick()">
+    <img src="assets/icons/start.png" alt="Start">
+  </button>
+  <div class="taskbar-icons">
+    <button *ngFor="let window of openWindows"
+            class="taskbar-icon"
+            [class.active]="!window.isMinimized"
+            (click)="onWindowClick(window.id)"
+            [title]="window.title">
+      <img [src]="window.icon" [alt]="window.title">
+      <span class="window-title">{{ window.title }}</span>
+    </button>
+  </div>
+  <div class="taskbar-spacer"></div>
+  <div class="system-tray">
+    <button class="volume-button">
+      <img src="assets/icons/volume.png" alt="Volume">
+    </button>
+    <div class="clock">{{ currentTime }}</div>
+  </div>
+</div>

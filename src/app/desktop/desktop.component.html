@@ -1,0 +1,110 @@
+<div class="desktop-overlay">
+  <div class="desktop" (click)="selectedIconId = null">
+    <!-- Pulsante di chiusura per tornare alla vista 3D -->
+    <button class="close-desktop-btn" (click)="onClose()" [attr.title]="'desktop.closeTooltip' | translate">
+      <span class="close-icon">✕</span>
+      <span class="close-text">{{ 'desktop.closeButton' | translate }}</span>
+    </button>
+
+    <div class="centered-text">
+      {{ 'desktop.title' | translate }}
+    </div>
+    <div *ngFor="let icon of desktopIcons" class="icon" [class.selected]="selectedIconId === icon.id" cdkDrag
+      [cdkDragFreeDragPosition]="icon.position" (cdkDragEnded)="onDragEnded($event, icon)"
+      (click)="selectIcon($event, icon.id)" (dblclick)="openIcon($event, icon.id)" [attr.data-id]="icon.id">
+      <img [src]="icon.image" [alt]="'icons.' + getIconKey(icon.id) | translate">
+      <span>{{ 'icons.' + getIconKey(icon.id) | translate }}</span>
+    </div>
+
+    <app-taskbar [openWindows]="openWindows" (startClick)="toggleStartMenu()" (windowClick)="onWindowClick($event)"
+      (openWindow)="onOpenWindow($event)">
+    </app-taskbar>
+
+    <div class="start-menu" *ngIf="isStartMenuOpen">
+      <div class="start-menu-content">
+        <div class="start-menu-right-content">
+          <div class="start-menu-header">
+            <img src="assets/icons/user.png" alt="User">
+            <span>{{ 'startMenu.user' | translate }}</span>
+          </div>
+          <div class="start-menu-items">
+            <div class="start-menu-item" (click)="openWindow(1, 'Computer', 'assets/icons/computer.png')">
+              <img src="assets/icons/computer.png" [alt]="'icons.computer' | translate">
+              <span>{{ 'icons.computer' | translate }}</span>
+            </div>
+            <div class="start-menu-item" (click)="openWindow(6, 'Paint', 'assets/icons/paint.png')">
+              <img src="assets/icons/paint.png" [alt]="'icons.paint' | translate">
+              <span>{{ 'icons.paint' | translate }}</span>
+            </div>
+            <div class="start-menu-item" (click)="openWindow(3, 'CV Gianluca', 'assets/icons/cv.png')">
+              <img src="assets/icons/cv.png" [alt]="'icons.cv' | translate">
+              <span>{{ 'icons.cv' | translate }}</span>
+            </div>
+            <div class="start-menu-item" (click)="openWindow(4, 'Prompt', 'assets/icons/prompt.png')">
+              <img src="assets/icons/prompt.png" [alt]="'startMenu.commandPrompt' | translate">
+              <span>{{ 'startMenu.commandPrompt' | translate }}</span>
+            </div>
+            <div class="start-menu-item" (click)="openWindow(5, 'README', 'assets/icons/readme.png')">
+              <img src="assets/icons/readme.png" [alt]="'icons.readme' | translate">
+              <span>{{ 'icons.readme' | translate }}</span>
+            </div>
+            <div class="start-menu-item" (click)="openWindow(8, 'Blocco Note', 'assets/icons/paper.png')">
+              <img src="assets/icons/paper.png" [alt]="'icons.notepad' | translate">
+              <span>{{ 'icons.notepad' | translate }}</span>
+            </div>
+            <div class="start-menu-item" (click)="openWindow(7, 'Cestino', 'assets/icons/cestino.png')">
+              <img src="assets/icons/cestino.png" [alt]="'icons.trash' | translate">
+              <span>{{ 'icons.trash' | translate }}</span>
+            </div>
+          </div>
+          <div class="start-menu-footer">
+            <div class="start-menu-item" (click)="onClose()">
+              <img src="assets/icons/spegni.png" [alt]="'startMenu.shutdown' | translate">
+              <span>{{ 'startMenu.shutdown' | translate }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <ng-container *ngFor="let window of openWindows">
+      <app-window *ngIf="window.isOpen" [id]="window.id" [title]="getWindowTitle(window.id)" [icon]="window.icon"
+        [zIndex]="window.zIndex" [windowType]="window.windowType ?? ''" [pdfSrc]="window.pdfSrc"
+        [isMinimized]="window.isMinimized" (closeWindow)="closeWindow(window.id)"
+        (minimizeWindow)="minimizeWindow(window.id)" (focusWindow)="onWindowFocus(window.id)">
+        <ng-container *ngIf="window.windowType === 'email'">
+          <div class="email-window">
+            <div class="window-body">
+              <textarea [(ngModel)]="emailContent" [placeholder]="'email.placeholder' | translate"></textarea>
+              <button (click)="sendEmail()">{{ 'email.send' | translate }}</button>
+            </div>
+          </div>
+        </ng-container>
+        <ng-container *ngIf="window.windowType === 'cv'">
+          <iframe [src]="getSafeCvPdfUrl()" width="100%" height="100%" style="border: none;"></iframe>
+        </ng-container>
+        <ng-container *ngIf="window.windowType === 'default' && window.id === 10">
+          <div style="display: flex; gap: 30px; align-items: flex-start; padding: 20px 0 0 20px;">
+            <div *ngFor="let sub of getSubIcons(10)" style="text-align: center; cursor: pointer;"
+              (dblclick)="openIcon($event, sub.id)">
+              <img [src]="sub.image" [alt]="sub.name" style="width:64px; height:64px;">
+              <div>{{ sub.name }}</div>
+            </div>
+          </div>
+        </ng-container>
+        <ng-container *ngIf="window.windowType === 'default' && window.id === 11">
+          <iframe [src]="'assets/file/uxability.pdf' | safe" width="100%" height="100%" style="border: none;"></iframe>
+        </ng-container>
+        <ng-container *ngIf="window.windowType === 'default' && window.id === 12">
+          <iframe [src]="'assets/file/estensioneWeb.pdf' | safe" width="100%" height="100%"
+            style="border: none;"></iframe>
+        </ng-container>
+        <ng-container
+          *ngIf="window.windowType !== 'cv' && window.windowType !== 'prompt' && window.windowType !== 'email' && !(window.windowType === 'default' && window.id === 10)">
+          <!-- Nessun testo di default -->
+        </ng-container>
+      </app-window>
+    </ng-container>
+
+  </div>
+</div>

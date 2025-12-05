@@ -1,0 +1,156 @@
+<!-- Loading Screen -->
+<div class="loading-screen" *ngIf="isLoading">
+    <!-- Language Toggle in Loading Screen -->
+    <div class="loading-language-toggle">
+        <button class="control-toggle language-toggle" (click)="toggleLanguage()"
+            [attr.aria-label]="currentLanguage === 'it' ? 'Switch to English' : 'Passa all\'Italiano'">
+            <!-- Bandiera Italiana -->
+            <svg *ngIf="currentLanguage === 'it'" class="flag-svg" viewBox="0 0 60 40"
+                xmlns="http://www.w3.org/2000/svg">
+                <rect width="20" height="40" x="0" y="0" fill="#009246" />
+                <rect width="20" height="40" x="20" y="0" fill="#FFFFFF" />
+                <rect width="20" height="40" x="40" y="0" fill="#CE2B37" />
+            </svg>
+            <!-- Bandiera Americana -->
+            <svg *ngIf="currentLanguage === 'en'" class="flag-svg" viewBox="0 0 60 40"
+                xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <pattern id="stars-loading" x="0" y="0" width="8" height="7" patternUnits="userSpaceOnUse">
+                        <polygon points="4,0.5 4.8,3.2 7.5,3.2 5.4,4.8 6.1,7.5 4,5.8 1.9,7.5 2.6,4.8 0.5,3.2 3.2,3.2"
+                            fill="white" />
+                    </pattern>
+                </defs>
+                <rect width="60" height="40" fill="#B22234" />
+                <rect width="60" height="3.08" y="0" fill="white" />
+                <rect width="60" height="3.08" y="6.15" fill="white" />
+                <rect width="60" height="3.08" y="12.31" fill="white" />
+                <rect width="60" height="3.08" y="18.46" fill="white" />
+                <rect width="60" height="3.08" y="24.62" fill="white" />
+                <rect width="60" height="3.08" y="30.77" fill="white" />
+                <rect width="60" height="3.08" y="36.92" fill="white" />
+                <rect width="24" height="17.23" fill="#3C3B6E" />
+                <rect width="24" height="17.23" fill="url(#stars-loading)" />
+            </svg>
+            <span class="language-text">{{ currentLanguage === 'it' ? 'IT' : 'EN' }}</span>
+        </button>
+    </div>
+
+    <div class="loading-content">
+        <!-- Animated Logo/Icon -->
+        <div class="loading-orb">
+            <div class="orb-core"></div>
+            <div class="orb-ring ring-1"></div>
+            <div class="orb-ring ring-2"></div>
+            <div class="orb-ring ring-3"></div>
+        </div>
+
+        <!-- Title -->
+        <h1 class="loading-title">Portfolio</h1>
+        <p class="loading-welcome">{{ 'loading.welcome' | translate }}</p>
+
+        <!-- Loading Status -->
+        <p class="loading-subtitle" *ngIf="!isLoadingComplete">{{ 'loading.loadingText' | translate }}</p>
+
+        <!-- Progress Bar (hide when complete) -->
+        <div class="loading-progress-container" *ngIf="!isLoadingComplete">
+            <div class="loading-progress-bar" [style.width.%]="loadingProgress"></div>
+            <div class="loading-progress-glow" [style.left.%]="loadingProgress"></div>
+        </div>
+
+        <!-- Percentage (hide when complete) -->
+        <span class="loading-percentage" *ngIf="!isLoadingComplete">{{ loadingProgress | number:'1.0-0' }}%</span>
+
+        <!-- Enter Button (show when complete) -->
+        <button class="enter-button" *ngIf="isLoadingComplete" (click)="enterPortfolio()">
+            <span class="enter-text">{{ 'loading.enterButton' | translate }}</span>
+            <svg class="enter-arrow" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+        </button>
+    </div>
+</div>
+
+<div #rendererContainer class="renderer-container" [class.loaded]="!isLoading"></div>
+
+<!-- Controls Container -->
+<div class="controls-container" *ngIf="!isLoading">
+    <!-- Language Toggle -->
+    <button class="control-toggle language-toggle" (click)="toggleLanguage()"
+        [attr.aria-label]="currentLanguage === 'it' ? 'Switch to English' : 'Passa all\'Italiano'">
+        <!-- Bandiera Italiana -->
+        <svg *ngIf="currentLanguage === 'it'" class="flag-svg" viewBox="0 0 60 40" xmlns="http://www.w3.org/2000/svg">
+            <rect width="20" height="40" x="0" y="0" fill="#009246" />
+            <rect width="20" height="40" x="20" y="0" fill="#FFFFFF" />
+            <rect width="20" height="40" x="40" y="0" fill="#CE2B37" />
+        </svg>
+        <!-- Bandiera Americana -->
+        <svg *ngIf="currentLanguage === 'en'" class="flag-svg" viewBox="0 0 60 40" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <pattern id="stars" x="0" y="0" width="8" height="7" patternUnits="userSpaceOnUse">
+                    <polygon points="4,0.5 4.8,3.2 7.5,3.2 5.4,4.8 6.1,7.5 4,5.8 1.9,7.5 2.6,4.8 0.5,3.2 3.2,3.2"
+                        fill="white" />
+                </pattern>
+            </defs>
+            <rect width="60" height="40" fill="#B22234" />
+            <rect width="60" height="3.08" y="0" fill="white" />
+            <rect width="60" height="3.08" y="6.15" fill="white" />
+            <rect width="60" height="3.08" y="12.31" fill="white" />
+            <rect width="60" height="3.08" y="18.46" fill="white" />
+            <rect width="60" height="3.08" y="24.62" fill="white" />
+            <rect width="60" height="3.08" y="30.77" fill="white" />
+            <rect width="60" height="3.08" y="36.92" fill="white" />
+            <rect width="24" height="17.23" fill="#3C3B6E" />
+            <rect width="24" height="17.23" fill="url(#stars)" />
+        </svg>
+        <span class="language-text">{{ currentLanguage === 'it' ? 'IT' : 'EN' }}</span>
+    </button>
+
+    <!-- Dark Mode Toggle -->
+    <button class="control-toggle dark-mode-toggle" (click)="toggleDarkMode()"
+        [attr.aria-label]="isDarkMode ? 'Attiva Light Mode' : 'Attiva Dark Mode'">
+        <svg *ngIf="!isDarkMode" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+        <svg *ngIf="isDarkMode" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+    </button>
+</div>
+
+<!-- Modale PDF premium -->
+<div class="pdf-modal-overlay" *ngIf="showPdfModal" (click)="closePdfModal()">
+    <div class="pdf-modal-container" (click)="$event.stopPropagation()">
+        <div class="pdf-modal-header">
+            <h2 class="pdf-modal-title">Curriculum Vitae</h2>
+            <button class="pdf-modal-close" (click)="closePdfModal()" aria-label="Chiudi">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+        <div class="pdf-modal-body">
+            <iframe src="assets/cv.pdf" class="pdf-viewer" frameborder="0" title="Curriculum Vitae PDF">
+            </iframe>
+        </div>
+    </div>
+</div>
+
+<!-- Desktop Component Overlay -->
+<app-desktop *ngIf="showDesktop" (closeDesktop)="returnFromDesktop()"></app-desktop>
+
+<!-- Game Component Overlay -->
+<app-game *ngIf="showGame" (closeGame)="returnFromGame()"></app-game>

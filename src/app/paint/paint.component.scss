@@ -1,0 +1,118 @@
+// ========================================
+// VARIABILI XP
+// ========================================
+$xp-gray: #E4E4E4;
+$xp-border: #808080;
+$xp-white: #fff;
+$xp-blue: #0000FF;
+$xp-shadow: inset 1px 1px 0 $xp-white, inset -1px -1px 0 $xp-border;
+
+// ========================================
+// MIXIN
+// ========================================
+@mixin xp-container {
+  background-color: $xp-gray;
+  border: 2px solid $xp-border;
+  box-shadow: $xp-shadow;
+}
+
+@mixin xp-button {
+  background: $xp-gray;
+  border: 2px solid $xp-border;
+  box-shadow: $xp-shadow;
+  cursor: pointer;
+  transition: box-shadow 0.1s;
+
+  &.active,
+  &:focus {
+    border-color: $xp-blue;
+    box-shadow: 0 0 5px $xp-blue;
+  }
+}
+
+// ========================================
+// CONTAINER
+// ========================================
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+// ========================================
+// TOOLBAR
+// ========================================
+.toolbar-xp {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  @include xp-container;
+  padding: 8px 12px;
+  margin-bottom: 0;
+  font-family: 'Tahoma', sans-serif;
+
+  button {
+    @include xp-button;
+    margin-right: 6px;
+    padding: 2px 4px;
+    border-radius: 2px;
+  }
+
+  img {
+    width: 22px;
+    height: 22px;
+  }
+}
+
+// ========================================
+// PALETTE
+// ========================================
+.palette-xp {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  background: #C0C0C0;
+  border: 2px solid $xp-border;
+  box-shadow: $xp-shadow;
+  padding: 4px 8px;
+  margin-bottom: 8px;
+}
+
+.color-swatch {
+  width: 22px;
+  height: 22px;
+  border: 1px solid $xp-border;
+  margin-right: 4px;
+  cursor: pointer;
+  box-shadow: 1px 1px 0 $xp-white, -1px -1px 0 $xp-border;
+  transition: border 0.1s;
+
+  &:hover {
+    border: 2px solid $xp-blue;
+  }
+}
+
+// ========================================
+// CANVAS & BUTTON
+// ========================================
+canvas {
+  border: 2px solid $xp-border;
+  background-color: $xp-white;
+  box-shadow: $xp-shadow;
+}
+
+.xp-button {
+  @include xp-container;
+  box-shadow: $xp-shadow, 1px 1px 0 $xp-white, -1px -1px 0 $xp-border;
+  padding: 5px 10px;
+  font-family: 'Tahoma', sans-serif;
+  font-size: 12px;
+  color: #000;
+  cursor: pointer;
+  margin-left: 10px;
+
+  &:active {
+    box-shadow: inset -1px -1px 0 $xp-white, inset 1px 1px 0 $xp-border,
+      -1px -1px 0 $xp-white, 1px 1px 0 $xp-border;
+  }
+}
