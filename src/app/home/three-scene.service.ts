@@ -162,8 +162,6 @@ export class ThreeSceneService implements OnDestroy {
         const rgbeLoader = new RGBELoader();
         rgbeLoader.setDataType(THREE.HalfFloatType);
 
-        this.simulateProgress(0, 40, 2000);
-
         rgbeLoader.load(
             'assets/cielo1.hdr',
             (texture) => {
@@ -178,10 +176,15 @@ export class ThreeSceneService implements OnDestroy {
                 pmremGenerator.dispose();
 
                 this.isEnvLoaded = true;
-                this.updateProgress(45);
                 this.checkLoadingComplete();
             },
-            undefined,
+            (event) => {
+                if (event.lengthComputable) {
+                    // Environment is roughly 30% of total weight
+                    const progress = (event.loaded / event.total) * 30;
+                    this.updateLoadingState(progress, 'env');
+                }
+            },
             (error) => {
                 console.error('Error loading HDR:', error);
                 this.isEnvLoaded = true;
@@ -192,12 +195,17 @@ export class ThreeSceneService implements OnDestroy {
 
     private loadModel(): void {
         const loader = new GLTFLoader();
-        this.simulateProgress(45, 85, 3000);
 
         loader.load(
             'assets/3d/room-space.glb',
             (gltf) => this.onModelLoaded(gltf),
-            undefined,
+            (event) => {
+                if (event.lengthComputable) {
+                    // Model is roughly 70% of total weight
+                    const progress = (event.loaded / event.total) * 70;
+                    this.updateLoadingState(progress, 'model');
+                }
+            },
             (error) => {
                 console.error('Error loading model:', error);
                 this.isModelLoaded = true;
@@ -216,7 +224,7 @@ export class ThreeSceneService implements OnDestroy {
         this.scene.add(this.model);
 
         this.isModelLoaded = true;
-        this.updateProgress(90);
+        this.updateLoadingState(30, 'model'); // Ensure it hits 100% contribution
         this.checkLoadingComplete();
     }
 
@@ -274,7 +282,7 @@ export class ThreeSceneService implements OnDestroy {
         }
     }
 
-    // Material application helpers (copied from original component but cleaned up)
+    // Material application helpers
     private applyGlassMaterial(mesh: THREE.Mesh, material: THREE.MeshStandardMaterial): void {
         const { GLASS } = MATERIAL_CONFIG;
         mesh.material = new THREE.MeshPhysicalMaterial({
@@ -373,24 +381,18 @@ export class ThreeSceneService implements OnDestroy {
         return this.textureCache.get(path)!;
     }
 
-    // Animation & Progress
-    private simulateProgress(start: number, end: number, duration: number): void {
-        const startTime = Date.now();
-        const animate = () => {
-            const elapsed = Date.now() - startTime;
-            const progress = Math.min(elapsed / duration, 1);
-            const eased = 1 - Math.pow(1 - progress, 3);
-            const current = start + (end - start) * eased;
+    private currentEnvProgress = 0;
+    private currentModelProgress = 0;
 
-            if (current > this.loadingProgress$.value) {
-                this.updateProgress(Math.round(current));
-            }
+    private updateLoadingState(progress: number, type: 'env' | 'model'): void {
+        if (type === 'env') {
+            this.currentEnvProgress = progress;
+        } else {
+            this.currentModelProgress = progress;
+        }
 
-            if (progress < 1 && !this.loadingComplete$.value) {
-                requestAnimationFrame(animate);
-            }
-        };
-        requestAnimationFrame(animate);
+        const totalProgress = Math.min(Math.round(this.currentEnvProgress + this.currentModelProgress), 99);
+        this.updateProgress(totalProgress);
     }
 
     private updateProgress(value: number): void {
