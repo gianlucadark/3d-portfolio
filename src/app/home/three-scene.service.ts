@@ -201,7 +201,7 @@ export class ThreeSceneService implements OnDestroy {
         loader.setDRACOLoader(dracoLoader);
 
         loader.load(
-            'assets/3d/room-space-draco.glb',
+            'assets/3d/room-space-optimized.glb',
             (gltf) => {
                 this.onModelLoaded(gltf);
                 dracoLoader.dispose();
@@ -264,6 +264,7 @@ export class ThreeSceneService implements OnDestroy {
             if (!material?.name) return;
 
             const name = material.name.toLowerCase();
+            console.log('Found mesh/material:', name);
             this.applyMaterialByName(mesh, material, name);
         });
     }
