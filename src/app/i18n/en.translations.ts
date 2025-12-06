@@ -19,7 +19,8 @@ export const EN_TRANSLATIONS = {
     },
 
     loading: {
-        welcome: 'Hi, I\'m Gianluca, welcome to my 3D world',
+        welcome: 'Hi, I\'m Gianluca, welcome to my 3D world.',
+        welcome2: 'Just a bored developer\'s portfolio',
         loadingText: 'Loading 3D experience...',
         enterButton: 'ENTER'
     },
