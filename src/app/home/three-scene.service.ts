@@ -1,6 +1,7 @@
 import { Injectable, NgZone, ElementRef, OnDestroy } from '@angular/core';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader';
 import { RectAreaLightUniformsLib } from 'three/examples/jsm/lights/RectAreaLightUniformsLib';
@@ -195,10 +196,16 @@ export class ThreeSceneService implements OnDestroy {
 
     private loadModel(): void {
         const loader = new GLTFLoader();
+        const dracoLoader = new DRACOLoader();
+        dracoLoader.setDecoderPath('assets/draco/');
+        loader.setDRACOLoader(dracoLoader);
 
         loader.load(
-            'assets/3d/room-space.glb',
-            (gltf) => this.onModelLoaded(gltf),
+            'assets/3d/room-space-draco.glb',
+            (gltf) => {
+                this.onModelLoaded(gltf);
+                dracoLoader.dispose();
+            },
             (event) => {
                 if (event.lengthComputable) {
                     // Model is roughly 70% of total weight
@@ -210,6 +217,7 @@ export class ThreeSceneService implements OnDestroy {
                 console.error('Error loading model:', error);
                 this.isModelLoaded = true;
                 this.checkLoadingComplete();
+                dracoLoader.dispose();
             }
         );
     }
@@ -270,9 +278,9 @@ export class ThreeSceneService implements OnDestroy {
         } else if (name.includes('led')) {
             this.applyLedMaterial(mesh, material);
         } else if (name.includes('schermogrande')) {
-            this.applyScreenMaterial(mesh, material, 'assets/sfondo.png', 'schermoGrande');
+            this.applyScreenMaterial(mesh, material, 'assets/sfondo.webp', 'schermoGrande');
         } else if (name.includes('schermopiccolo')) {
-            this.applyScreenMaterial(mesh, material, 'assets/pacman.png', 'schermoPiccolo');
+            this.applyScreenMaterial(mesh, material, 'assets/pacman.webp', 'schermoPiccolo');
         } else if (name.includes('quadro')) {
             this.applyQuadroMaterial(mesh, material);
         } else if (name.includes('cornice')) {
@@ -347,7 +355,7 @@ export class ThreeSceneService implements OnDestroy {
     }
 
     private applyQuadroMaterial(mesh: THREE.Mesh, material: THREE.MeshStandardMaterial): void {
-        const texture = this.loadTexture('assets/cvfoto1.png');
+        const texture = this.loadTexture('assets/cvfoto1.webp');
         material.map = texture;
         material.needsUpdate = true;
         material.emissive = new THREE.Color(COLORS.WHITE);
