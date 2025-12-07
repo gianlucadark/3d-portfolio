@@ -170,6 +170,7 @@ $transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     text-shadow: 0 0 40px rgba($ice-blue, 0.3);
     animation: titleGlow 3s ease-in-out infinite;
+    text-align: center;
 }
 
 .loading-welcome {
