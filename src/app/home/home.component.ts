@@ -94,6 +94,11 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     enterPortfolio(): void {
         this.isLoading = false;
         this.cdr.markForCheck();
+
+        // Posiziona la camera direttamente davanti allo schermo grande (senza animazione)
+        setTimeout(() => {
+            this.threeSceneService.setInitialPositionOnScreen();
+        }, 100);
     }
 
     returnFromDesktop(): void {

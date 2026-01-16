@@ -97,7 +97,9 @@ export const EN_TRANSLATIONS = {
     desktop: {
         title: 'WINDOWS XP BY GIANLUCA D\'ARCANGELO',
         closeButton: 'EXIT',
-        closeTooltip: 'Return to 3D view'
+        closeTooltip: 'Return to 3D view',
+        seeWorldButton: 'SEE MY WORLD',
+        seeWorldTooltip: 'Explore the 3D environment'
     },
 
     diskInfo: {

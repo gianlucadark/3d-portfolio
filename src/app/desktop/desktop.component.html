@@ -1,10 +1,12 @@
 <div class="desktop-overlay">
   <div class="desktop" (click)="selectedIconId = null">
-    <!-- Pulsante di chiusura per tornare alla vista 3D -->
-    <button class="close-desktop-btn" (click)="onClose()" [attr.title]="'desktop.closeTooltip' | translate">
-      <span class="close-icon">✕</span>
-      <span class="close-text">{{ 'desktop.closeButton' | translate }}</span>
-    </button>
+    <!-- Pulsante in alto a destra per tornare alla vista 3D -->
+    <div class="desktop-top-actions">
+      <button class="see-world-btn" (click)="onClose()" [attr.title]="'desktop.seeWorldTooltip' | translate">
+        <span class="world-icon">🌍</span>
+        <span class="world-text">{{ 'desktop.seeWorldButton' | translate }}</span>
+      </button>
+    </div>
 
     <div class="centered-text">
       {{ 'desktop.title' | translate }}

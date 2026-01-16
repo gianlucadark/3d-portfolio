@@ -97,7 +97,9 @@ export const IT_TRANSLATIONS = {
     desktop: {
         title: 'WINDOWS XP BY GIANLUCA D\'ARCANGELO',
         closeButton: 'ESCI',
-        closeTooltip: 'Torna alla vista 3D'
+        closeTooltip: 'Torna alla vista 3D',
+        seeWorldButton: 'VEDI IL MIO MONDO',
+        seeWorldTooltip: 'Esplora l\'ambiente 3D'
     },
 
     diskInfo: {

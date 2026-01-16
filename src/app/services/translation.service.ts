@@ -35,9 +35,9 @@ export class TranslationService {
     private loadSavedLanguage(): Language {
         try {
             const saved = localStorage.getItem(STORAGE_KEY) as Language | null;
-            return saved === 'it' || saved === 'en' ? saved : 'it';
+            return saved === 'it' || saved === 'en' ? saved : 'en';
         } catch {
-            return 'it';
+            return 'en';
         }
     }
 

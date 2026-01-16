@@ -598,6 +598,33 @@ export class ThreeSceneService implements OnDestroy {
         });
     }
 
+    public setInitialPositionOnScreen(): void {
+        if (!this.schermoGrandeMesh) return;
+
+        // Salva la posizione originale della camera (per poter tornare indietro)
+        this.cameraOriginalPosition.copy(this.camera.position);
+        this.controlsOriginalTarget.copy(this.controls.target);
+
+        // Ottieni la posizione dello schermo grande
+        const screenPos = new THREE.Vector3();
+        this.schermoGrandeMesh.getWorldPosition(screenPos);
+
+        // Posiziona la camera direttamente davanti allo schermo (senza animazione)
+        this.camera.position.set(
+            screenPos.x,
+            screenPos.y,
+            screenPos.z + THREE_CONFIG.ZOOM.SCREEN_DISTANCE
+        );
+
+        // Imposta il target dei controlli sullo schermo
+        this.controls.target.set(screenPos.x, screenPos.y, screenPos.z);
+        this.controls.update();
+
+        // Disabilita i controlli e mostra il desktop
+        this.controls.enabled = false;
+        this.ngZone.run(() => this.screenClick$.next('desktop'));
+    }
+
     public returnFromZoom(): void {
         this.isZooming = true;
         const duration = THREE_CONFIG.ZOOM.RETURN_DURATION;
