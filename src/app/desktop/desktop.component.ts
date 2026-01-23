@@ -24,7 +24,7 @@ import {
 /** Configurazione delle icone del desktop */
 const DESKTOP_ICONS: Icon[] = [
   { id: 1, name: 'Computer', image: 'assets/icons/computer.png', position: { x: 20, y: 20 } },
-  { id: 3, name: 'CV Gianluca', image: 'assets/icons/cv.png', position: { x: 20, y: 120 } },
+  { id: 13, name: 'Curriculum', image: 'assets/icons/folder.png', position: { x: 20, y: 120 } },
   { id: 4, name: 'Prompt', image: 'assets/icons/prompt.png', position: { x: 20, y: 220 } },
   { id: 5, name: 'README', image: 'assets/icons/readme.png', position: { x: 20, y: 320 } },
   { id: 6, name: 'Paint', image: 'assets/icons/paint.png', position: { x: 20, y: 420 } },
@@ -163,7 +163,7 @@ export class DesktopComponent implements OnInit, OnDestroy {
       isOpen: true,
       zIndex: this.highestZIndex,
       windowType: (WINDOW_TYPE_MAP[id] || 'default') as WindowType,
-      pdfSrc: id === 3 ? this.getCvPdfUrl() : undefined,
+      pdfSrc: (id === 3 || id === 13) ? this.getCvPdfUrl() : undefined,
       isMinimized: false,
       size: this.getWindowSize(id)
     };

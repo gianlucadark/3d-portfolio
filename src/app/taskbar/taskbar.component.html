@@ -1,22 +1,41 @@
 <div class="taskbar">
   <button class="start-button" (click)="onStartClick()">
-    <img src="assets/icons/start.png" alt="Start">
+    <img src="assets/icons/start.png" alt="" class="start-flag">
+    <span class="start-text">start</span>
   </button>
+
+  <!-- Quick Launch -->
+  <div class="quick-launch">
+    <div class="taskbar-separator"></div>
+    <button class="quick-launch-item" (click)="onWindowClick(1)" title="My Computer">
+      <img src="assets/icons/computer.png" alt="Computer">
+    </button>
+    <button class="quick-launch-item" title="Desktop" (click)="onStartClick()">
+      <img src="assets/icons/computer.png" alt="Desktop" style="filter: hue-rotate(90deg);">
+    </button>
+    <button class="quick-launch-item" (click)="onWindowClick(6)" title="Paint">
+      <img src="assets/icons/paint.png" alt="Paint">
+    </button>
+    <div class="taskbar-separator"></div>
+  </div>
+
   <div class="taskbar-icons">
-    <button *ngFor="let window of openWindows"
-            class="taskbar-icon"
-            [class.active]="!window.isMinimized"
-            (click)="onWindowClick(window.id)"
-            [title]="window.title">
+    <button *ngFor="let window of openWindows" class="taskbar-item" [class.active]="!window.isMinimized"
+      (click)="onWindowClick(window.id)" [title]="window.title">
       <img [src]="window.icon" [alt]="window.title">
       <span class="window-title">{{ window.title }}</span>
     </button>
   </div>
+
   <div class="taskbar-spacer"></div>
+
   <div class="system-tray">
-    <button class="volume-button">
-      <img src="assets/icons/volume.png" alt="Volume">
-    </button>
+    <div class="tray-icons">
+      <button class="tray-lang-toggle" (click)="onLanguageToggle()">
+        {{ currentLanguage | uppercase }}
+      </button>
+      <img src="assets/icons/volume.png" alt="Volume" class="tray-icon">
+    </div>
     <div class="clock">{{ currentTime }}</div>
   </div>
 </div>

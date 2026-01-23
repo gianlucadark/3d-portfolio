@@ -37,6 +37,7 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
   gameWon = false;
   score = 0;
   highScore = 10000;
+  isMobile = false;
 
   // Power Mode
   private powerModeTime = 0;
@@ -64,7 +65,9 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
 
   constructor(private readonly ngZone: NgZone) { }
 
-  ngOnInit(): void { }
+  ngOnInit(): void {
+    this.isMobile = window.innerWidth <= 1024 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  }
 
   ngAfterViewInit(): void {
     const canvas = this.canvasRef.nativeElement;

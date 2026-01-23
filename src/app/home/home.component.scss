@@ -45,262 +45,400 @@ $transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
     height: 100vh;
     display: block;
     overflow: hidden;
-    opacity: 0;
-    transition: opacity 0.8s ease-out;
-
-    &.loaded {
-        opacity: 1;
-    }
+    background: #000;
+    position: fixed;
+    inset: 0;
+    z-index: 1; // Always below loading and overlays
 }
 
-// ========================================
-// LOADING SCREEN
-// ========================================
 .loading-screen {
     position: fixed;
     inset: 0;
     z-index: 10000;
-    background: linear-gradient(135deg, #0a0a1a 0%, #0f172a 50%, #0a0a1a 100%);
+    background: #000;
     @include flex-center;
     flex-direction: column;
     overflow: hidden;
+    transition: opacity 0.8s $transition-smooth, visibility 0.8s;
+    opacity: 1;
+    visibility: visible;
 
-    &::before {
-        content: '';
-        position: absolute;
-        inset: 0;
-        background-image:
-            radial-gradient(circle at 20% 80%, rgba($ice-blue, 0.03) 0%, transparent 50%),
-            radial-gradient(circle at 80% 20%, rgba($ice-blue-dark, 0.05) 0%, transparent 50%),
-            radial-gradient(circle at 50% 50%, rgba($ice-blue-light, 0.02) 0%, transparent 70%);
-        animation: backgroundPulse 8s ease-in-out infinite;
-    }
-}
-
-.loading-content {
-    @include flex-center;
-    flex-direction: column;
-    position: relative;
-    z-index: 1;
-}
-
-// Language Toggle in Loading Screen
-.loading-language-toggle {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    z-index: 10001;
-
-    .control-toggle {
-        @include glass-effect(0.15);
-        border-color: rgba($ice-blue, 0.3);
-
-        &:hover {
-            background: rgba($ice-blue, 0.2);
-            border-color: rgba($ice-blue, 0.5);
-            @include glow-shadow;
-        }
-    }
-}
-
-// Animated Orb
-.loading-orb {
-    position: relative;
-    width: 120px;
-    height: 120px;
-    margin-bottom: 40px;
-}
-
-.orb-core {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 30px;
-    height: 30px;
-    transform: translate(-50%, -50%);
-    background: radial-gradient(circle, $ice-blue 0%, $ice-blue-dark 100%);
-    border-radius: 50%;
-    box-shadow:
-        0 0 30px rgba($ice-blue, 0.8),
-        0 0 60px rgba($ice-blue, 0.4),
-        0 0 90px rgba($ice-blue-dark, 0.3);
-    animation: corePulse 2s ease-in-out infinite;
-}
-
-.orb-ring {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    border: 2px solid transparent;
-    border-top-color: $ice-blue;
-    border-right-color: rgba($ice-blue, 0.5);
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-
-    &.ring-1 {
-        width: 60px;
-        height: 60px;
-        animation: ringRotate1 3s linear infinite;
-    }
-
-    &.ring-2 {
-        width: 85px;
-        height: 85px;
-        border-top-color: $ice-blue-light;
-        border-right-color: rgba($ice-blue-light, 0.3);
-        animation: ringRotate2 4s linear infinite reverse;
-    }
-
-    &.ring-3 {
-        width: 110px;
-        height: 110px;
-        border-top-color: $ice-blue-dark;
-        border-right-color: rgba($ice-blue-dark, 0.4);
-        animation: ringRotate1 5s linear infinite;
-    }
-}
-
-.loading-title {
-    margin: 0 0 8px 0;
-    font-size: 42px;
-    font-weight: 700;
-    @include gradient-text;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    text-shadow: 0 0 40px rgba($ice-blue, 0.3);
-    animation: titleGlow 3s ease-in-out infinite;
-    text-align: center;
-}
-
-.loading-welcome {
-    margin: 0 0 30px 0;
-    font-size: 18px;
-    color: rgba(255, 255, 255, 0.7);
-    font-weight: 300;
-    letter-spacing: 1px;
-    text-align: center;
-    max-width: 400px;
-    line-height: 1.6;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-}
-
-.loading-subtitle {
-    margin: 0 0 40px 0;
-    font-size: 14px;
-    color: rgba(255, 255, 255, 0.5);
-    letter-spacing: 2px;
-    font-weight: 300;
-    text-transform: uppercase;
-}
-
-.loading-progress-container {
-    position: relative;
-    width: 280px;
-    height: 4px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 4px;
-    overflow: visible;
-    margin-bottom: 16px;
-}
-
-.loading-progress-bar {
-    height: 100%;
-    background: linear-gradient(90deg, $ice-blue-dark, $ice-blue, $ice-blue-light);
-    border-radius: 4px;
-    transition: width 0.3s ease-out;
-    position: relative;
-    box-shadow: 0 0 10px rgba($ice-blue, 0.5);
-}
-
-.loading-progress-glow {
-    position: absolute;
-    top: 50%;
-    width: 20px;
-    height: 20px;
-    background: radial-gradient(circle, rgba($ice-blue, 0.8) 0%, transparent 70%);
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-    pointer-events: none;
-    filter: blur(4px);
-}
-
-.loading-percentage {
-    font-size: 16px;
-    font-weight: 600;
-    color: $ice-blue;
-    letter-spacing: 2px;
-    font-family: 'Inter', monospace;
-    text-shadow: 0 0 10px rgba($ice-blue, 0.5);
-}
-
-// Enter Button
-.enter-button {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 16px 48px;
-    margin-top: 20px;
-    background: linear-gradient(135deg, rgba($ice-blue, 0.15) 0%, rgba($ice-blue-dark, 0.2) 100%);
-    border: 2px solid rgba($ice-blue, 0.4);
-    border-radius: 50px;
-    color: $ice-blue;
-    font-size: 18px;
-    font-weight: 700;
-    letter-spacing: 4px;
-    cursor: pointer;
-    position: relative;
-    overflow: hidden;
-    transition: all 0.4s $transition-smooth;
-    animation: enterButtonAppear 0.6s ease-out;
-
-    &::before {
-        content: '';
-        position: absolute;
-        inset: 0;
-        background: linear-gradient(135deg, rgba($ice-blue, 0.3) 0%, rgba($ice-blue-dark, 0.4) 100%);
+    &.ending {
         opacity: 0;
-        transition: opacity 0.3s ease;
+        visibility: hidden;
+        pointer-events: none;
     }
+}
+
+// ========================================
+// ICONIC XP BOOT EXPERIENCE
+// ========================================
+
+// CRT Effect Overlay
+.crt-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 10005;
+    pointer-events: none;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%,
+            rgba(0, 0, 0, 0.1) 50%), linear-gradient(90deg,
+            rgba(255, 0, 0, 0.03),
+            rgba(0, 255, 0, 0.01),
+            rgba(0, 0, 255, 0.03));
+    background-size: 100% 3px, 3px 100%;
 
     &::after {
-        content: '';
+        content: "";
         position: absolute;
-        top: 50%;
-        left: 50%;
-        width: 0;
-        height: 0;
-        background: radial-gradient(circle, rgba($ice-blue, 0.4) 0%, transparent 70%);
-        transform: translate(-50%, -50%);
-        transition: width 0.5s ease, height 0.5s ease;
-        border-radius: 50%;
+        inset: 0;
+        background: radial-gradient(circle, transparent 50%, rgba(0, 0, 0, 0.4) 100%);
+        pointer-events: none;
     }
+
+    animation: crtFlicker 0.15s infinite;
+}
+
+// BIOS Sequence
+.bios-sequence {
+    position: fixed;
+    inset: 0;
+    background: #000;
+    color: #ccc;
+    font-family: 'Courier New', Courier, monospace;
+    padding: 40px;
+    font-size: 16px;
+    line-height: 1.4;
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    p {
+        opacity: 0;
+        animation: biosLineFade 0.1s forwards;
+
+        @for $i from 1 through 20 {
+            &:nth-child(#{$i}) {
+                animation-delay: #{$i * 0.1}s;
+            }
+        }
+    }
+}
+
+@keyframes biosLineFade {
+    to {
+        opacity: 1;
+    }
+}
+
+.bios-main {
+    flex: 1;
+    margin-top: 40px;
+}
+
+.bios-blink {
+    &::after {
+        content: '_';
+        animation: biosCursor 0.5s infinite;
+    }
+}
+
+// XP Welcome Screen
+.xp-welcome-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 10001;
+    background: #5a7edc; // Base XP Blue
+    background: linear-gradient(to bottom,
+            #0031a5 0%,
+            #5a7edc 15%,
+            #5a7edc 85%,
+            #0031a5 100%);
+    @include flex-center;
+    flex-direction: column;
+    overflow: hidden;
+
+    &::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: rgba(255, 255, 255, 0.3);
+        box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+    }
+}
+
+.welcome-container {
+    display: flex;
+    width: 100%;
+    max-width: 1000px;
+    height: 100%;
+    align-items: center;
+    position: relative;
+    z-index: 2;
+}
+
+.welcome-left {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    padding-right: 60px;
+    border-right: 2px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 2px 0 0 rgba(0, 0, 0, 0.1);
+}
+
+.welcome-header {
+    margin-bottom: 30px;
+
+    .welcome-logo {
+        width: 180px;
+        height: auto;
+        opacity: 0.9;
+        filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.3));
+    }
+}
+
+.welcome-presentation {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    text-align: right;
+    color: #fff;
+    width: 100%;
+}
+
+.welcome-right {
+    flex: 1;
+    padding-left: 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.welcome-login-area {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+}
+
+.welcome-title {
+    font-family: 'Franklin Gothic Medium', 'Tahoma', sans-serif;
+    font-size: 38px;
+    font-weight: normal;
+    margin-bottom: 5px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.welcome-portfolio-title {
+    font-family: 'Tahoma', sans-serif;
+    font-size: 16px;
+    font-weight: normal;
+    opacity: 0.8;
+    margin-top: 5px;
+}
+
+.welcome-separator {
+    width: 150px;
+    height: 2px;
+    background: linear-gradient(to left, #fff, transparent);
+    margin: 15px 0;
+    opacity: 0.5;
+}
+
+.welcome-status {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    margin-top: 10px;
+
+    .status-text {
+        font-family: 'Tahoma', sans-serif;
+        font-size: 14px;
+        margin-bottom: 10px;
+        opacity: 0.9;
+    }
+}
+
+// Custom Progress Bar for Welcome Screen
+.xp-progress-container {
+    width: 160px;
+    height: 12px;
+    border: 1px solid #fff;
+    padding: 1px;
+    position: relative;
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 2px;
+}
+
+.xp-progress-blocks {
+    display: flex;
+    gap: 2px;
+    height: 100%;
+    position: absolute;
+    left: -40px;
+    animation: xpProgressMove 2s infinite linear;
+}
+
+.xp-block {
+    width: 8px;
+    height: 100%;
+    border-radius: 1px;
+
+    &.block-1 {
+        background: linear-gradient(to bottom, #7bb0ff, #386ef3);
+    }
+
+    &.block-2 {
+        background: linear-gradient(to bottom, #d6e8ff, #7bb0ff);
+    }
+
+    &.block-3 {
+        background: linear-gradient(to bottom, #7bb0ff, #386ef3);
+    }
+}
+
+// XP Login Style Button
+.xp-login-button {
+    margin-top: 30px;
+    background: none;
+    border: none;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    border-radius: 8px;
+    text-align: left;
 
     &:hover {
-        background: linear-gradient(135deg, rgba($ice-blue, 0.25) 0%, rgba($ice-blue-dark, 0.3) 100%);
-        border-color: rgba($ice-blue, 0.8);
-        transform: scale(1.05);
-        box-shadow:
-            0 0 30px rgba($ice-blue, 0.4),
-            0 0 60px rgba($ice-blue, 0.2),
-            inset 0 0 20px rgba($ice-blue, 0.1);
+        background: rgba(255, 255, 255, 0.1);
+        transform: translateX(5px);
 
-        &::before {
-            opacity: 1;
-        }
-
-        &::after {
-            width: 200px;
-            height: 200px;
-        }
-
-        .enter-arrow {
-            transform: translateX(4px);
+        .user-avatar {
+            border-color: #fff;
+            transform: scale(1.05);
         }
     }
 
-    &:active {
-        transform: scale(0.98);
+    .login-icon {
+        margin-right: 15px;
+    }
+
+    .user-avatar {
+        width: 50px;
+        height: 50px;
+        border: 2px solid rgba(255, 255, 255, 0.5);
+        border-radius: 4px;
+        background: #fff;
+        transition: all 0.2s;
+    }
+
+    .login-text {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .user-name {
+        font-family: 'Tahoma', sans-serif;
+        font-size: 20px;
+        font-weight: bold;
+        color: #fff;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    }
+
+    .login-action {
+        font-family: 'Tahoma', sans-serif;
+        font-size: 14px;
+        color: rgba(255, 255, 255, 0.8);
+    }
+}
+
+// XP Welcome Controls
+.welcome-controls {
+    display: flex;
+    padding-left: 10px;
+}
+
+.welcome-lang-toggle {
+    background: none;
+    border: none;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    color: #fff;
+    font-family: 'Tahoma', sans-serif;
+    font-size: 14px;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+
+    &:hover {
+        opacity: 1;
+        text-decoration: underline;
+    }
+
+    .control-icon-svg {
+        width: 32px;
+        height: 32px;
+        margin-right: 12px;
+        filter: drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.5));
+
+        .globe-outline {
+            fill: none;
+            stroke: #fff;
+            stroke-width: 1.5;
+            opacity: 0.8;
+        }
+
+        .globe-meridian {
+            fill: none;
+            stroke: #fff;
+            stroke-width: 1.2;
+            opacity: 0.6;
+        }
+
+        .globe-equator,
+        .globe-axis {
+            stroke: #fff;
+            stroke-width: 1;
+            opacity: 0.6;
+        }
+    }
+}
+
+// Animations
+@keyframes crtFlicker {
+    0% {
+        opacity: 0.97;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+@keyframes biosCursor {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0;
+    }
+}
+
+@keyframes xpProgressMove {
+    0% {
+        transform: translateX(0);
+    }
+
+    100% {
+        transform: translateX(200px);
     }
 }
 
@@ -316,68 +454,13 @@ $transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
     filter: drop-shadow(0 0 4px rgba($ice-blue, 0.5));
 }
 
-// Loading Animations
-@keyframes backgroundPulse {
-
-    0%,
-    100% {
-        opacity: 1;
-    }
-
-    50% {
-        opacity: 0.7;
-    }
-}
-
-@keyframes corePulse {
-
-    0%,
-    100% {
-        transform: translate(-50%, -50%) scale(1);
-        box-shadow:
-            0 0 30px rgba($ice-blue, 0.8),
-            0 0 60px rgba($ice-blue, 0.4),
-            0 0 90px rgba($ice-blue-dark, 0.3);
-    }
-
-    50% {
-        transform: translate(-50%, -50%) scale(1.15);
-        box-shadow:
-            0 0 40px rgba($ice-blue, 1),
-            0 0 80px rgba($ice-blue, 0.6),
-            0 0 120px rgba($ice-blue-dark, 0.4);
-    }
-}
-
-@keyframes ringRotate1 {
+@keyframes xpProgressMove {
     0% {
-        transform: translate(-50%, -50%) rotate(0deg);
+        transform: translateX(0);
     }
 
     100% {
-        transform: translate(-50%, -50%) rotate(360deg);
-    }
-}
-
-@keyframes ringRotate2 {
-    0% {
-        transform: translate(-50%, -50%) rotate(0deg);
-    }
-
-    100% {
-        transform: translate(-50%, -50%) rotate(-360deg);
-    }
-}
-
-@keyframes titleGlow {
-
-    0%,
-    100% {
-        text-shadow: 0 0 40px rgba($ice-blue, 0.3);
-    }
-
-    50% {
-        text-shadow: 0 0 60px rgba($ice-blue, 0.5);
+        transform: translateX(340px);
     }
 }
 
@@ -654,6 +737,75 @@ $transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
 // RESPONSIVE
 // ========================================
 @media (max-width: 768px) {
+    .bios-sequence {
+        padding: 20px;
+        font-size: 14px;
+    }
+
+    .welcome-container {
+        flex-direction: column;
+        justify-content: center;
+        max-width: 100%;
+        padding: 40px 20px;
+    }
+
+    .welcome-left {
+        align-items: center;
+        padding-right: 0;
+        border-right: none;
+        box-shadow: none;
+        border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        padding-bottom: 40px;
+        width: 100%;
+    }
+
+    .welcome-presentation {
+        align-items: center;
+        text-align: center;
+    }
+
+    .welcome-title {
+        font-size: 32px;
+    }
+
+    .welcome-portfolio-title {
+        font-size: 14px;
+        max-width: 250px;
+    }
+
+    .welcome-separator {
+        width: 80%;
+        background: linear-gradient(to right, transparent, #fff, transparent);
+    }
+
+    .welcome-status {
+        align-items: center;
+    }
+
+    .welcome-right {
+        padding-left: 0;
+        padding-top: 40px;
+        width: 100%;
+        align-items: center;
+    }
+
+    .welcome-login-area {
+        gap: 20px;
+        align-items: center;
+    }
+
+    .xp-login-button {
+        margin-top: 0;
+
+        &:hover {
+            transform: scale(1.02);
+        }
+    }
+
+    .welcome-controls {
+        padding-left: 0;
+    }
+
     .pdf-modal-container {
         width: 95%;
         height: 95vh;
@@ -671,20 +823,6 @@ $transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
     .pdf-modal-close {
         width: 44px;
         height: 44px;
-    }
-
-    .loading-title {
-        font-size: 32px;
-    }
-
-    .loading-welcome {
-        font-size: 16px;
-        max-width: 300px;
-    }
-
-    .enter-button {
-        padding: 14px 36px;
-        font-size: 16px;
     }
 }
 
@@ -707,25 +845,21 @@ $transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
         padding: 16px 20px;
     }
 
-    .loading-title {
+    .welcome-title {
         font-size: 28px;
-        letter-spacing: 2px;
     }
 
-    .loading-welcome {
-        font-size: 14px;
-        max-width: 280px;
-        padding: 0 20px;
+    .welcome-header .welcome-logo {
+        width: 140px;
     }
 
-    .loading-orb {
-        width: 100px;
-        height: 100px;
+    .user-avatar {
+        width: 40px;
+        height: 40px;
     }
 
-    .enter-button {
-        padding: 12px 32px;
-        font-size: 14px;
-        letter-spacing: 3px;
+    .user-name {
+        font-size: 16px;
     }
+
 }

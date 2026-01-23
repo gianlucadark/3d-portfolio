@@ -49,7 +49,7 @@ export class WindowComponent implements OnInit, OnChanges, OnDestroy {
   @Input() initialPosition: Position | null = null;
   @Input() zIndex = 0;
   @Input() windowType = 'default';
-  @Input() pdfSrc: SafeResourceUrl | undefined;
+  @Input() pdfSrc: string | undefined;
   @Input() id!: number;
   @Input() isMinimized = false;
 
@@ -60,6 +60,7 @@ export class WindowComponent implements OnInit, OnChanges, OnDestroy {
   @Output() readonly focusWindow = new EventEmitter<void>();
   @Output() readonly minimizeWindow = new EventEmitter<void>();
   @Output() readonly restoreWindow = new EventEmitter<void>();
+  @Output() readonly openOtherWindow = new EventEmitter<number>();
 
   // Window state
   isDragging = false;
@@ -86,7 +87,7 @@ export class WindowComponent implements OnInit, OnChanges, OnDestroy {
   showHelp = false;
 
   // Notepad
-  notepadText = '';
+  notepadText = '--- CURRICULUM VITAE ---\n\nPuoi visualizzare il mio CV cliccando sul file "CV Gianluca" nella cartella Curriculum sul Desktop.\n\nIn alternativa, clicca su questo link per aprirlo istantaneamente: CV_LINK';
 
   // Cleanup
   private readonly destroy$ = new Subject<void>();
@@ -123,7 +124,7 @@ export class WindowComponent implements OnInit, OnChanges, OnDestroy {
 
   private initializeWindow(): void {
     if (!this.pdfSrc && this.windowType === 'cv') {
-      this.pdfSrc = this.sanitizer.bypassSecurityTrustResourceUrl('assets/file/cv-gianluca.pdf');
+      this.pdfSrc = 'assets/file/cv-gianluca.pdf';
     }
   }
 
@@ -405,7 +406,7 @@ export class WindowComponent implements OnInit, OnChanges, OnDestroy {
 
   openCvWindow(event: Event): void {
     event.preventDefault();
-    console.warn('openCvWindow: DesktopComponent not injected');
+    this.openOtherWindow.emit(13);
   }
 
   selectIcon(event: MouseEvent): void {

@@ -10,6 +10,7 @@ export type WindowType =
   | 'recycle-bin'
   | 'notepad'
   | 'email'
+  | 'curriculum'
   | 'default';
 
 /**

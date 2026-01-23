@@ -22,8 +22,13 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
     // Loading State
     isLoading = true;
+    isEndingLoading = false; // For fade-out animation
     isLoadingComplete = false;
     loadingProgress = 0;
+
+    // Iconic Boot Flow
+    isBiosComplete = false;
+    showWelcome = false;
 
     private readonly destroy$ = new Subject<void>();
 
@@ -52,6 +57,14 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
             .pipe(takeUntil(this.destroy$))
             .subscribe(complete => {
                 this.isLoadingComplete = complete;
+                if (complete) {
+                    // Start BIOS -> Welcome transition
+                    setTimeout(() => {
+                        this.isBiosComplete = true;
+                        this.showWelcome = true;
+                        this.cdr.markForCheck();
+                    }, 2500); // Wait for BIOS animation to finish
+                }
                 this.cdr.markForCheck();
             });
 
@@ -92,13 +105,19 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     enterPortfolio(): void {
-        this.isLoading = false;
+        // 1. Mostra il desktop e sposta la camera (istantaneo)
+        this.showDesktop = true;
+        this.threeSceneService.setInitialPositionOnScreen();
+
+        // 2. Avvia l'animazione di fade-out
+        this.isEndingLoading = true;
         this.cdr.markForCheck();
 
-        // Posiziona la camera direttamente davanti allo schermo grande (senza animazione)
+        // 3. Rimuovi definitivamente il loading screen dopo che il fade è finito
         setTimeout(() => {
-            this.threeSceneService.setInitialPositionOnScreen();
-        }, 100);
+            this.isLoading = false;
+            this.cdr.markForCheck();
+        }, 800); // Coincide con la durata della transizione CSS
     }
 
     returnFromDesktop(): void {

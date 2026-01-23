@@ -95,13 +95,14 @@ export const WINDOW_TYPE_MAP: Record<number, string> = {
     6: 'paint',
     7: 'recycle-bin',
     8: 'notepad',
-    9: 'email'
+    9: 'email',
+    13: 'cv'
 } as const;
 
 // ============================================
 // FINESTRE FULLSCREEN
 // ============================================
-export const FULLSCREEN_WINDOWS = [3, 11, 12] as const;
+export const FULLSCREEN_WINDOWS = [3, 11, 12, 13] as const;
 
 // ============================================
 // MAPPA CHIAVI ICONE PER TRADUZIONE
@@ -117,7 +118,8 @@ export const ICON_KEY_MAP: Record<number, string> = {
     9: 'email',
     10: 'projects',
     11: 'uxability',
-    12: 'webExtension'
+    12: 'webExtension',
+    13: 'curriculum'
 } as const;
 
 // ============================================

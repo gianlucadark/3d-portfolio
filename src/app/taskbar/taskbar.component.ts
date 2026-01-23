@@ -1,4 +1,5 @@
 import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { TranslationService, Language } from '../services/translation.service';
 import { OpenWindow } from 'src/utilities/interface/open-window.interface';
 
 @Component({
@@ -16,7 +17,19 @@ export class TaskbarComponent implements OnInit, OnDestroy {
   currentTime = '';
   private timerId: ReturnType<typeof setInterval> | null = null;
 
-  constructor(private readonly cdr: ChangeDetectorRef) { }
+  constructor(
+    private readonly cdr: ChangeDetectorRef,
+    private readonly translationService: TranslationService
+  ) { }
+
+  get currentLanguage(): Language {
+    return this.translationService.currentLanguage;
+  }
+
+  onLanguageToggle(): void {
+    this.translationService.toggleLanguage();
+    this.cdr.markForCheck();
+  }
 
   ngOnInit(): void {
     this.updateTime();

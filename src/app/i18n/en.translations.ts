@@ -12,6 +12,7 @@ export const EN_TRANSLATIONS = {
         search: 'Search',
         folders: 'Folders',
         address: 'Address',
+        go: 'Go',
         desktop: 'Desktop',
         send: 'Send',
         clear: 'Clear',
@@ -19,7 +20,7 @@ export const EN_TRANSLATIONS = {
     },
 
     loading: {
-        welcome: 'Hi, I\'m Gianluca, welcome to my 3D world.',
+        welcome: 'Welcome to my world.',
         welcome2: 'Just a bored developer\'s portfolio',
         loadingText: 'Loading 3D experience...',
         enterButton: 'ENTER'
@@ -44,6 +45,7 @@ export const EN_TRANSLATIONS = {
         notepad: 'Notepad',
         email: 'Email',
         projects: 'Projects',
+        curriculum: 'Curriculum',
         uxability: 'Uxability',
         webExtension: 'Web Extension'
     },
@@ -104,5 +106,9 @@ export const EN_TRANSLATIONS = {
 
     diskInfo: {
         localDisk: 'Local Disk (C:)'
+    },
+
+    pacman: {
+        mobileWarning: 'Hey! Pac-Man needs real keys to escape ghosts. Get back to your PC or the ghosts will catch you even in real life! 👻'
     }
 };

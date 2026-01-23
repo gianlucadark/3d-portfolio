@@ -73,7 +73,8 @@
       <app-window *ngIf="window.isOpen" [id]="window.id" [title]="getWindowTitle(window.id)" [icon]="window.icon"
         [zIndex]="window.zIndex" [windowType]="window.windowType ?? ''" [pdfSrc]="window.pdfSrc"
         [isMinimized]="window.isMinimized" (closeWindow)="closeWindow(window.id)"
-        (minimizeWindow)="minimizeWindow(window.id)" (focusWindow)="onWindowFocus(window.id)">
+        (minimizeWindow)="minimizeWindow(window.id)" (focusWindow)="onWindowFocus(window.id)"
+        (openOtherWindow)="onOpenWindow($event)">
         <ng-container *ngIf="window.windowType === 'email'">
           <div class="email-window">
             <div class="window-body">
@@ -83,14 +84,15 @@
           </div>
         </ng-container>
         <ng-container *ngIf="window.windowType === 'cv'">
-          <iframe [src]="getSafeCvPdfUrl()" width="100%" height="100%" style="border: none;"></iframe>
+          <!-- Redundant iframe removed. Handled by app-window component. -->
         </ng-container>
-        <ng-container *ngIf="window.windowType === 'default' && window.id === 10">
+        <ng-container
+          *ngIf="(window.windowType === 'default' && window.id === 10) || window.windowType === 'curriculum'">
           <div style="display: flex; gap: 30px; align-items: flex-start; padding: 20px 0 0 20px;">
-            <div *ngFor="let sub of getSubIcons(10)" style="text-align: center; cursor: pointer;"
+            <div *ngFor="let sub of getSubIcons(window.id)" style="text-align: center; cursor: pointer;"
               (dblclick)="openIcon($event, sub.id)">
               <img [src]="sub.image" [alt]="sub.name" style="width:64px; height:64px;">
-              <div>{{ sub.name }}</div>
+              <div style="font-family: Tahoma; font-size: 11px; margin-top: 4px;">{{ sub.name }}</div>
             </div>
           </div>
         </ng-container>

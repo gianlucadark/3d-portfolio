@@ -1,5 +1,5 @@
 <!-- Loading Screen -->
-<div class="loading-screen" *ngIf="isLoading">
+<div class="loading-screen" *ngIf="isLoading" [class.ending]="isEndingLoading">
     <!-- Language Toggle in Loading Screen -->
     <div class="loading-language-toggle">
         <button class="control-toggle language-toggle" (click)="toggleLanguage()"
@@ -35,38 +35,89 @@
         </button>
     </div>
 
-    <div class="loading-content">
-        <!-- Animated Logo/Icon -->
-        <div class="loading-orb">
-            <div class="orb-core"></div>
-            <div class="orb-ring ring-1"></div>
-            <div class="orb-ring ring-2"></div>
-            <div class="orb-ring ring-3"></div>
+    <!-- CRT Scanline Overlay (always on during loading) -->
+    <div class="crt-overlay"></div>
+
+    <!-- BIOS Sequence -->
+    <div class="bios-sequence" *ngIf="!isBiosComplete">
+        <div class="bios-header">
+            <p>Gianluca's Portfolio BIOS</p>
+            <p>Copyright (C) 2026, Gianluca Software, Inc.</p>
         </div>
-
-        <!-- Title -->
-        <h1 class="loading-title">Just a bored developer's portfolio</h1>
-        <p class="loading-welcome">{{ 'loading.welcome' | translate }}</p>
-        <p class="loading-subtitle" *ngIf="!isLoadingComplete">{{ 'loading.loadingText' | translate }}</p>
-
-        <!-- Progress Bar (hide when complete) -->
-        <div class="loading-progress-container" *ngIf="!isLoadingComplete">
-            <div class="loading-progress-bar" [style.width.%]="loadingProgress"></div>
-            <div class="loading-progress-glow" [style.left.%]="loadingProgress"></div>
+        <div class="bios-main">
+            <p>Main Processor : BORED DEVELOPER @ 4.20GHz</p>
+            <p>Memory Test : 65536K OK</p>
+            <p>&nbsp;</p>
+            <p>Detecting Primary Master ... [STORAGE_PORTFOLIO]</p>
+            <p>Detecting Primary Slave ... [NONE]</p>
+            <p>Detecting Secondary Master... [DISK_RESUME]</p>
+            <p>&nbsp;</p>
+            <p class="bios-blink">Verifying DMI Pool Data ........... Success</p>
+            <p>Booting from Hard Disk...</p>
         </div>
+        <div class="bios-footer">
+            <p>Press <b>DEL</b> to enter SETUP , <b>ESC</b> to Skip</p>
+            <p>04/20/2001-IA-64-82371-G-L-U-C-A-00</p>
+        </div>
+    </div>
 
-        <!-- Percentage (hide when complete) -->
-        <span class="loading-percentage" *ngIf="!isLoadingComplete">{{ loadingProgress | number:'1.0-0' }}%</span>
+    <!-- XP Iconic Welcome Screen -->
+    <div class="xp-welcome-screen" *ngIf="isBiosComplete">
+        <div class="welcome-container">
+            <!-- Left Side: Presentation -->
+            <div class="welcome-left">
+                <!-- <div class="welcome-header">
+                    <img src="assets/icons/xp_boot_logo.png" alt="XP Logo" class="welcome-logo">
+                </div> -->
+                <div class="welcome-presentation">
+                    <h1 class="welcome-title">{{ 'loading.welcome' | translate }}</h1>
+                    <div class="welcome-separator"></div>
+                    <h2 class="welcome-portfolio-title">Just a bored developer's portfolio</h2>
 
-        <!-- Enter Button (show when complete) -->
-        <button class="enter-button" *ngIf="isLoadingComplete" (click)="enterPortfolio()">
-            <span class="enter-text">{{ 'loading.enterButton' | translate }}</span>
-            <svg class="enter-arrow" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="5" y1="12" x2="19" y2="12"></line>
-                <polyline points="12 5 19 12 12 19"></polyline>
-            </svg>
-        </button>
+                    <!-- Progress bar integrated into welcome -->
+                    <div class="welcome-status" *ngIf="!showWelcome">
+                        <p class="status-text">{{ 'loading.loadingText' | translate }}</p>
+                        <div class="xp-progress-container">
+                            <div class="xp-progress-blocks">
+                                <div class="xp-block block-1"></div>
+                                <div class="xp-block block-2"></div>
+                                <div class="xp-block block-3"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Side: Login & Controls -->
+            <div class="welcome-right">
+                <div class="welcome-login-area">
+                    <!-- Enter Button (Final XP Login style) -->
+                    <button class="xp-login-button" *ngIf="showWelcome" (click)="enterPortfolio()">
+                        <div class="login-icon">
+                            <img src="assets/icons/user.png" alt="User" class="user-avatar">
+                        </div>
+                        <div class="login-text">
+                            <span class="user-name">Gianluca</span>
+                            <span class="login-action">{{ 'loading.enterButton' | translate }}</span>
+                        </div>
+                    </button>
+
+                    <!-- Language Toggle (below the login button) -->
+                    <div class="welcome-controls" *ngIf="showWelcome">
+                        <button class="welcome-lang-toggle" (click)="toggleLanguage()">
+                            <svg class="control-icon-svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="12" cy="12" r="10" class="globe-outline" />
+                                <path d="M12 2C12 2 16 6 16 12C16 18 12 22 12 22C12 22 8 18 8 12C8 6 12 2 12 2Z"
+                                    class="globe-meridian" />
+                                <line x1="2" y1="12" x2="22" y2="12" class="globe-equator" />
+                                <path d="M12 2L12 22" class="globe-axis" />
+                            </svg>
+                            <span>{{ currentLanguage === 'it' ? 'English (US)' : 'Italiano (IT)' }}</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 

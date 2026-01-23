@@ -18,48 +18,63 @@
 
   <!-- Barra di menu -->
   <div class="menu-bar" *ngIf="windowType !== 'prompt'">
-    <button class="menu-item">{{ 'menu.file' | translate }}</button>
-    <button class="menu-item">{{ 'menu.edit' | translate }}</button>
-    <button class="menu-item">{{ 'menu.view' | translate }}</button>
-    <button class="menu-item">{{ 'menu.favorites' | translate }}</button>
-    <button class="menu-item">{{ 'menu.tools' | translate }}</button>
-    <button class="menu-item">{{ 'menu.help' | translate }}</button>
+    <div class="menu-item">{{ 'menu.file' | translate }}</div>
+    <div class="menu-item">{{ 'menu.edit' | translate }}</div>
+    <div class="menu-item">{{ 'menu.view' | translate }}</div>
+    <div class="menu-item">{{ 'menu.favorites' | translate }}</div>
+    <div class="menu-item">{{ 'menu.tools' | translate }}</div>
+    <div class="menu-item">{{ 'menu.help' | translate }}</div>
   </div>
 
-  <!-- Nuova sezione per i tasti di navigazione -->
+  <!-- Toolbar Section -->
   <div class="navigation-bar" *ngIf="windowType !== 'prompt'">
-    <button class="nav-button" [attr.aria-label]="'common.back' | translate" disabled>
-      <img src="assets/icons/back.png" [alt]="'common.back' | translate" class="nav-icon">
-      <span class="nav-text">{{ 'common.back' | translate }}</span>
-    </button>
-    <button class="nav-button" [attr.aria-label]="'common.forward' | translate" disabled>
-      <img src="assets/icons/avanti.png" [alt]="'common.forward' | translate" class="nav-icon">
+    <div class="toolbar-group">
+      <button class="nav-button main" [attr.aria-label]="'common.back' | translate" disabled>
+        <img src="assets/icons/back.png" [alt]="'common.back' | translate" class="nav-icon large">
+        <span class="nav-text">{{ 'common.back' | translate }}</span>
+      </button>
+      <button class="nav-button" [attr.aria-label]="'common.forward' | translate" disabled>
+        <img src="assets/icons/avanti.png" [alt]="'common.forward' | translate" class="nav-icon">
+      </button>
+    </div>
+    <div class="nav-separator"></div>
+    <button class="nav-button main">
+      <img src="assets/icons/folder.png" alt="Up" class="nav-icon">
     </button>
     <div class="nav-separator"></div>
-    <button class="nav-button" [attr.aria-label]="'common.search' | translate">
-      <img src="assets/icons/cerca.png" [alt]="'common.search' | translate" class="nav-icon">
-      <span class="nav-text">{{ 'common.search' | translate }}</span>
-    </button>
-    <button class="nav-button" [attr.aria-label]="'common.folders' | translate">
-      <img src="assets/icons/folder.png" [alt]="'common.folders' | translate" class="nav-icon">
-      <span class="nav-text">{{ 'common.folders' | translate }}</span>
+    <div class="toolbar-group">
+      <button class="nav-button main">
+        <img src="assets/icons/cerca.png" alt="Search" class="nav-icon">
+        <span class="nav-text">{{ 'common.search' | translate }}</span>
+      </button>
+      <button class="nav-button main">
+        <img src="assets/icons/folder.png" alt="Folders" class="nav-icon">
+        <span class="nav-text">{{ 'common.folders' | translate }}</span>
+      </button>
+    </div>
+    <div class="nav-separator"></div>
+    <button class="nav-button main">
+      <img src="assets/icons/computer.png" alt="View" class="nav-icon">
     </button>
   </div>
 
-  <div class="folder-path" *ngIf="folderPath.length > 0 && (windowType !== 'cv' && windowType !== 'prompt')">
-    <div class="address-bar">
-      <span class="address-label">{{ 'common.address' | translate }}</span>
-      <div class="address-content">
-        <img src="assets/icons/folder.png" alt="Folder" class="folder-icon">
-        <span class="path-text">{{ folderPath.join('\\') }}</span>
-        <img src="assets/icons/avanti.png" [alt]="'common.forward' | translate" class="avanti-icon">
-      </div>
+  <!-- Address Bar -->
+  <div class="address-bar-container" *ngIf="windowType !== 'cv' && windowType !== 'prompt'">
+    <div class="address-label">{{ 'common.address' | translate }}</div>
+    <div class="address-input-wrapper">
+      <img src="assets/icons/folder.png" alt="Folder" class="address-icon">
+      <div class="address-text">{{ folderPath.join('\\') }}</div>
+      <div class="address-dropdown"></div>
     </div>
+    <button class="go-button">
+      <img src="assets/icons/avanti.png" alt="Go">
+      <span>{{ 'common.go' | translate }}</span>
+    </button>
   </div>
   <div class="window-body">
     <ng-container *ngIf="windowType === 'cv'">
       <ng-container *ngIf="pdfSrc; else noPdf">
-        <iframe [src]="pdfSrc" width="100%" height="100%" frameborder="0"></iframe>
+        <iframe [src]="pdfSrc | safe" width="100%" height="100%" frameborder="0"></iframe>
       </ng-container>
       <ng-template #noPdf>
         <p>{{ 'common.error' | translate }}: {{ pdfSrc }}</p>
@@ -126,6 +141,11 @@
     <ng-container *ngIf="windowType === 'notepad'">
       <div class="notepad-content">
         <textarea [(ngModel)]="notepadText" class="notepad-textarea"></textarea>
+        <div class="notepad-footer" *ngIf="notepadText.includes('CV_LINK')">
+          <button (click)="openCvWindow($event)" class="notepad-link-btn">
+            [ CLICCA QUI PER APRIRE IL CV ]
+          </button>
+        </div>
       </div>
     </ng-container>
     <ng-container

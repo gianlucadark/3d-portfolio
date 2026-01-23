@@ -12,6 +12,7 @@ export const IT_TRANSLATIONS = {
         search: 'Cerca',
         folders: 'Cartelle',
         address: 'Indirizzo',
+        go: 'Vai',
         desktop: 'Desktop',
         send: 'Invia',
         clear: 'Pulisci',
@@ -19,7 +20,7 @@ export const IT_TRANSLATIONS = {
     },
 
     loading: {
-        welcome: 'Ciao, sono Gianluca, benvenuto nel mio mondo 3D.',
+        welcome: 'Benvenuto nel mio mondo.',
         welcome2: 'Just a bored developer\'s portfolio',
         loadingText: 'Caricamento esperienza 3D...',
         enterButton: 'ENTRA'
@@ -44,6 +45,7 @@ export const IT_TRANSLATIONS = {
         notepad: 'Blocco Note',
         email: 'Email',
         projects: 'Progetti',
+        curriculum: 'Curriculum',
         uxability: 'Uxability',
         webExtension: 'Estensione Web'
     },
@@ -104,5 +106,9 @@ export const IT_TRANSLATIONS = {
 
     diskInfo: {
         localDisk: 'Disco locale (C:)'
+    },
+
+    pacman: {
+        mobileWarning: 'Ehi! Pac-Man ha bisogno di tasti veri per scappare dai fantasmi. Torna sul tuo PC o i fantasmi ti prenderanno anche nella vita reale! 👻'
     }
 };
