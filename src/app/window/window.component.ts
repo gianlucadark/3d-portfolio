@@ -129,13 +129,17 @@ export class WindowComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   private calculateInitialPosition(): Position {
+    // Ensure window size doesn't exceed screen size
+    this.size.width = Math.min(this.size.width, window.innerWidth * 0.95);
+    this.size.height = Math.min(this.size.height, (window.innerHeight - WINDOW_CONFIG.TASKBAR_HEIGHT) * 0.9);
+
     if (this.initialPosition) {
       return this.initialPosition;
     }
 
     return {
       x: Math.max(0, (window.innerWidth - this.size.width) / 2),
-      y: Math.max(0, (window.innerHeight - this.size.height) / 2)
+      y: Math.max(0, (window.innerHeight - this.size.height - WINDOW_CONFIG.TASKBAR_HEIGHT) / 2)
     };
   }
 

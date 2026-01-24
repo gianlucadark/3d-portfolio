@@ -250,6 +250,116 @@ $black: #000;
 }
 
 // ========================================
+// EMAIL WINDOW (OUTLOOK EXPRESS STYLE)
+// ========================================
+.email-window {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: #ECE9D8;
+  font-family: 'Tahoma', sans-serif;
+}
+
+.email-toolbar {
+  display: flex;
+  padding: 4px;
+  background-color: #ECE9D8;
+  border-bottom: 1px solid #ACA899;
+  gap: 4px;
+}
+
+.email-tool-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: transparent;
+  border: 1px solid transparent;
+  padding: 4px 10px;
+  cursor: pointer;
+  min-width: 60px;
+
+  img {
+    width: 24px;
+    height: 24px;
+    margin-bottom: 2px;
+  }
+
+  span {
+    font-size: 11px;
+    color: #000;
+  }
+
+  &:hover {
+    border-color: #316ac5;
+    background-color: #C1D2EE;
+    border-radius: 2px;
+  }
+
+  &:active {
+    background-color: #98B5E2;
+  }
+}
+
+.email-tool-sep {
+  width: 1px;
+  background-color: #ACA899;
+  margin: 4px 2px;
+  box-shadow: 1px 0 0 #fff;
+}
+
+.email-headers {
+  padding: 10px;
+  background-color: #ECE9D8;
+  border-bottom: 1px solid #ACA899;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.email-header-row {
+  display: flex;
+  align-items: center;
+}
+
+.email-label {
+  width: 60px;
+  font-size: 11px;
+  color: #333;
+}
+
+.email-input {
+  flex-grow: 1;
+  border: 1px solid #7F9DB9;
+  background-color: #fff;
+  padding: 2px 4px;
+  font-size: 12px;
+  font-family: 'Tahoma', sans-serif;
+  outline: none;
+
+  &[readonly] {
+    background-color: #F1F1F1;
+    color: #666;
+  }
+}
+
+.email-body {
+  flex-grow: 1;
+  padding: 10px;
+  background-color: #fff;
+  display: flex;
+
+  textarea {
+    flex-grow: 1;
+    border: none;
+    resize: none;
+    outline: none;
+    font-family: 'Tahoma', sans-serif;
+    font-size: 13px;
+    line-height: 1.4;
+  }
+}
+
+// ========================================
 // MISC
 // ========================================
 .centered-text {

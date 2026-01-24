@@ -479,8 +479,10 @@ $black: #000;
   position: relative;
   display: flex;
   flex-direction: column;
-  overflow: auto;
+  overflow-y: auto;
+  overflow-x: hidden;
   @include xp-scrollbar;
+  padding: 1px; // Prevent border from being cut off by scrollbar
 
   // Fondo scuro per iframe (PDF) per evitare zone bianche a fine pagina
   &:has(iframe) {
@@ -528,8 +530,32 @@ $black: #000;
 }
 
 // ========================================
-// NOTEPAD & PROMPT
+// NOTEPAD & PROMPT & README
 // ========================================
+.readme-content {
+  padding: 24px;
+  font-family: 'Tahoma', sans-serif;
+  color: #333;
+  line-height: 1.5;
+
+  h1 {
+    font-size: 24px;
+    margin-bottom: 16px;
+    color: #003399;
+    border-bottom: 2px solid #0054E3;
+    padding-bottom: 8px;
+  }
+
+  p {
+    margin-bottom: 12px;
+    font-size: 13px;
+  }
+
+  strong {
+    color: #cc0000;
+  }
+}
+
 .notepad-content {
   display: flex;
   flex-direction: column;

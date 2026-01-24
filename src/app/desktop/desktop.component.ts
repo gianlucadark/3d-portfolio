@@ -18,24 +18,26 @@ import {
   DESKTOP_CONFIG,
   WINDOW_TYPE_MAP,
   FULLSCREEN_WINDOWS,
-  ICON_KEY_MAP
+  ICON_KEY_MAP,
+  ICON_GRID_CONFIG,
+  WINDOW_CONFIG
 } from '../constants/app.constants';
 
 /** Configurazione delle icone del desktop */
 const DESKTOP_ICONS: Icon[] = [
-  { id: 1, name: 'Computer', image: 'assets/icons/computer.png', position: { x: 20, y: 20 } },
-  { id: 13, name: 'Curriculum', image: 'assets/icons/folder.png', position: { x: 20, y: 120 } },
-  { id: 4, name: 'Prompt', image: 'assets/icons/prompt.png', position: { x: 20, y: 220 } },
-  { id: 5, name: 'README', image: 'assets/icons/readme.png', position: { x: 20, y: 320 } },
-  { id: 6, name: 'Paint', image: 'assets/icons/paint.png', position: { x: 20, y: 420 } },
-  { id: 8, name: 'Blocco Note', image: 'assets/icons/paper.png', position: { x: 20, y: 520 } },
-  { id: 9, name: 'Email', image: 'assets/icons/email.png', position: { x: 20, y: 620 } },
-  { id: 10, name: 'Progetti', image: 'assets/icons/folder.png', position: { x: 150, y: 20 } },
+  { id: 1, name: 'Computer', image: 'assets/icons/computer.png', position: { x: 0, y: 0 } },
+  { id: 13, name: 'Curriculum', image: 'assets/icons/folder.png', position: { x: 0, y: 0 } },
+  { id: 4, name: 'Prompt', image: 'assets/icons/prompt.png', position: { x: 0, y: 0 } },
+  { id: 5, name: 'README', image: 'assets/icons/readme.png', position: { x: 0, y: 0 } },
+  { id: 6, name: 'Paint', image: 'assets/icons/paint.png', position: { x: 0, y: 0 } },
+  { id: 8, name: 'Blocco Note', image: 'assets/icons/paper.png', position: { x: 0, y: 0 } },
+  { id: 9, name: 'Email', image: 'assets/icons/email.png', position: { x: 0, y: 0 } },
+  { id: 10, name: 'Progetti', image: 'assets/icons/folder.png', position: { x: 0, y: 0 } },
   {
     id: 11,
     name: 'Uxability',
     image: 'assets/icons/folder.png',
-    position: { x: 150, y: 120 },
+    position: { x: 0, y: 0 },
     parentId: 10,
     description: `Uxability è un'applicazione web sviluppata in Angular che permette di analizzare l'accessibilità e le performance di qualsiasi sito web semplicemente inserendo l'URL desiderato. L'applicazione genera report dettagliati che evidenziano errori, criticità e suggerimenti pratici per il miglioramento, offrendo anche una heatmap interattiva che visualizza graficamente le aree problematiche del sito. Un sistema di intelligenza artificiale integrato fornisce spiegazioni approfondite e chiare sugli errori riscontrati, rendendo le informazioni accessibili anche a chi non ha competenze tecniche, e suggerisce soluzioni concrete per ottimizzare il codice e l'esperienza utente complessiva. Cosa aspetti, contattami per saperne di più!`
   },
@@ -43,7 +45,7 @@ const DESKTOP_ICONS: Icon[] = [
     id: 12,
     name: 'Estensione Web',
     image: 'assets/icons/folder.png',
-    position: { x: 150, y: 220 },
+    position: { x: 0, y: 0 },
     parentId: 10,
     description: `L'estensione web sviluppata, consente di migliorare sensibilmente l'accessibilità dei siti internet, offrendo strumenti avanzati e personalizzabili per adattare la navigazione alle esigenze delle persone con disabilità. L'utente può intervenire in tempo reale su testo, contrasti, colori, spaziature, font e livello di zoom, rendendo ogni sito più leggibile e fruibile. Grazie a questa estensione, l'esperienza di navigazione diventa più inclusiva e accessibile per tutti, senza la necessità di modificare il sito originale.`
   }
@@ -64,6 +66,8 @@ export class DesktopComponent implements OnInit, OnDestroy {
   openWindows: Window[] = [];
   icons: Icon[] = [];
   emailContent = '';
+  emailSubject = 'In contatto dal tuo Portfolio';
+  emailTo = 'gianlucadark1@gmail.com';
 
   // Z-index management
   private highestZIndex = 1000;
@@ -83,7 +87,30 @@ export class DesktopComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.calculateIconPositions();
     this.openWindow(5, 'README', 'assets/icons/readme.png');
+  }
+
+  @HostListener('window:resize')
+  onResize(): void {
+    this.calculateIconPositions();
+    this.cdr.markForCheck();
+  }
+
+  private calculateIconPositions(): void {
+    const desktopIcons = this.desktopIcons;
+    const availableHeight = window.innerHeight - WINDOW_CONFIG.TASKBAR_HEIGHT - 60; // 60px margin for top/bottom
+    const itemsPerColumn = Math.max(1, Math.floor(availableHeight / ICON_GRID_CONFIG.ITEM_HEIGHT));
+
+    desktopIcons.forEach((icon, index) => {
+      const col = Math.floor(index / itemsPerColumn);
+      const row = index % itemsPerColumn;
+
+      icon.position = {
+        x: ICON_GRID_CONFIG.PADDING_LEFT + (col * ICON_GRID_CONFIG.ITEM_WIDTH),
+        y: ICON_GRID_CONFIG.PADDING_TOP + (row * ICON_GRID_CONFIG.ITEM_HEIGHT)
+      };
+    });
   }
 
   ngOnDestroy(): void {
@@ -171,9 +198,15 @@ export class DesktopComponent implements OnInit, OnDestroy {
 
   private getWindowSize(id: number): { width: number; height: number } {
     if (FULLSCREEN_WINDOWS.includes(id as typeof FULLSCREEN_WINDOWS[number])) {
-      return { width: window.innerWidth, height: window.innerHeight };
+      return {
+        width: window.innerWidth,
+        height: window.innerHeight - WINDOW_CONFIG.TASKBAR_HEIGHT
+      };
     }
-    return { width: 800, height: 600 };
+    return {
+      width: WINDOW_CONFIG.DEFAULT_WIDTH,
+      height: WINDOW_CONFIG.DEFAULT_HEIGHT
+    };
   }
 
   bringToFront(window: Window): void {
@@ -298,7 +331,7 @@ export class DesktopComponent implements OnInit, OnDestroy {
   }
 
   sendEmail(): void {
-    const mailtoLink = `mailto:gianlucadark1@gmail.com?subject=Email%20da%20Windows%20XP&body=${encodeURIComponent(this.emailContent)}`;
+    const mailtoLink = `mailto:${this.emailTo}?subject=${encodeURIComponent(this.emailSubject)}&body=${encodeURIComponent(this.emailContent)}`;
     window.location.href = mailtoLink;
   }
 

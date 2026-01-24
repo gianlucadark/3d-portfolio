@@ -9,13 +9,21 @@
 export const WINDOW_CONFIG = {
     MIN_WIDTH: 200,
     MIN_HEIGHT: 150,
-    DEFAULT_WIDTH: 600,
-    DEFAULT_HEIGHT: 700,
+    DEFAULT_WIDTH: 700,
+    DEFAULT_HEIGHT: 550, // Reduced from 700 to fit better on standard screens
     TASKBAR_HEIGHT: 30,
     MOBILE_BREAKPOINT: 768,
     MOBILE_WIDTH_RATIO: 0.9,
     MOBILE_HEIGHT_RATIO: 0.8,
     INITIAL_Z_INDEX: 1000
+} as const;
+
+export const ICON_GRID_CONFIG = {
+    ITEM_WIDTH: 100,
+    ITEM_HEIGHT: 100,
+    PADDING_LEFT: 20,
+    PADDING_TOP: 20,
+    MARGIN: 10
 } as const;
 
 // ============================================

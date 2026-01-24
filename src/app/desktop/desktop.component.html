@@ -77,9 +77,46 @@
         (openOtherWindow)="onOpenWindow($event)">
         <ng-container *ngIf="window.windowType === 'email'">
           <div class="email-window">
-            <div class="window-body">
-              <textarea [(ngModel)]="emailContent" [placeholder]="'email.placeholder' | translate"></textarea>
-              <button (click)="sendEmail()">{{ 'email.send' | translate }}</button>
+            <div class="email-toolbar">
+              <button class="email-tool-btn" (click)="sendEmail()">
+                <img src="assets/icons/spegni.png" style="filter: hue-rotate(90deg);" alt="Send">
+                <span>Invia</span>
+              </button>
+              <div class="email-tool-sep"></div>
+              <button class="email-tool-btn">
+                <img src="assets/icons/cv.png" style="width: 20px; height: 20px;" alt="Cut">
+                <span>Taglia</span>
+              </button>
+              <button class="email-tool-btn">
+                <img src="assets/icons/computer.png" style="width: 20px; height: 20px;" alt="Copy">
+                <span>Copia</span>
+              </button>
+              <button class="email-tool-btn">
+                <img src="assets/icons/paint.png" style="width: 20px; height: 20px;" alt="Paste">
+                <span>Incolla</span>
+              </button>
+              <div class="email-tool-sep"></div>
+              <button class="email-tool-btn">
+                <img src="assets/icons/readme.png" style="width: 20px; height: 20px;" alt="Undo">
+                <span>Annulla</span>
+              </button>
+            </div>
+            <div class="email-headers">
+              <div class="email-header-row">
+                <span class="email-label">A:</span>
+                <input class="email-input" [(ngModel)]="emailTo" readonly>
+              </div>
+              <div class="email-header-row">
+                <span class="email-label">Cc:</span>
+                <input class="email-input">
+              </div>
+              <div class="email-header-row">
+                <span class="email-label">Oggetto:</span>
+                <input class="email-input" [(ngModel)]="emailSubject">
+              </div>
+            </div>
+            <div class="email-body">
+              <textarea [(ngModel)]="emailContent" placeholder="Scrivi qui il tuo messaggio..."></textarea>
             </div>
           </div>
         </ng-container>
