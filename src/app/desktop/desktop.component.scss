@@ -93,7 +93,8 @@ $black: #000;
 .desktop-top-actions {
   position: absolute;
   top: 20px;
-  right: 20px;
+  left: 50%;
+  // transform: translate(-50%, -50%);
   z-index: 10000;
 }
 

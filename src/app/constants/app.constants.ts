@@ -193,3 +193,46 @@ export const PACMAN_CONFIG = {
         BASE_GHOST: 200
     }
 } as const;
+
+// ============================================
+// ID FINESTRE
+// ============================================
+export const WINDOW_IDS = {
+    COMPUTER: 1,
+    CV: 3,
+    PROMPT: 4,
+    README: 5,
+    PAINT: 6,
+    TRASH: 7,
+    NOTEPAD: 8,
+    EMAIL: 9,
+    PROJECTS: 10,
+    UXABILITY: 11,
+    WEB_EXTENSION: 12,
+    CURRICULUM: 13
+} as const;
+
+// ============================================
+// PATH ASSET
+// ============================================
+export const ASSET_PATHS = {
+    ICONS: {
+        COMPUTER: 'assets/icons/computer.png',
+        CV: 'assets/icons/cv.png',
+        PROMPT: 'assets/icons/prompt.png',
+        README: 'assets/icons/readme.png',
+        PAINT: 'assets/icons/paint.png',
+        TRASH: 'assets/icons/cestino.png',
+        PAPER: 'assets/icons/paper.png',
+        EMAIL: 'assets/icons/email.png',
+        FOLDER: 'assets/icons/folder.png'
+    }
+} as const;
+
+// ============================================
+// DESCRIZIONI PROGETTI
+// ============================================
+export const PROJECT_DESCRIPTIONS = {
+    UXABILITY: `Uxability è un'applicazione web sviluppata in Angular che permette di analizzare l'accessibilità e le performance di qualsiasi sito web semplicemente inserendo l'URL desiderato. L'applicazione genera report dettagliati che evidenziano errori, criticità e suggerimenti pratici per il miglioramento, offrendo anche una heatmap interattiva che visualizza graficamente le aree problematiche del sito. Un sistema di intelligenza artificiale integrato fornisce spiegazioni approfondite e chiare sugli errori riscontrati, rendendo le informazioni accessibili anche a chi non ha competenze tecniche, e suggerisce soluzioni concrete per ottimizzare il codice e l'esperienza utente complessiva. Cosa aspetti, contattami per saperne di più!`,
+    WEB_EXTENSION: `L'estensione web sviluppata, consente di migliorare sensibilmente l'accessibilità dei siti internet, offrendo strumenti avanzati e personalizzabili per adattare la navigazione alle esigenze delle persone con disabilità. L'utente può intervenire in tempo reale su testo, contrasti, colori, spaziature, font e livello di zoom, rendendo ogni sito più leggibile e fruibile. Grazie a questa estensione, l'esperienza di navigazione diventa più inclusiva e accessibile per tutti, senza la necessità di modificare il sito originale.`
+} as const;

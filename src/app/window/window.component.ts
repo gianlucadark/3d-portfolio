@@ -87,7 +87,7 @@ export class WindowComponent implements OnInit, OnChanges, OnDestroy {
   showHelp = false;
 
   // Notepad
-  notepadText = '--- CURRICULUM VITAE ---\n\nPuoi visualizzare il mio CV cliccando sul file "CV Gianluca" nella cartella Curriculum sul Desktop.\n\nIn alternativa, clicca su questo link per aprirlo istantaneamente: CV_LINK';
+  notepadText = '';
 
   // Cleanup
   private readonly destroy$ = new Subject<void>();
