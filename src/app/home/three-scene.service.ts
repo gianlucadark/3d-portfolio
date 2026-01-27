@@ -98,8 +98,9 @@ export class ThreeSceneService implements OnDestroy {
         this.renderer.outputColorSpace = THREE.SRGBColorSpace;
         this.renderer.shadowMap.enabled = true;
         this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-        this.renderer.toneMappingExposure = 1.1;
+        this.renderer.toneMappingExposure = 0.4;
 
         container.appendChild(this.renderer.domElement);
     }
@@ -164,7 +165,7 @@ export class ThreeSceneService implements OnDestroy {
         rgbeLoader.setDataType(THREE.HalfFloatType);
 
         rgbeLoader.load(
-            'assets/cielo1.hdr',
+            'assets/cielo_map.hdr',
             (texture) => {
                 const pmremGenerator = new THREE.PMREMGenerator(this.renderer);
                 pmremGenerator.compileEquirectangularShader();
@@ -172,6 +173,10 @@ export class ThreeSceneService implements OnDestroy {
                 this.envMap = pmremGenerator.fromEquirectangular(texture).texture;
                 this.scene.background = this.envMap;
                 this.scene.environment = this.envMap;
+
+                // Adjust intensity
+                (this.scene as any).backgroundIntensity = THREE_CONFIG.LIGHTS.ENVIRONMENT_INTENSITY;
+                (this.scene as any).environmentIntensity = THREE_CONFIG.LIGHTS.ENVIRONMENT_INTENSITY;
 
                 texture.dispose();
                 pmremGenerator.dispose();
@@ -201,7 +206,7 @@ export class ThreeSceneService implements OnDestroy {
         loader.setDRACOLoader(dracoLoader);
 
         loader.load(
-            'assets/3d/room-space-final.glb',
+            'assets/3d/room-space.glb',
             (gltf) => {
                 this.onModelLoaded(gltf);
                 dracoLoader.dispose();
@@ -288,6 +293,8 @@ export class ThreeSceneService implements OnDestroy {
             this.cacheCornice(mesh, material);
         } else if (name.includes('giallo')) {
             this.applyYellowMaterial(material);
+        } else if (name.includes('stanza')) {
+            this.applyWallMaterial(mesh, material);
         }
     }
 
@@ -321,6 +328,25 @@ export class ThreeSceneService implements OnDestroy {
             metalness: MARBLE.METALNESS,
             clearcoat: MARBLE.CLEARCOAT,
             clearcoatRoughness: 0.1,
+            side: THREE.DoubleSide
+        });
+    }
+
+    private applyWallMaterial(mesh: THREE.Mesh, material: THREE.MeshStandardMaterial): void {
+        const { WALL } = MATERIAL_CONFIG;
+        mesh.material = new THREE.MeshPhysicalMaterial({
+            name: material.name,
+            map: material.map,
+            normalMap: material.normalMap,
+            color: material.color,
+            transparent: true,
+            transmission: WALL.TRANSMISSION,
+            opacity: 0.2,
+            roughness: WALL.ROUGHNESS,
+            metalness: WALL.METALNESS,
+            ior: WALL.IOR,
+            thickness: WALL.THICKNESS,
+            specularIntensity: WALL.SPECULAR_INTENSITY,
             side: THREE.DoubleSide
         });
     }
@@ -665,6 +691,8 @@ export class ThreeSceneService implements OnDestroy {
             if (this.envMap) {
                 this.scene.background = this.envMap;
                 this.scene.environment = this.envMap;
+                (this.scene as any).backgroundIntensity = THREE_CONFIG.LIGHTS.ENVIRONMENT_INTENSITY;
+                (this.scene as any).environmentIntensity = THREE_CONFIG.LIGHTS.ENVIRONMENT_INTENSITY;
             }
         }
     }

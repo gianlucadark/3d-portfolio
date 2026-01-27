@@ -30,31 +30,31 @@
   <div class="navigation-bar" *ngIf="windowType !== 'prompt'">
     <div class="toolbar-group">
       <button class="nav-button main" [attr.aria-label]="'common.back' | translate" disabled>
-        <img src="assets/icons/back.png" [alt]="'common.back' | translate" class="nav-icon large">
+        <img src="assets/icons/back.webp" [alt]="'common.back' | translate" class="nav-icon large">
         <span class="nav-text">{{ 'common.back' | translate }}</span>
       </button>
       <button class="nav-button" [attr.aria-label]="'common.forward' | translate" disabled>
-        <img src="assets/icons/avanti.png" [alt]="'common.forward' | translate" class="nav-icon">
+        <img src="assets/icons/avanti.webp" [alt]="'common.forward' | translate" class="nav-icon">
       </button>
     </div>
     <div class="nav-separator"></div>
     <button class="nav-button main">
-      <img src="assets/icons/folder.png" alt="Up" class="nav-icon">
+      <img src="assets/icons/folder.webp" alt="Up" class="nav-icon">
     </button>
     <div class="nav-separator"></div>
     <div class="toolbar-group">
       <button class="nav-button main">
-        <img src="assets/icons/cerca.png" alt="Search" class="nav-icon">
+        <img src="assets/icons/cerca.webp" alt="Search" class="nav-icon">
         <span class="nav-text">{{ 'common.search' | translate }}</span>
       </button>
       <button class="nav-button main">
-        <img src="assets/icons/folder.png" alt="Folders" class="nav-icon">
+        <img src="assets/icons/folder.webp" alt="Folders" class="nav-icon">
         <span class="nav-text">{{ 'common.folders' | translate }}</span>
       </button>
     </div>
     <div class="nav-separator"></div>
     <button class="nav-button main">
-      <img src="assets/icons/computer.png" alt="View" class="nav-icon">
+      <img src="assets/icons/computer.webp" alt="View" class="nav-icon">
     </button>
   </div>
 
@@ -62,12 +62,12 @@
   <div class="address-bar-container" *ngIf="windowType !== 'cv' && windowType !== 'prompt'">
     <div class="address-label">{{ 'common.address' | translate }}</div>
     <div class="address-input-wrapper">
-      <img src="assets/icons/folder.png" alt="Folder" class="address-icon">
+      <img src="assets/icons/folder.webp" alt="Folder" class="address-icon">
       <div class="address-text">{{ folderPath.join('\\') }}</div>
       <div class="address-dropdown"></div>
     </div>
     <button class="go-button">
-      <img src="assets/icons/avanti.png" alt="Go">
+      <img src="assets/icons/avanti.webp" alt="Go">
       <span>{{ 'common.go' | translate }}</span>
     </button>
   </div>
@@ -120,15 +120,15 @@
     </ng-container>
     <ng-container *ngIf="windowType === 'computer'">
       <div class="icon" (click)="selectIcon($event)">
-        <img src="assets/icons/disco.png" [alt]="'diskInfo.localDisk' | translate">
+        <img src="assets/icons/disco.webp" [alt]="'diskInfo.localDisk' | translate">
         <span>{{ 'diskInfo.localDisk' | translate }}</span>
       </div>
     </ng-container>
     <ng-container *ngIf="windowType === 'recycle-bin'">
       <div class="recycle-bin-icons">
         <div class="icon" (click)="selectIcon($event)">
-          <img src="assets/icons/sperlonga.png" alt="Foto">
-          <span>sperlonga.png</span>
+          <img src="assets/icons/sperlonga.webp" alt="Foto">
+          <span>sperlonga.webp</span>
         </div>
       </div>
     </ng-container>

@@ -65,7 +65,9 @@ export const THREE_CONFIG = {
         RECT: {
             INTENSITY_LIGHT: 2,
             INTENSITY_DARK: 0
-        }
+        },
+        EXPOSURE: 0.8,
+        ENVIRONMENT_INTENSITY: 0.5
     },
     ZOOM: {
         SCREEN_DISTANCE: 1.5,
@@ -150,6 +152,14 @@ export const MATERIAL_CONFIG = {
         METALNESS: 0.05,
         CLEARCOAT: 0.8
     },
+    WALL: {
+        ROUGHNESS: 0.05,
+        METALNESS: 0.1,
+        TRANSMISSION: 0.5,
+        IOR: 1.1,
+        THICKNESS: 0,
+        SPECULAR_INTENSITY: 1
+    },
     GLASS: {
         TRANSMISSION: 0,
         ROUGHNESS: 0.8,
@@ -217,15 +227,15 @@ export const WINDOW_IDS = {
 // ============================================
 export const ASSET_PATHS = {
     ICONS: {
-        COMPUTER: 'assets/icons/computer.png',
-        CV: 'assets/icons/cv.png',
-        PROMPT: 'assets/icons/prompt.png',
-        README: 'assets/icons/readme.png',
-        PAINT: 'assets/icons/paint.png',
-        TRASH: 'assets/icons/cestino.png',
-        PAPER: 'assets/icons/paper.png',
-        EMAIL: 'assets/icons/email.png',
-        FOLDER: 'assets/icons/folder.png'
+        COMPUTER: 'assets/icons/computer.webp',
+        CV: 'assets/icons/cv.webp',
+        PROMPT: 'assets/icons/prompt.webp',
+        README: 'assets/icons/readme.webp',
+        PAINT: 'assets/icons/paint.webp',
+        TRASH: 'assets/icons/cestino.webp',
+        PAPER: 'assets/icons/paper.webp',
+        EMAIL: 'assets/icons/email.webp',
+        FOLDER: 'assets/icons/folder.webp'
     }
 } as const;
 
