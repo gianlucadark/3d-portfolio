@@ -45,6 +45,8 @@ export class ThreeSceneService implements OnDestroy {
     private readonly controlsOriginalTarget = new THREE.Vector3();
     private readonly textureCache = new Map<string, THREE.Texture>();
     private isHovering = false;
+    private placeholder: THREE.Mesh | null = null;
+    private isFullQualityEnabled = false;
 
     // Observables
     public readonly loadingProgress$ = new BehaviorSubject<number>(0);
@@ -60,6 +62,7 @@ export class ThreeSceneService implements OnDestroy {
     public initialize(container: ElementRef): void {
         this.ngZone.runOutsideAngular(() => {
             this.initScene(container);
+            this.createPlaceholder();
             this.loadModel();
             this.startAnimation();
             this.setupEventListeners(container.nativeElement);
@@ -94,11 +97,11 @@ export class ThreeSceneService implements OnDestroy {
         });
 
         this.renderer.setSize(width, height);
-        this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, THREE_CONFIG.MAX_PIXEL_RATIO));
+        // Start with lower pixel ratio for faster initial render
+        this.renderer.setPixelRatio(1);
         this.renderer.outputColorSpace = THREE.SRGBColorSpace;
-        this.renderer.shadowMap.enabled = true;
-        this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-        this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        // Disable shadows initially for faster loading
+        this.renderer.shadowMap.enabled = false;
         this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
         this.renderer.toneMappingExposure = 0.4;
 
@@ -199,12 +202,55 @@ export class ThreeSceneService implements OnDestroy {
         );
     }
 
+    private createPlaceholder(): void {
+        // Create a simple wireframe box as placeholder
+        const geometry = new THREE.BoxGeometry(10, 6, 10);
+        const material = new THREE.MeshBasicMaterial({
+            color: 0x4a9eff,
+            wireframe: true,
+            transparent: true,
+            opacity: 0.2
+        });
+
+        this.placeholder = new THREE.Mesh(geometry, material);
+        this.placeholder.position.y = 0;
+        this.scene.add(this.placeholder);
+
+        // Animate placeholder with subtle pulse
+        gsap.to(this.placeholder.scale, {
+            x: 1.05,
+            y: 1.05,
+            z: 1.05,
+            duration: 1.5,
+            repeat: -1,
+            yoyo: true,
+            ease: 'power1.inOut'
+        });
+    }
+
+    private enableProgressiveFeatures(): void {
+        if (this.isFullQualityEnabled) return;
+        this.isFullQualityEnabled = true;
+
+        // Upgrade pixel ratio for better quality
+        this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, THREE_CONFIG.MAX_PIXEL_RATIO));
+
+        // Enable shadows
+        this.renderer.shadowMap.enabled = true;
+        this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+        console.log('Progressive features enabled: high-quality rendering active');
+    }
+
+
     private loadModel(): void {
         const loader = new GLTFLoader();
         const dracoLoader = new DRACOLoader();
         dracoLoader.setDecoderPath('assets/draco/');
+        dracoLoader.preload();
         loader.setDRACOLoader(dracoLoader);
 
+        // Load the correct model with optimizations
         loader.load(
             'assets/3d/room-space.glb',
             (gltf) => {
@@ -234,7 +280,52 @@ export class ThreeSceneService implements OnDestroy {
         this.centerModel();
         this.enableShadows();
         this.applyMaterials();
+
+        // Remove placeholder with fade out
+        if (this.placeholder) {
+            gsap.to(this.placeholder.material, {
+                opacity: 0,
+                duration: 0.5,
+                onComplete: () => {
+                    this.scene.remove(this.placeholder!);
+                    this.placeholder?.geometry.dispose();
+                    (this.placeholder?.material as THREE.Material).dispose();
+                    this.placeholder = null;
+                }
+            });
+        }
+
+        // Add model with fade in
+        this.model.traverse((child) => {
+            if ((child as THREE.Mesh).isMesh) {
+                const mesh = child as THREE.Mesh;
+                const material = mesh.material as THREE.MeshStandardMaterial;
+                if (material && material.transparent === undefined) {
+                    material.transparent = true;
+                    material.opacity = 0;
+                }
+            }
+        });
+
         this.scene.add(this.model);
+
+        // Fade in model
+        this.model.traverse((child) => {
+            if ((child as THREE.Mesh).isMesh) {
+                const mesh = child as THREE.Mesh;
+                const material = mesh.material as THREE.MeshStandardMaterial;
+                if (material) {
+                    gsap.to(material, {
+                        opacity: 1,
+                        duration: 0.8,
+                        ease: 'power2.out'
+                    });
+                }
+            }
+        });
+
+        // Enable progressive features after a short delay
+        setTimeout(() => this.enableProgressiveFeatures(), 1000);
 
         this.isModelLoaded = true;
         this.updateLoadingState(30, 'model'); // Ensure it hits 100% contribution
@@ -367,13 +458,21 @@ export class ThreeSceneService implements OnDestroy {
 
     private applyScreenMaterial(mesh: THREE.Mesh, material: THREE.MeshStandardMaterial, texturePath: string, target: 'schermoGrande' | 'schermoPiccolo'): void {
         const { SCREEN } = MATERIAL_CONFIG;
-        const texture = this.loadTexture(texturePath);
-        material.map = texture;
+
+        // Set basic material properties immediately
         material.emissive = new THREE.Color(COLORS.WHITE);
-        material.emissiveMap = texture;
-        material.emissiveIntensity = SCREEN.EMISSIVE_INTENSITY;
+        material.emissiveIntensity = SCREEN.EMISSIVE_INTENSITY * 0.3; // Lower initially
         material.roughness = SCREEN.ROUGHNESS;
         material.metalness = SCREEN.METALNESS;
+
+        // Lazy load texture after model is visible
+        setTimeout(() => {
+            const texture = this.loadTexture(texturePath);
+            material.map = texture;
+            material.emissiveMap = texture;
+            material.emissiveIntensity = SCREEN.EMISSIVE_INTENSITY;
+            material.needsUpdate = true;
+        }, 500);
 
         if (target === 'schermoGrande') this.schermoGrandeMesh = mesh;
         else this.schermoPiccoloMesh = mesh;
@@ -382,12 +481,18 @@ export class ThreeSceneService implements OnDestroy {
     }
 
     private applyQuadroMaterial(mesh: THREE.Mesh, material: THREE.MeshStandardMaterial): void {
-        const texture = this.loadTexture('assets/cvfoto1.webp');
-        material.map = texture;
-        material.needsUpdate = true;
+        // Set basic properties immediately
         material.emissive = new THREE.Color(COLORS.WHITE);
-        material.emissiveMap = texture;
-        material.emissiveIntensity = MATERIAL_CONFIG.SCREEN.EMISSIVE_INTENSITY;
+        material.emissiveIntensity = MATERIAL_CONFIG.SCREEN.EMISSIVE_INTENSITY * 0.3;
+
+        // Lazy load texture
+        setTimeout(() => {
+            const texture = this.loadTexture('assets/cvfoto1.webp');
+            material.map = texture;
+            material.emissiveMap = texture;
+            material.emissiveIntensity = MATERIAL_CONFIG.SCREEN.EMISSIVE_INTENSITY;
+            material.needsUpdate = true;
+        }, 500);
 
         this.quadroMesh = mesh;
         this.quadroOriginalScale.copy(mesh.scale);
@@ -411,6 +516,9 @@ export class ThreeSceneService implements OnDestroy {
             const texture = loader.load(path);
             texture.flipY = true;
             texture.colorSpace = THREE.SRGBColorSpace;
+            // Disable mipmaps for faster loading on textures that don't need them
+            texture.generateMipmaps = false;
+            texture.minFilter = THREE.LinearFilter;
             this.textureCache.set(path, texture);
         }
         return this.textureCache.get(path)!;
