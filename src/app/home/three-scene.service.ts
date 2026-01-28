@@ -252,7 +252,7 @@ export class ThreeSceneService implements OnDestroy {
 
         // Load the optimized model (preserves all original materials)
         loader.load(
-            'assets/3d/room-space-opt-allmaterials.glb',
+            'assets/3d/room-space-opt-allmaterials-v3.glb',
             (gltf) => {
                 this.onModelLoaded(gltf);
                 dracoLoader.dispose();
