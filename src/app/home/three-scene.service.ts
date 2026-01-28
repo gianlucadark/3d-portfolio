@@ -250,9 +250,9 @@ export class ThreeSceneService implements OnDestroy {
         dracoLoader.preload();
         loader.setDRACOLoader(dracoLoader);
 
-        // Load the correct model with optimizations
+        // Load the optimized model (preserves all original materials)
         loader.load(
-            'assets/3d/room-space.glb',
+            'assets/3d/room-space-opt-allmaterials.glb',
             (gltf) => {
                 this.onModelLoaded(gltf);
                 dracoLoader.dispose();
@@ -276,8 +276,9 @@ export class ThreeSceneService implements OnDestroy {
     private onModelLoaded(gltf: any): void {
         this.model = gltf.scene;
         if (!this.model) return;
-
         this.centerModel();
+        // Auto-frame the model so the camera targets the center and frames it nicely
+        this.frameModel();
         this.enableShadows();
         this.applyMaterials();
 
@@ -342,6 +343,32 @@ export class ThreeSceneService implements OnDestroy {
         this.model.position.x += THREE_CONFIG.MODEL.POSITION_X_OFFSET;
     }
 
+    private frameModel(): void {
+        if (!this.model || !this.camera || !this.controls) return;
+
+        const box = new THREE.Box3().setFromObject(this.model);
+        const size = box.getSize(new THREE.Vector3());
+        const center = box.getCenter(new THREE.Vector3());
+
+        // Fit the camera to the model using a simple bounding-sphere approach
+        const maxDim = Math.max(size.x, size.y, size.z);
+        const fov = this.camera.fov * (Math.PI / 180);
+        let distance = Math.abs(maxDim / (2 * Math.tan(fov / 2)));
+        distance *= 1.4; // add some padding
+
+        // Place camera offset slightly above center for a better initial view
+        const cameraPos = new THREE.Vector3(center.x, center.y + maxDim * 0.15, center.z + distance);
+
+        // Apply positions
+        this.camera.position.copy(cameraPos);
+        this.controls.target.copy(center);
+        this.controls.update();
+
+        // Save original positions for zoom return
+        this.cameraOriginalPosition.copy(this.camera.position);
+        this.controlsOriginalTarget.copy(this.controls.target);
+    }
+
     private enableShadows(): void {
         this.model?.traverse((child) => {
             if ((child as THREE.Mesh).isMesh) {
@@ -357,11 +384,27 @@ export class ThreeSceneService implements OnDestroy {
 
             const mesh = child as THREE.Mesh;
             const material = mesh.material as THREE.MeshStandardMaterial;
+            const matName = material?.name || '(no-name)';
+            const meshName = mesh.name || '(no-mesh-name)';
+            const mapInfo = material?.map ? (material.map as any).name || (material.map as any).image?.src || 'map-present' : 'map-none';
+            const normalInfo = material?.normalMap ? 'normal-present' : 'normal-none';
+            console.log(`Mesh: ${meshName}  Material: ${matName}  map:${mapInfo}  normal:${normalInfo}`);
+
             if (!material?.name) return;
 
             const name = material.name.toLowerCase();
-            console.log('Found mesh/material:', name);
+            const meshNameLower = meshName.toLowerCase();
+
+            // Prefer material-name based handlers, but fall back to mesh-name
+            // detection for cases where the GLB optimizer merged/renamed materials.
             this.applyMaterialByName(mesh, material, name);
+
+            // Fallback: if optimizer changed material names, detect screens by mesh name
+            if (meshNameLower.includes('schermogrande') && !name.includes('schermogrande')) {
+                this.applyScreenMaterial(mesh, material, 'assets/sfondo.webp', 'schermoGrande');
+            } else if (meshNameLower.includes('schermopiccolo') && !name.includes('schermopiccolo')) {
+                this.applyScreenMaterial(mesh, material, 'assets/pacman.webp', 'schermoPiccolo');
+            }
         });
     }
 
@@ -392,54 +435,87 @@ export class ThreeSceneService implements OnDestroy {
     // Material application helpers
     private applyGlassMaterial(mesh: THREE.Mesh, material: THREE.MeshStandardMaterial): void {
         const { GLASS } = MATERIAL_CONFIG;
-        mesh.material = new THREE.MeshPhysicalMaterial({
-            name: material.name,
-            map: material.map,
-            normalMap: material.normalMap,
-            color: material.color,
-            transparent: true,
-            transmission: GLASS.TRANSMISSION,
-            opacity: 1,
-            roughness: GLASS.ROUGHNESS,
-            metalness: GLASS.METALNESS,
-            ior: GLASS.IOR,
-            thickness: 0.05,
-            side: THREE.DoubleSide
-        });
+        // Preserve original material: update non-physical properties in-place
+        material.map = material.map || material.map;
+        material.normalMap = material.normalMap || material.normalMap;
+        material.color = (material.color || new THREE.Color(0xffffff)).clone();
+        material.transparent = true;
+        material.opacity = 1;
+        material.roughness = GLASS.ROUGHNESS;
+        material.metalness = GLASS.METALNESS;
+        material.side = THREE.DoubleSide;
+
+        // Only set physical-only properties if material is a MeshPhysicalMaterial
+        if ((material as any).isMeshPhysicalMaterial) {
+            (material as any).transmission = GLASS.TRANSMISSION;
+            (material as any).ior = GLASS.IOR;
+            (material as any).thickness = 0.05;
+        } else {
+            console.log(`Skipping physical props for material '${material.name}' (not MeshPhysicalMaterial)`);
+        }
+        material.needsUpdate = true;
     }
 
     private applyMarbleMaterial(mesh: THREE.Mesh, material: THREE.MeshStandardMaterial): void {
         const { MARBLE } = MATERIAL_CONFIG;
-        mesh.material = new THREE.MeshPhysicalMaterial({
-            name: material.name,
-            map: material.map,
-            normalMap: material.normalMap,
-            color: material.color,
-            roughness: MARBLE.ROUGHNESS,
-            metalness: MARBLE.METALNESS,
-            clearcoat: MARBLE.CLEARCOAT,
-            clearcoatRoughness: 0.1,
-            side: THREE.DoubleSide
-        });
+        // Preserve original material: tweak properties in-place
+        material.map = material.map || material.map;
+        material.normalMap = material.normalMap || material.normalMap;
+        material.color = (material.color || new THREE.Color(0xffffff)).clone();
+        material.roughness = MARBLE.ROUGHNESS;
+        material.metalness = MARBLE.METALNESS;
+        material.side = THREE.DoubleSide;
+
+        if ((material as any).isMeshPhysicalMaterial) {
+            (material as any).clearcoat = MARBLE.CLEARCOAT;
+            (material as any).clearcoatRoughness = 0.1;
+        } else {
+            console.log(`Skipping clearcoat props for material '${material.name}' (not MeshPhysicalMaterial)`);
+        }
+        material.needsUpdate = true;
     }
 
     private applyWallMaterial(mesh: THREE.Mesh, material: THREE.MeshStandardMaterial): void {
         const { WALL } = MATERIAL_CONFIG;
-        mesh.material = new THREE.MeshPhysicalMaterial({
-            name: material.name,
-            map: material.map,
-            normalMap: material.normalMap,
-            color: material.color,
+        // Turn the wall ('stanza') into a glass-like material while preserving maps
+        const oldMap = material.map || null;
+        const oldNormal = material.normalMap || undefined;
+        const color = (material.color || new THREE.Color(0xffffff)).clone();
+
+        // If already a physical material, just tweak to be glassy
+        if ((material as any).isMeshPhysicalMaterial) {
+            material.transparent = true;
+            material.opacity = 1;
+            material.roughness = 0.02;
+            material.metalness = 0;
+            (material as any).transmission = 0.9;
+            (material as any).ior = 1.45;
+            (material as any).thickness = 0.05;
+            material.side = THREE.DoubleSide;
+            material.needsUpdate = true;
+            return;
+        }
+
+        // Otherwise create a MeshPhysicalMaterial and replace the old one
+        const glass = new THREE.MeshPhysicalMaterial({
+            map: oldMap,
+            normalMap: oldNormal,
+            color,
             transparent: true,
-            transmission: WALL.TRANSMISSION,
             opacity: 0.2,
-            roughness: WALL.ROUGHNESS,
-            metalness: WALL.METALNESS,
-            ior: WALL.IOR,
-            thickness: WALL.THICKNESS,
-            specularIntensity: WALL.SPECULAR_INTENSITY,
+            roughness: 0.02,
+            metalness: 0,
+            transmission: 0.9,
+            ior: 1.1,
+            thickness: 0,
             side: THREE.DoubleSide
         });
+        glass.name = material.name || 'stanza-glass';
+
+        // Assign new material to mesh and dispose old material to avoid leaks
+        mesh.material = glass;
+        try { material.dispose(); } catch (e) { /* ignore */ }
+        glass.needsUpdate = true;
     }
 
     private applyCeilingMaterial(material: THREE.MeshStandardMaterial): void {
@@ -467,7 +543,7 @@ export class ThreeSceneService implements OnDestroy {
 
         // Lazy load texture after model is visible
         setTimeout(() => {
-            const texture = this.loadTexture(texturePath);
+            const texture = this.loadTexture(texturePath, { flipY: true });
             material.map = texture;
             material.emissiveMap = texture;
             material.emissiveIntensity = SCREEN.EMISSIVE_INTENSITY;
@@ -487,7 +563,7 @@ export class ThreeSceneService implements OnDestroy {
 
         // Lazy load texture
         setTimeout(() => {
-            const texture = this.loadTexture('assets/cvfoto1.webp');
+            const texture = this.loadTexture('assets/cvfoto1.webp', { flipY: true });
             material.map = texture;
             material.emissiveMap = texture;
             material.emissiveIntensity = MATERIAL_CONFIG.SCREEN.EMISSIVE_INTENSITY;
@@ -510,18 +586,21 @@ export class ThreeSceneService implements OnDestroy {
         material.emissiveIntensity = MATERIAL_CONFIG.SCREEN.EMISSIVE_INTENSITY;
     }
 
-    private loadTexture(path: string): THREE.Texture {
-        if (!this.textureCache.has(path)) {
+    private loadTexture(path: string, opts?: { flipY?: boolean; generateMipmaps?: boolean }): THREE.Texture {
+        const key = `${path}::f:${String(opts?.flipY ?? false)}::m:${String(opts?.generateMipmaps ?? false)}`;
+        if (!this.textureCache.has(key)) {
             const loader = new THREE.TextureLoader();
             const texture = loader.load(path);
-            texture.flipY = true;
-            texture.colorSpace = THREE.SRGBColorSpace;
-            // Disable mipmaps for faster loading on textures that don't need them
-            texture.generateMipmaps = false;
-            texture.minFilter = THREE.LinearFilter;
-            this.textureCache.set(path, texture);
+            // Allow override of flipY per-texture; default false to match glTF convention
+            texture.flipY = opts?.flipY ?? false;
+            // Ensure correct color space for sRGB textures when available
+            try { texture.colorSpace = THREE.SRGBColorSpace; } catch (e) { /* ignore if not available */ }
+            // Mipmaps: allow opt-in (default disabled)
+            texture.generateMipmaps = opts?.generateMipmaps ?? false;
+            texture.minFilter = texture.generateMipmaps ? THREE.LinearMipmapLinearFilter : THREE.LinearFilter;
+            this.textureCache.set(key, texture);
         }
-        return this.textureCache.get(path)!;
+        return this.textureCache.get(key)!;
     }
 
     private currentEnvProgress = 0;
@@ -790,7 +869,12 @@ export class ThreeSceneService implements OnDestroy {
             this.ambientLight.intensity = LIGHTS.AMBIENT.INTENSITY_DARK;
             this.directionalLight.intensity = LIGHTS.DIRECTIONAL.INTENSITY_DARK;
             this.rectLight.intensity = LIGHTS.RECT.INTENSITY_DARK;
-            this.scene.background = new THREE.Color(COLORS.DARK_BACKGROUND);
+            // Show the HDR sky as a 'photo' background but disable it as lighting source
+            if (this.envMap) {
+                this.scene.background = this.envMap;
+            } else {
+                this.scene.background = new THREE.Color(COLORS.DARK_BACKGROUND);
+            }
             this.scene.environment = null;
         } else {
             this.ambientLight.intensity = LIGHTS.AMBIENT.INTENSITY_LIGHT;

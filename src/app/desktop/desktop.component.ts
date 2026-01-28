@@ -31,7 +31,7 @@ const DESKTOP_ICONS: Icon[] = [
   { id: 5, name: 'README', image: 'assets/icons/readme.webp', position: { x: 0, y: 0 } },
   { id: 6, name: 'Paint', image: 'assets/icons/paint.webp', position: { x: 0, y: 0 } },
   { id: 8, name: 'Blocco Note', image: 'assets/icons/paper.webp', position: { x: 0, y: 0 } },
-  { id: 9, name: 'Email', image: 'assets/icons/email.webp', position: { x: 0, y: 0 } },
+  { id: 9, name: 'Email', image: 'assets/icons/email.png', position: { x: 0, y: 0 } },
   { id: 10, name: 'Progetti', image: 'assets/icons/folder.webp', position: { x: 0, y: 0 } },
   {
     id: 11,

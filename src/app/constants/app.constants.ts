@@ -67,7 +67,7 @@ export const THREE_CONFIG = {
             INTENSITY_DARK: 0
         },
         EXPOSURE: 0.8,
-        ENVIRONMENT_INTENSITY: 0.5
+        ENVIRONMENT_INTENSITY: 0.3
     },
     ZOOM: {
         SCREEN_DISTANCE: 1.5,
@@ -148,7 +148,7 @@ export const MATERIAL_CONFIG = {
         METALNESS: 0.3
     },
     MARBLE: {
-        ROUGHNESS: 0.1,
+        ROUGHNESS: 1,
         METALNESS: 0.05,
         CLEARCOAT: 0.8
     },
@@ -234,7 +234,7 @@ export const ASSET_PATHS = {
         PAINT: 'assets/icons/paint.webp',
         TRASH: 'assets/icons/cestino.webp',
         PAPER: 'assets/icons/paper.webp',
-        EMAIL: 'assets/icons/email.webp',
+        EMAIL: 'assets/icons/email.png',
         FOLDER: 'assets/icons/folder.webp'
     }
 } as const;
