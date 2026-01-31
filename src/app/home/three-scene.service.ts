@@ -173,7 +173,7 @@ export class ThreeSceneService implements OnDestroy {
         rgbeLoader.setDataType(THREE.HalfFloatType);
 
         rgbeLoader.load(
-            'assets/cielo_map.hdr',
+            'assets/cielo1.hdr',
             (texture) => {
                 const pmremGenerator = new THREE.PMREMGenerator(this.renderer);
                 pmremGenerator.compileEquirectangularShader();
