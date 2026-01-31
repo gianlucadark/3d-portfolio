@@ -143,6 +143,8 @@ export class ThreeSceneService implements OnDestroy {
         this.directionalLight.position.set(-5, 10, 7);
         this.directionalLight.target.position.set(0, 0, 0);
         this.directionalLight.castShadow = true;
+        // Boost light intensity slightly while waiting for env map
+        this.directionalLight.intensity = THREE_CONFIG.LIGHTS.DIRECTIONAL.INTENSITY_LIGHT * 1.5;
 
         const shadow = this.directionalLight.shadow;
         if (shadow?.camera) {
@@ -164,6 +166,9 @@ export class ThreeSceneService implements OnDestroy {
     }
 
     private loadEnvironment(): void {
+        // Set a default background color while waiting for HDR
+        this.scene.background = new THREE.Color(COLORS.ICE_BLUE).multiplyScalar(0.2);
+
         const rgbeLoader = new RGBELoader();
         rgbeLoader.setDataType(THREE.HalfFloatType);
 
@@ -181,23 +186,16 @@ export class ThreeSceneService implements OnDestroy {
                 (this.scene as any).backgroundIntensity = THREE_CONFIG.LIGHTS.ENVIRONMENT_INTENSITY;
                 (this.scene as any).environmentIntensity = THREE_CONFIG.LIGHTS.ENVIRONMENT_INTENSITY;
 
+                // Reset directional light to normal
+                this.directionalLight.intensity = THREE_CONFIG.LIGHTS.DIRECTIONAL.INTENSITY_LIGHT;
+
                 texture.dispose();
                 pmremGenerator.dispose();
-
-                this.isEnvLoaded = true;
-                this.checkLoadingComplete();
+                console.log('Environment map loaded lazily.');
             },
-            (event) => {
-                if (event.lengthComputable) {
-                    // Environment is roughly 30% of total weight
-                    const progress = (event.loaded / event.total) * 30;
-                    this.updateLoadingState(progress, 'env');
-                }
-            },
+            undefined, // No progress tracking for env anymore
             (error) => {
                 console.error('Error loading HDR:', error);
-                this.isEnvLoaded = true;
-                this.checkLoadingComplete();
             }
         );
     }
@@ -252,15 +250,15 @@ export class ThreeSceneService implements OnDestroy {
 
         // Load the optimized model (preserves all original materials)
         loader.load(
-            'assets/3d/room-space-opt-allmaterials-v5-final.glb',
+            'assets/3d/room-space-2-final.glb',
             (gltf) => {
                 this.onModelLoaded(gltf);
                 dracoLoader.dispose();
             },
             (event) => {
                 if (event.lengthComputable) {
-                    // Model is roughly 70% of total weight
-                    const progress = (event.loaded / event.total) * 70;
+                    // Model is now 100% of the visible loading bar
+                    const progress = (event.loaded / event.total) * 100;
                     this.updateLoadingState(progress, 'model');
                 }
             },
@@ -329,7 +327,8 @@ export class ThreeSceneService implements OnDestroy {
         setTimeout(() => this.enableProgressiveFeatures(), 1000);
 
         this.isModelLoaded = true;
-        this.updateLoadingState(30, 'model'); // Ensure it hits 100% contribution
+        this.isModelLoaded = true;
+        this.updateLoadingState(100, 'model');
         this.checkLoadingComplete();
     }
 
@@ -607,14 +606,11 @@ export class ThreeSceneService implements OnDestroy {
     private currentModelProgress = 0;
 
     private updateLoadingState(progress: number, type: 'env' | 'model'): void {
-        if (type === 'env') {
-            this.currentEnvProgress = progress;
-        } else {
+        // Only track model progress for the UI
+        if (type === 'model') {
             this.currentModelProgress = progress;
+            this.updateProgress(progress);
         }
-
-        const totalProgress = Math.min(Math.round(this.currentEnvProgress + this.currentModelProgress), 99);
-        this.updateProgress(totalProgress);
     }
 
     private updateProgress(value: number): void {
@@ -622,7 +618,7 @@ export class ThreeSceneService implements OnDestroy {
     }
 
     private checkLoadingComplete(): void {
-        if (this.isEnvLoaded && this.isModelLoaded) {
+        if (this.isModelLoaded) {
             this.updateProgress(100);
             setTimeout(() => {
                 this.ngZone.run(() => this.loadingComplete$.next(true));
