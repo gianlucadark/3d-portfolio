@@ -195,5 +195,12 @@ export const IT_TRANSLATIONS = {
 
     notepad: {
         cvLink: '[ CLICCA QUI PER APRIRE IL CV ]'
+    },
+    catModal: {
+        title: 'Presentazione Speciale: La mia Gatta 🐾',
+        intro: 'Ciao a tutti! Volevo per forza esserci anche io in questo portfolio, non potevo mica lasciare tutto lo spazio a Gianluca!',
+        description: 'Sono una gatta Siberiana di quasi 3 anni (li compio a breve, preparate i croccantini premium!). Mi piace molto "aiutare" Gianluca mentre programma, specialmente camminando sulla tastiera nei momenti meno opportuni o fissando il cursore con estremo sospetto.',
+        personality: 'Sono bella, regale e soprattutto... sono io la vera padrona di casa (e di questo codice). Se il sito funziona bene, è merito delle mie fusa incoraggianti. Se ci sono bug... beh, probabilmente ho solo premuto qualche tasto di troppo.',
+        close: 'Chiudi presentazione'
     }
 };

@@ -35,6 +35,7 @@ export class ThreeSceneService implements OnDestroy {
     private corniceMesh: THREE.Mesh | null = null;
     private schermoGrandeMesh: THREE.Mesh | null = null;
     private schermoPiccoloMesh: THREE.Mesh | null = null;
+    private catMesh: THREE.Mesh | null = null;
     private quadroOriginalScale = new THREE.Vector3();
     private corniceOriginalScale = new THREE.Vector3();
 
@@ -66,6 +67,7 @@ export class ThreeSceneService implements OnDestroy {
     public readonly loadingComplete$ = new BehaviorSubject<boolean>(false);
     public readonly screenClick$ = new Subject<'desktop' | 'game'>();
     public readonly pdfClick$ = new Subject<void>();
+    public readonly catClick$ = new Subject<void>();
 
     private isEnvLoaded = false;
     private isModelLoaded = false;
@@ -458,7 +460,14 @@ export class ThreeSceneService implements OnDestroy {
             this.applyYellowMaterial(material);
         } else if (name.includes('stanza')) {
             this.applyWallMaterial(mesh, material);
+        } else if (name.includes('gatto') || name.includes('cat') || name.includes('siberi')) {
+            this.applyCatMaterial(mesh);
         }
+    }
+
+    private applyCatMaterial(mesh: THREE.Mesh): void {
+        this.catMesh = mesh;
+        mesh.userData['isClickable'] = true;
     }
 
     // Material application helpers
@@ -713,6 +722,11 @@ export class ThreeSceneService implements OnDestroy {
             this.zoomToScreen(this.schermoPiccoloMesh!, THREE_CONFIG.ZOOM.GAME_DISTANCE, () => {
                 this.screenClick$.next('game');
             });
+            return;
+        }
+
+        if (this.checkIntersection(this.catMesh)) {
+            this.ngZone.run(() => this.catClick$.next());
         }
     }
 
@@ -729,7 +743,7 @@ export class ThreeSceneService implements OnDestroy {
         let isHoveringSomething = false;
 
         if (this.handleQuadroHover()) isHoveringSomething = true;
-        if (!isHoveringSomething && (this.checkIntersection(this.schermoGrandeMesh) || this.checkIntersection(this.schermoPiccoloMesh))) {
+        if (!isHoveringSomething && (this.checkIntersection(this.schermoGrandeMesh) || this.checkIntersection(this.schermoPiccoloMesh) || this.checkIntersection(this.catMesh))) {
             isHoveringSomething = true;
         }
 

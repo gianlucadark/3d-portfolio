@@ -16,6 +16,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     // UI State
     isDarkMode = false;
     showPdfModal = false;
+    showCatModal = false;
     showDesktop = false;
     showGame = false;
     currentLanguage: Language = 'it';
@@ -85,6 +86,13 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
                 this.showPdfModal = true;
                 this.cdr.markForCheck();
             });
+
+        this.threeSceneService.catClick$
+            .pipe(takeUntil(this.destroy$))
+            .subscribe(() => {
+                this.showCatModal = true;
+                this.cdr.markForCheck();
+            });
     }
 
     ngAfterViewInit(): void {
@@ -134,6 +142,11 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
     closePdfModal(): void {
         this.showPdfModal = false;
+        this.cdr.markForCheck();
+    }
+
+    closeCatModal(): void {
+        this.showCatModal = false;
         this.cdr.markForCheck();
     }
 

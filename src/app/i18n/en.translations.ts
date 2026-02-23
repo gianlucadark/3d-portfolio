@@ -195,5 +195,12 @@ export const EN_TRANSLATIONS = {
 
     notepad: {
         cvLink: '[ CLICK HERE TO OPEN CV ]'
+    },
+    catModal: {
+        title: 'Special Presentation: My Cat 🐾',
+        intro: 'Hi everyone! I absolutely had to be in this portfolio, I couldn\'t let Gianluca take all the spotlight!',
+        description: 'I\'m a Siberian cat almost 3 years old (birthday coming soon, keep those premium treats ready!). I love "helping" Gianluca while he codes, especially by walking on the keyboard at the worst possible moments or staring at the cursor with extreme suspicion.',
+        personality: 'I\'m beautiful, regal and above all... I\'m the true boss of the house (and of this code). If the site works well, it\'s thanks to my encouraging purrs. If there are bugs... well, I probably just pressed a few too many keys.',
+        close: 'Close presentation'
     }
 };

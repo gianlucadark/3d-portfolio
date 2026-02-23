@@ -198,6 +198,40 @@
     </div>
 </div>
 
+<!-- Modale Gatta Dolly -->
+<div class="cat-modal-overlay" *ngIf="showCatModal" (click)="closeCatModal()">
+    <div class="cat-modal-container" (click)="$event.stopPropagation()">
+        <div class="cat-modal-header">
+            <div class="cat-title-group">
+                <span class="cat-emoji">🐾</span>
+                <h2 class="cat-modal-title">{{ 'catModal.title' | translate }}</h2>
+            </div>
+            <button class="pdf-modal-close" (click)="closeCatModal()" [attr.aria-label]="'catModal.close' | translate">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+        <div class="cat-modal-body">
+            <div class="cat-image-container">
+                <div class="cat-image-wrapper">
+                    <img src="assets/dolly.png" alt="Dolly the Siberian Cat" class="cat-photo">
+                </div>
+                <div class="cat-badge">Dolly</div>
+            </div>
+            <div class="cat-content">
+                <p class="cat-intro">{{ 'catModal.intro' | translate }}</p>
+                <div class="cat-description-box">
+                    <p>{{ 'catModal.description' | translate }}</p>
+                    <p class="cat-personality">{{ 'catModal.personality' | translate }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Desktop Component Overlay -->
 <app-desktop *ngIf="showDesktop" (closeDesktop)="returnFromDesktop()"></app-desktop>
 
