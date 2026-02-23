@@ -143,13 +143,201 @@
         <textarea [(ngModel)]="notepadText" class="notepad-textarea"></textarea>
         <div class="notepad-footer" *ngIf="notepadText.includes('CV_LINK')">
           <button (click)="openCvWindow($event)" class="notepad-link-btn">
-            [ CLICCA QUI PER APRIRE IL CV ]
+            {{ 'notepad.cvLink' | translate }}
           </button>
         </div>
       </div>
     </ng-container>
+    <ng-container *ngIf="windowType === 'uxability'">
+      <div class="project-page uxability-page">
+        <div class="project-hero">
+          <div class="project-hero-icon">🔍</div>
+          <h1 class="project-title">{{ 'projects.uxability.name' | translate }}</h1>
+          <p class="project-subtitle">{{ 'projects.uxability.subtitle' | translate }}</p>
+        </div>
+
+        <div class="project-description">
+          <p>{{ 'projects.uxability.description' | translate }}</p>
+          <p>{{ 'projects.uxability.overview' | translate }}</p>
+        </div>
+
+        <div class="project-section">
+          <h2 class="project-section-title">
+            <span class="section-icon">🚀</span>
+            {{ 'projects.uxability.howItWorksTitle' | translate }}
+          </h2>
+          <div class="project-steps">
+            <div class="step-item">
+              <div class="step-number">1</div>
+              <p>{{ 'projects.uxability.step1' | translate }}</p>
+            </div>
+            <div class="step-item">
+              <div class="step-number">2</div>
+              <p>{{ 'projects.uxability.step2' | translate }}</p>
+            </div>
+            <div class="step-item">
+              <div class="step-number">3</div>
+              <p>{{ 'projects.uxability.step3' | translate }}</p>
+            </div>
+            <div class="step-item">
+              <div class="step-number">4</div>
+              <p>{{ 'projects.uxability.step4' | translate }}</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="project-section">
+          <h2 class="project-section-title">
+            <span class="section-icon">⚡</span>
+            {{ 'projects.uxability.featuresTitle' | translate }}
+          </h2>
+          <div class="features-grid">
+            <div class="feature-card">
+              <div class="feature-icon">♿</div>
+              <h3>{{ 'projects.uxability.feature1Title' | translate }}</h3>
+              <p>{{ 'projects.uxability.feature1Desc' | translate }}</p>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon">🗺️</div>
+              <h3>{{ 'projects.uxability.feature2Title' | translate }}</h3>
+              <p>{{ 'projects.uxability.feature2Desc' | translate }}</p>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon">📊</div>
+              <h3>{{ 'projects.uxability.feature3Title' | translate }}</h3>
+              <p>{{ 'projects.uxability.feature3Desc' | translate }}</p>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon">🤖</div>
+              <h3>{{ 'projects.uxability.feature4Title' | translate }}</h3>
+              <p>{{ 'projects.uxability.feature4Desc' | translate }}</p>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon">⏱️</div>
+              <h3>{{ 'projects.uxability.feature5Title' | translate }}</h3>
+              <p>{{ 'projects.uxability.feature5Desc' | translate }}</p>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon">📈</div>
+              <h3>{{ 'projects.uxability.feature6Title' | translate }}</h3>
+              <p>{{ 'projects.uxability.feature6Desc' | translate }}</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="project-section">
+          <h2 class="project-section-title">
+            <span class="section-icon">🛠️</span>
+            {{ 'projects.uxability.techTitle' | translate }}
+          </h2>
+          <div class="tech-stack-bar">
+            {{ 'projects.uxability.techStack' | translate }}
+          </div>
+        </div>
+
+        <div class="project-cta">
+          <p>{{ 'projects.uxability.ctaText' | translate }}</p>
+          <button class="cta-button" (click)="openEmailWindow()">✉️ Email</button>
+        </div>
+      </div>
+    </ng-container>
+
+    <ng-container *ngIf="windowType === 'web-extension'">
+      <div class="project-page web-extension-page">
+        <div class="project-hero">
+          <div class="project-hero-icon">🧩</div>
+          <h1 class="project-title">{{ 'projects.webExtension.name' | translate }}</h1>
+          <p class="project-subtitle">{{ 'projects.webExtension.subtitle' | translate }}</p>
+        </div>
+
+        <div class="project-description">
+          <p>{{ 'projects.webExtension.description' | translate }}</p>
+          <p>{{ 'projects.webExtension.overview' | translate }}</p>
+        </div>
+
+        <div class="project-section">
+          <h2 class="project-section-title">
+            <span class="section-icon">🚀</span>
+            {{ 'projects.webExtension.howItWorksTitle' | translate }}
+          </h2>
+          <div class="project-steps">
+            <div class="step-item">
+              <div class="step-number">1</div>
+              <p>{{ 'projects.webExtension.step1' | translate }}</p>
+            </div>
+            <div class="step-item">
+              <div class="step-number">2</div>
+              <p>{{ 'projects.webExtension.step2' | translate }}</p>
+            </div>
+            <div class="step-item">
+              <div class="step-number">3</div>
+              <p>{{ 'projects.webExtension.step3' | translate }}</p>
+            </div>
+            <div class="step-item">
+              <div class="step-number">4</div>
+              <p>{{ 'projects.webExtension.step4' | translate }}</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="project-section">
+          <h2 class="project-section-title">
+            <span class="section-icon">⚡</span>
+            {{ 'projects.webExtension.featuresTitle' | translate }}
+          </h2>
+          <div class="features-grid">
+            <div class="feature-card">
+              <div class="feature-icon">🔤</div>
+              <h3>{{ 'projects.webExtension.feature1Title' | translate }}</h3>
+              <p>{{ 'projects.webExtension.feature1Desc' | translate }}</p>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon">🎨</div>
+              <h3>{{ 'projects.webExtension.feature2Title' | translate }}</h3>
+              <p>{{ 'projects.webExtension.feature2Desc' | translate }}</p>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon">🧭</div>
+              <h3>{{ 'projects.webExtension.feature3Title' | translate }}</h3>
+              <p>{{ 'projects.webExtension.feature3Desc' | translate }}</p>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon">👤</div>
+              <h3>{{ 'projects.webExtension.feature4Title' | translate }}</h3>
+              <p>{{ 'projects.webExtension.feature4Desc' | translate }}</p>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon">🔊</div>
+              <h3>{{ 'projects.webExtension.feature5Title' | translate }}</h3>
+              <p>{{ 'projects.webExtension.feature5Desc' | translate }}</p>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon">🔎</div>
+              <h3>{{ 'projects.webExtension.feature6Title' | translate }}</h3>
+              <p>{{ 'projects.webExtension.feature6Desc' | translate }}</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="project-section">
+          <h2 class="project-section-title">
+            <span class="section-icon">🛠️</span>
+            {{ 'projects.webExtension.techTitle' | translate }}
+          </h2>
+          <div class="tech-stack-bar">
+            {{ 'projects.webExtension.techStack' | translate }}
+          </div>
+        </div>
+
+        <div class="project-cta">
+          <p>{{ 'projects.webExtension.ctaText' | translate }}</p>
+          <button class="cta-button" (click)="openEmailWindow()">✉️ Email</button>
+        </div>
+      </div>
+    </ng-container>
+
     <ng-container
-      *ngIf="windowType !== 'cv' && windowType !== 'readme' && windowType !== 'prompt' && windowType !== 'computer' && windowType !== 'recycle-bin' && windowType !== 'documenti' && windowType !== 'paint'">
+      *ngIf="windowType !== 'cv' && windowType !== 'readme' && windowType !== 'prompt' && windowType !== 'computer' && windowType !== 'recycle-bin' && windowType !== 'documenti' && windowType !== 'paint' && windowType !== 'uxability' && windowType !== 'web-extension'">
       <ng-content></ng-content>
     </ng-container>
   </div>

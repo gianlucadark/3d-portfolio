@@ -10,9 +10,10 @@
             <canvas #gameCanvas width="400" height="400"></canvas>
 
             <div class="game-overlay" *ngIf="!isPlaying && !isMobile">
-                <h1 *ngIf="gameOver">GAME OVER</h1>
-                <h1 *ngIf="gameWon" class="win">YOU WIN!</h1>
-                <p class="blink">{{ gameOver || gameWon ? 'PRESS START TO RESTART' : 'PRESS START TO PLAY' }}</p>
+                <h1 *ngIf="gameOver">{{ 'pacman.gameOver' | translate }}</h1>
+                <h1 *ngIf="gameWon" class="win">{{ 'pacman.youWin' | translate }}</h1>
+                <p class="blink">{{ gameOver || gameWon ? ('pacman.pressStartRestart' | translate) :
+                    ('pacman.pressStartPlay' | translate) }}</p>
             </div>
 
             <!-- Mobile/Tablet Warning -->
@@ -29,8 +30,9 @@
                 <div class="stick"></div>
             </div>
             <div class="buttons">
-                <button class="action-btn red" (click)="onClose()">EXIT</button>
-                <button class="action-btn blue" (click)="startGame()" *ngIf="!isMobile">START</button>
+                <button class="action-btn red" (click)="onClose()">{{ 'pacman.exit' | translate }}</button>
+                <button class="action-btn blue" (click)="startGame()" *ngIf="!isMobile">{{ 'pacman.start' | translate
+                    }}</button>
             </div>
         </div>
     </div>

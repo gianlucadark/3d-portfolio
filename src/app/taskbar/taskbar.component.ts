@@ -1,6 +1,8 @@
 import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { TranslationService, Language } from '../services/translation.service';
 import { OpenWindow } from 'src/utilities/interface/open-window.interface';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-taskbar',
@@ -16,6 +18,7 @@ export class TaskbarComponent implements OnInit, OnDestroy {
 
   currentTime = '';
   private timerId: ReturnType<typeof setInterval> | null = null;
+  private readonly destroy$ = new Subject<void>();
 
   constructor(
     private readonly cdr: ChangeDetectorRef,
@@ -37,6 +40,13 @@ export class TaskbarComponent implements OnInit, OnDestroy {
       this.updateTime();
       this.cdr.markForCheck();
     }, 1000);
+
+    this.translationService.language$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.updateTime();
+        this.cdr.markForCheck();
+      });
   }
 
   ngOnDestroy(): void {
@@ -44,10 +54,13 @@ export class TaskbarComponent implements OnInit, OnDestroy {
       clearInterval(this.timerId);
       this.timerId = null;
     }
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   private updateTime(): void {
-    this.currentTime = new Date().toLocaleTimeString('it-IT', {
+    const locale = this.currentLanguage === 'it' ? 'it-IT' : 'en-US';
+    this.currentTime = new Date().toLocaleTimeString(locale, {
       hour: '2-digit',
       minute: '2-digit'
     });

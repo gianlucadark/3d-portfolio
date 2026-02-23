@@ -31,7 +31,7 @@
                 <rect width="24" height="17.23" fill="#3C3B6E" />
                 <rect width="24" height="17.23" fill="url(#stars-loading)" />
             </svg>
-            <span class="language-text">{{ currentLanguage === 'it' ? 'IT' : 'EN' }}</span>
+            <span class="language-text">{{ currentLanguage | uppercase }}</span>
         </button>
     </div>
 
@@ -72,7 +72,7 @@
                 <div class="welcome-presentation">
                     <h1 class="welcome-title">{{ 'loading.welcome' | translate }}</h1>
                     <div class="welcome-separator"></div>
-                    <h2 class="welcome-portfolio-title">Just a bored developer's portfolio</h2>
+                    <h2 class="welcome-portfolio-title">{{ 'loading.welcome2' | translate }}</h2>
 
                     <!-- Progress bar integrated into welcome -->
                     <div class="welcome-status" *ngIf="!showWelcome">
@@ -112,7 +112,7 @@
                                 <line x1="2" y1="12" x2="22" y2="12" class="globe-equator" />
                                 <path d="M12 2L12 22" class="globe-axis" />
                             </svg>
-                            <span>{{ currentLanguage === 'it' ? 'English (US)' : 'Italiano (IT)' }}</span>
+                            <span>{{ 'loading.switchLang' | translate }}</span>
                         </button>
                     </div>
                 </div>
@@ -153,12 +153,12 @@
             <rect width="24" height="17.23" fill="#3C3B6E" />
             <rect width="24" height="17.23" fill="url(#stars)" />
         </svg>
-        <span class="language-text">{{ currentLanguage === 'it' ? 'IT' : 'EN' }}</span>
+        <span class="language-text">{{ currentLanguage | uppercase }}</span>
     </button>
 
     <!-- Dark Mode Toggle -->
     <button class="control-toggle dark-mode-toggle" (click)="toggleDarkMode()"
-        [attr.aria-label]="isDarkMode ? 'Attiva Light Mode' : 'Attiva Dark Mode'">
+        [attr.aria-label]="isDarkMode ? ('darkMode.disable' | translate) : ('darkMode.enable' | translate)">
         <svg *ngIf="!isDarkMode" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
             fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
@@ -182,8 +182,8 @@
 <div class="pdf-modal-overlay" *ngIf="showPdfModal" (click)="closePdfModal()">
     <div class="pdf-modal-container" (click)="$event.stopPropagation()">
         <div class="pdf-modal-header">
-            <h2 class="pdf-modal-title">Curriculum Vitae</h2>
-            <button class="pdf-modal-close" (click)="closePdfModal()" aria-label="Chiudi">
+            <h2 class="pdf-modal-title">{{ 'pdfModal.title' | translate }}</h2>
+            <button class="pdf-modal-close" (click)="closePdfModal()" [attr.aria-label]="'pdfModal.close' | translate">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="18" y1="6" x2="6" y2="18"></line>

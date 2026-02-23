@@ -13,6 +13,12 @@
   <meta property="og:image" content="assets/icons/profile.webp">
   <link rel="preload" href="assets/3d/room-space-3-final.glb" as="fetch" crossorigin="anonymous">
   <link rel="preload" href="assets/cielo1.hdr" as="fetch" crossorigin="anonymous">
+  <!-- Preload texture principali: scaricano in parallelo al GLB -->
+  <link rel="preload" href="assets/opt_sfondo.webp" as="image">
+  <link rel="preload" href="assets/opt_cvfoto1.webp" as="image">
+  <link rel="preload" href="assets/opt_pacman.webp" as="image">
+  <!-- Preload DRACO WASM decoder: scarica insieme al GLB anziche' dopo -->
+  <link rel="preload" href="assets/draco/draco_decoder.wasm" as="fetch" crossorigin="anonymous">
 </head>
 
 <body>

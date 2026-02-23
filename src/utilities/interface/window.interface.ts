@@ -11,6 +11,8 @@ export type WindowType =
   | 'notepad'
   | 'email'
   | 'curriculum'
+  | 'uxability'
+  | 'web-extension'
   | 'default';
 
 /**

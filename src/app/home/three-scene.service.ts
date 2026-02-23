@@ -9,6 +9,11 @@ import gsap from 'gsap';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { THREE_CONFIG, MATERIAL_CONFIG, COLORS } from '../constants/app.constants';
 
+// Throttle render: ms per frame target
+const FPS_ACTIVE = 1000 / 60;  // 60fps durante interazione
+const FPS_IDLE = 1000 / 30;  // 30fps a riposo
+const INTERACTION_COOLDOWN_MS = 2000; // torna a idle dopo 2s senza input
+
 @Injectable({
     providedIn: 'root'
 })
@@ -48,6 +53,14 @@ export class ThreeSceneService implements OnDestroy {
     private placeholder: THREE.Mesh | null = null;
     private isFullQualityEnabled = false;
 
+    // Render throttling
+    private lastFrameTime = 0;
+    private lastInteractionTime = 0;
+    private frameCount = 0; // per throttle raycaster nel mousemove
+
+    // Shared DRACO loader (inizializzato una volta sola)
+    private readonly dracoLoader: DRACOLoader;
+
     // Observables
     public readonly loadingProgress$ = new BehaviorSubject<number>(0);
     public readonly loadingComplete$ = new BehaviorSubject<boolean>(false);
@@ -57,7 +70,12 @@ export class ThreeSceneService implements OnDestroy {
     private isEnvLoaded = false;
     private isModelLoaded = false;
 
-    constructor(private readonly ngZone: NgZone) { }
+    constructor(private readonly ngZone: NgZone) {
+        // Pre-inizializza DRACO subito (scarica il WASM in background)
+        this.dracoLoader = new DRACOLoader();
+        this.dracoLoader.setDecoderPath('assets/draco/');
+        this.dracoLoader.preload();
+    }
 
     public initialize(container: ElementRef): void {
         this.ngZone.runOutsideAngular(() => {
@@ -89,9 +107,13 @@ export class ThreeSceneService implements OnDestroy {
 
     private setupRenderer(container: HTMLElement): void {
         const { clientWidth: width, clientHeight: height } = container;
+        // Su schermi HiDPI (DPR >= 2) il pixel ratio copre gia' la qualita',
+        // l'antialias hardware e' superfluo e costa molto (2x overdraw).
+        const dpr = window.devicePixelRatio || 1;
+        const needsAntialias = dpr < 2;
 
         this.renderer = new THREE.WebGLRenderer({
-            antialias: true,
+            antialias: needsAntialias,
             powerPreference: 'high-performance',
             stencil: false
         });
@@ -175,25 +197,38 @@ export class ThreeSceneService implements OnDestroy {
         rgbeLoader.load(
             'assets/cielo1.hdr',
             (texture) => {
-                const pmremGenerator = new THREE.PMREMGenerator(this.renderer);
-                pmremGenerator.compileEquirectangularShader();
+                // Usa requestIdleCallback se disponibile: il PMREM generator e' CPU-bound
+                // e non deve bloccare il thread principale durante il caricamento del modello.
+                const applyEnv = () => {
+                    const pmremGenerator = new THREE.PMREMGenerator(this.renderer);
+                    pmremGenerator.compileEquirectangularShader();
 
-                this.envMap = pmremGenerator.fromEquirectangular(texture).texture;
-                this.scene.background = this.envMap;
-                this.scene.environment = this.envMap;
+                    this.envMap = pmremGenerator.fromEquirectangular(texture).texture;
+                    this.scene.background = this.envMap;
+                    this.scene.environment = this.envMap;
 
-                // Adjust intensity
-                (this.scene as any).backgroundIntensity = THREE_CONFIG.LIGHTS.ENVIRONMENT_INTENSITY;
-                (this.scene as any).environmentIntensity = THREE_CONFIG.LIGHTS.ENVIRONMENT_INTENSITY;
+                    // Adjust intensity
+                    (this.scene as any).backgroundIntensity = THREE_CONFIG.LIGHTS.ENVIRONMENT_INTENSITY;
+                    (this.scene as any).environmentIntensity = THREE_CONFIG.LIGHTS.ENVIRONMENT_INTENSITY;
 
-                // Reset directional light to normal
-                this.directionalLight.intensity = THREE_CONFIG.LIGHTS.DIRECTIONAL.INTENSITY_LIGHT;
+                    // Reset directional light to normal
+                    this.directionalLight.intensity = THREE_CONFIG.LIGHTS.DIRECTIONAL.INTENSITY_LIGHT;
 
-                texture.dispose();
-                pmremGenerator.dispose();
-                console.log('Environment map loaded lazily.');
+                    texture.dispose();
+                    pmremGenerator.dispose();
+                };
+
+                // Se il modello e' gia' caricato, applica subito;
+                // altrimenti aspetta un momento di idle per non contendere il download
+                if (this.isModelLoaded) {
+                    applyEnv();
+                } else if (typeof (window as any).requestIdleCallback === 'function') {
+                    (window as any).requestIdleCallback(applyEnv, { timeout: 3000 });
+                } else {
+                    setTimeout(applyEnv, 100);
+                }
             },
-            undefined, // No progress tracking for env anymore
+            undefined,
             (error) => {
                 console.error('Error loading HDR:', error);
             }
@@ -243,21 +278,17 @@ export class ThreeSceneService implements OnDestroy {
 
     private loadModel(): void {
         const loader = new GLTFLoader();
-        const dracoLoader = new DRACOLoader();
-        dracoLoader.setDecoderPath('assets/draco/');
-        dracoLoader.preload();
-        loader.setDRACOLoader(dracoLoader);
+        // Riusa il dracoLoader gia' pre-inizializzato nel costruttore
+        loader.setDRACOLoader(this.dracoLoader);
 
         // Load the optimized model (preserves all original materials)
         loader.load(
             'assets/3d/room-space-3-final.glb',
             (gltf) => {
                 this.onModelLoaded(gltf);
-                dracoLoader.dispose();
             },
             (event) => {
                 if (event.lengthComputable) {
-                    // Model is now 100% of the visible loading bar
                     const progress = (event.loaded / event.total) * 100;
                     this.updateLoadingState(progress, 'model');
                 }
@@ -266,7 +297,6 @@ export class ThreeSceneService implements OnDestroy {
                 console.error('Error loading model:', error);
                 this.isModelLoaded = true;
                 this.checkLoadingComplete();
-                dracoLoader.dispose();
             }
         );
     }
@@ -400,9 +430,9 @@ export class ThreeSceneService implements OnDestroy {
 
             // Fallback: if optimizer changed material names, detect screens by mesh name
             if (meshNameLower.includes('schermogrande') && !name.includes('schermogrande')) {
-                this.applyScreenMaterial(mesh, material, 'assets/sfondo.webp', 'schermoGrande');
+                this.applyScreenMaterial(mesh, material, 'assets/opt_sfondo.webp', 'schermoGrande');
             } else if (meshNameLower.includes('schermopiccolo') && !name.includes('schermopiccolo')) {
-                this.applyScreenMaterial(mesh, material, 'assets/pacman.webp', 'schermoPiccolo');
+                this.applyScreenMaterial(mesh, material, 'assets/opt_pacman.webp', 'schermoPiccolo');
             }
         });
     }
@@ -417,9 +447,9 @@ export class ThreeSceneService implements OnDestroy {
         } else if (name.includes('led')) {
             this.applyLedMaterial(mesh, material);
         } else if (name.includes('schermogrande')) {
-            this.applyScreenMaterial(mesh, material, 'assets/sfondo.webp', 'schermoGrande');
+            this.applyScreenMaterial(mesh, material, 'assets/opt_sfondo.webp', 'schermoGrande');
         } else if (name.includes('schermopiccolo')) {
-            this.applyScreenMaterial(mesh, material, 'assets/pacman.webp', 'schermoPiccolo');
+            this.applyScreenMaterial(mesh, material, 'assets/opt_pacman.webp', 'schermoPiccolo');
         } else if (name.includes('quadro')) {
             this.applyQuadroMaterial(mesh, material);
         } else if (name.includes('cornice')) {
@@ -540,14 +570,12 @@ export class ThreeSceneService implements OnDestroy {
         material.roughness = SCREEN.ROUGHNESS;
         material.metalness = SCREEN.METALNESS;
 
-        // Lazy load texture after model is visible
-        setTimeout(() => {
-            const texture = this.loadTexture(texturePath, { flipY: true });
-            material.map = texture;
-            material.emissiveMap = texture;
-            material.emissiveIntensity = SCREEN.EMISSIVE_INTENSITY;
-            material.needsUpdate = true;
-        }, 500);
+        // Carica la texture subito (il modello e' gia' visibile a questo punto)
+        const texture = this.loadTexture(texturePath, { flipY: true });
+        material.map = texture;
+        material.emissiveMap = texture;
+        material.emissiveIntensity = SCREEN.EMISSIVE_INTENSITY;
+        material.needsUpdate = true;
 
         if (target === 'schermoGrande') this.schermoGrandeMesh = mesh;
         else this.schermoPiccoloMesh = mesh;
@@ -558,16 +586,13 @@ export class ThreeSceneService implements OnDestroy {
     private applyQuadroMaterial(mesh: THREE.Mesh, material: THREE.MeshStandardMaterial): void {
         // Set basic properties immediately
         material.emissive = new THREE.Color(COLORS.WHITE);
-        material.emissiveIntensity = MATERIAL_CONFIG.SCREEN.EMISSIVE_INTENSITY * 0.3;
 
-        // Lazy load texture
-        setTimeout(() => {
-            const texture = this.loadTexture('assets/cvfoto1.webp', { flipY: true });
-            material.map = texture;
-            material.emissiveMap = texture;
-            material.emissiveIntensity = MATERIAL_CONFIG.SCREEN.EMISSIVE_INTENSITY;
-            material.needsUpdate = true;
-        }, 500);
+        // Carica la texture subito
+        const texture = this.loadTexture('assets/opt_cvfoto1.webp', { flipY: true });
+        material.map = texture;
+        material.emissiveMap = texture;
+        material.emissiveIntensity = MATERIAL_CONFIG.SCREEN.EMISSIVE_INTENSITY;
+        material.needsUpdate = true;
 
         this.quadroMesh = mesh;
         this.quadroOriginalScale.copy(mesh.scale);
@@ -630,17 +655,33 @@ export class ThreeSceneService implements OnDestroy {
         this.animationId = requestAnimationFrame(this.animate.bind(this));
     }
 
-    private animate(): void {
+    private animate(now: number = 0): void {
         this.animationId = requestAnimationFrame(this.animate.bind(this));
+
+        // Render throttling: 60fps durante interazione, 30fps a riposo
+        const isActive = (now - this.lastInteractionTime) < INTERACTION_COOLDOWN_MS;
+        const targetFps = isActive ? FPS_ACTIVE : FPS_IDLE;
+        const elapsed = now - this.lastFrameTime;
+        if (elapsed < targetFps) return;
+        this.lastFrameTime = now - (elapsed % targetFps);
+
+        this.frameCount++;
         this.controls?.update();
         this.renderer.render(this.scene, this.camera);
     }
 
     // Interaction
+    private markInteraction(): void {
+        this.lastInteractionTime = performance.now();
+    }
+
     private setupEventListeners(canvas: HTMLElement): void {
         window.addEventListener('resize', () => this.onWindowResize(canvas));
-        canvas.addEventListener('click', (e) => this.onCanvasClick(e, canvas));
-        canvas.addEventListener('mousemove', (e) => this.onMouseMove(e, canvas));
+        canvas.addEventListener('click', (e) => { this.markInteraction(); this.onCanvasClick(e, canvas); });
+        canvas.addEventListener('mousemove', (e) => { this.markInteraction(); this.onMouseMove(e, canvas); });
+        // Segna interazione anche per touch e scroll (OrbitControls)
+        canvas.addEventListener('touchstart', () => this.markInteraction(), { passive: true });
+        canvas.addEventListener('wheel', () => this.markInteraction(), { passive: true });
     }
 
     private onWindowResize(canvas: HTMLElement): void {
@@ -679,6 +720,10 @@ export class ThreeSceneService implements OnDestroy {
         if (this.isZooming) return;
 
         this.updateMouseCoordinates(event, canvas);
+
+        // Throttle raycasting: ogni 2 frames (risparmia CPU soprattutto su mesh complessi)
+        if (this.frameCount % 2 !== 0) return;
+
         this.raycaster.setFromCamera(this.mouse, this.camera);
 
         let isHoveringSomething = false;

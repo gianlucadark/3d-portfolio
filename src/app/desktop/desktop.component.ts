@@ -11,6 +11,7 @@ import {
 import { CdkDragEnd } from '@angular/cdk/drag-drop';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { Icon } from 'src/utilities/interface/icon.interface';
 import { Window, WindowType } from 'src/utilities/interface/window.interface';
 import { TranslationService } from '../services/translation.service';
@@ -25,29 +26,27 @@ import {
 
 /** Configurazione delle icone del desktop */
 const DESKTOP_ICONS: Icon[] = [
-  { id: 1, name: 'Computer', image: 'assets/icons/computer.webp', position: { x: 0, y: 0 } },
-  { id: 13, name: 'Curriculum', image: 'assets/icons/folder.webp', position: { x: 0, y: 0 } },
-  { id: 4, name: 'Prompt', image: 'assets/icons/prompt.webp', position: { x: 0, y: 0 } },
-  { id: 5, name: 'README', image: 'assets/icons/readme.webp', position: { x: 0, y: 0 } },
-  { id: 6, name: 'Paint', image: 'assets/icons/paint.webp', position: { x: 0, y: 0 } },
-  { id: 8, name: 'Blocco Note', image: 'assets/icons/paper.webp', position: { x: 0, y: 0 } },
-  { id: 9, name: 'Email', image: 'assets/icons/email.png', position: { x: 0, y: 0 } },
-  { id: 10, name: 'Progetti', image: 'assets/icons/folder.webp', position: { x: 0, y: 0 } },
+  { id: 1, name: 'icons.computer', image: 'assets/icons/computer.webp', position: { x: 0, y: 0 } },
+  { id: 13, name: 'icons.curriculum', image: 'assets/icons/folder.webp', position: { x: 0, y: 0 } },
+  { id: 4, name: 'icons.prompt', image: 'assets/icons/prompt.webp', position: { x: 0, y: 0 } },
+  { id: 5, name: 'icons.readme', image: 'assets/icons/readme.webp', position: { x: 0, y: 0 } },
+  { id: 6, name: 'icons.paint', image: 'assets/icons/paint.webp', position: { x: 0, y: 0 } },
+  { id: 8, name: 'icons.notepad', image: 'assets/icons/paper.webp', position: { x: 0, y: 0 } },
+  { id: 9, name: 'icons.email', image: 'assets/icons/email.png', position: { x: 0, y: 0 } },
+  { id: 10, name: 'icons.projects', image: 'assets/icons/folder.webp', position: { x: 0, y: 0 } },
   {
     id: 11,
-    name: 'Uxability',
+    name: 'icons.uxability',
     image: 'assets/icons/folder.webp',
     position: { x: 0, y: 0 },
-    parentId: 10,
-    description: `Uxability è un'applicazione web sviluppata in Angular che permette di analizzare l'accessibilità e le performance di qualsiasi sito web semplicemente inserendo l'URL desiderato. L'applicazione genera report dettagliati che evidenziano errori, criticità e suggerimenti pratici per il miglioramento, offrendo anche una heatmap interattiva che visualizza graficamente le aree problematiche del sito. Un sistema di intelligenza artificiale integrato fornisce spiegazioni approfondite e chiare sugli errori riscontrati, rendendo le informazioni accessibili anche a chi non ha competenze tecniche, e suggerisce soluzioni concrete per ottimizzare il codice e l'esperienza utente complessiva. Cosa aspetti, contattami per saperne di più!`
+    parentId: 10
   },
   {
     id: 12,
-    name: 'Estensione Web',
+    name: 'icons.webExtension',
     image: 'assets/icons/folder.webp',
     position: { x: 0, y: 0 },
-    parentId: 10,
-    description: `L'estensione web sviluppata, consente di migliorare sensibilmente l'accessibilità dei siti internet, offrendo strumenti avanzati e personalizzabili per adattare la navigazione alle esigenze delle persone con disabilità. L'utente può intervenire in tempo reale su testo, contrasti, colori, spaziature, font e livello di zoom, rendendo ogni sito più leggibile e fruibile. Grazie a questa estensione, l'esperienza di navigazione diventa più inclusiva e accessibile per tutti, senza la necessità di modificare il sito originale.`
+    parentId: 10
   }
 ];
 
@@ -66,8 +65,9 @@ export class DesktopComponent implements OnInit, OnDestroy {
   openWindows: Window[] = [];
   icons: Icon[] = [];
   emailContent = '';
-  emailSubject = 'In contatto dal tuo Portfolio';
+  emailSubject = '';
   emailTo = 'gianlucadark1@gmail.com';
+  currentLanguage = 'en';
 
   // Z-index management
   private highestZIndex = 1000;
@@ -88,7 +88,20 @@ export class DesktopComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.calculateIconPositions();
-    this.openWindow(5, 'README', 'assets/icons/readme.webp');
+    this.openWindow(5, this.getWindowTitle(5), 'assets/icons/readme.webp');
+
+    this.translationService.language$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(lang => {
+        this.currentLanguage = lang;
+        this.updateTranslatedStrings();
+        this.cdr.markForCheck();
+      });
+  }
+
+  private updateTranslatedStrings(): void {
+    this.emailSubject = this.translationService.translate('email.subject');
+    // Qualsiasi altra stringa che deve essere aggiornata manualmente nel componente
   }
 
   @HostListener('window:resize')
@@ -156,7 +169,7 @@ export class DesktopComponent implements OnInit, OnDestroy {
     event.stopPropagation();
     const icon = this.icons.find(i => i.id === id);
     if (icon) {
-      this.openWindow(id, icon.name, icon.image);
+      this.openWindow(id, this.getWindowTitle(id), icon.image);
     }
   }
 
@@ -273,7 +286,7 @@ export class DesktopComponent implements OnInit, OnDestroy {
   onOpenWindow(windowId: number): void {
     const icon = this.icons.find(i => i.id === windowId);
     if (icon) {
-      this.openWindow(windowId, icon.name, icon.image);
+      this.openWindow(windowId, this.getWindowTitle(windowId), icon.image);
     }
   }
 
@@ -323,7 +336,7 @@ export class DesktopComponent implements OnInit, OnDestroy {
   // ============================================
 
   getCvPdfUrl(): string {
-    return 'assets/file/cv-gianluca.pdf';
+    return 'assets/cv.pdf';
   }
 
   getSafeCvPdfUrl(): SafeResourceUrl {

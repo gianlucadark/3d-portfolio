@@ -106,6 +106,8 @@ export const WINDOW_TYPE_MAP: Record<number, string> = {
     7: 'recycle-bin',
     8: 'notepad',
     9: 'email',
+    11: 'uxability',
+    12: 'web-extension',
     13: 'cv'
 } as const;
 

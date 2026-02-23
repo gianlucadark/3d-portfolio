@@ -16,7 +16,7 @@
             <img src="assets/icons/ellipse.png" alt="Cerchio" />
         </button>
         <input type="color" (input)="selectColor($event)" [value]="color" />
-        <button class="xp-button" (click)="clearCanvas()">Pulisci</button>
+        <button class="xp-button" (click)="clearCanvas()">{{ 'paint.clear' | translate }}</button>
     </div>
     <div class="palette-xp">
         <div *ngFor="let c of paletteColors" class="color-swatch" [style.background]="c" (click)="setColor(c)"></div>

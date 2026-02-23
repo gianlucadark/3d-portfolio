@@ -30,31 +30,31 @@
             <span>{{ 'startMenu.user' | translate }}</span>
           </div>
           <div class="start-menu-items">
-            <div class="start-menu-item" (click)="openWindow(1, 'Computer', 'assets/icons/computer.webp')">
+            <div class="start-menu-item" (click)="openWindow(1, getWindowTitle(1), 'assets/icons/computer.webp')">
               <img src="assets/icons/computer.webp" [alt]="'icons.computer' | translate">
               <span>{{ 'icons.computer' | translate }}</span>
             </div>
-            <div class="start-menu-item" (click)="openWindow(6, 'Paint', 'assets/icons/paint.webp')">
+            <div class="start-menu-item" (click)="openWindow(6, getWindowTitle(6), 'assets/icons/paint.webp')">
               <img src="assets/icons/paint.webp" [alt]="'icons.paint' | translate">
               <span>{{ 'icons.paint' | translate }}</span>
             </div>
-            <div class="start-menu-item" (click)="openWindow(3, 'CV Gianluca', 'assets/icons/cv.webp')">
+            <div class="start-menu-item" (click)="openWindow(3, getWindowTitle(3), 'assets/icons/cv.webp')">
               <img src="assets/icons/cv.webp" [alt]="'icons.cv' | translate">
               <span>{{ 'icons.cv' | translate }}</span>
             </div>
-            <div class="start-menu-item" (click)="openWindow(4, 'Prompt', 'assets/icons/prompt.webp')">
+            <div class="start-menu-item" (click)="openWindow(4, getWindowTitle(4), 'assets/icons/prompt.webp')">
               <img src="assets/icons/prompt.webp" [alt]="'startMenu.commandPrompt' | translate">
               <span>{{ 'startMenu.commandPrompt' | translate }}</span>
             </div>
-            <div class="start-menu-item" (click)="openWindow(5, 'README', 'assets/icons/readme.webp')">
+            <div class="start-menu-item" (click)="openWindow(5, getWindowTitle(5), 'assets/icons/readme.webp')">
               <img src="assets/icons/readme.webp" [alt]="'icons.readme' | translate">
               <span>{{ 'icons.readme' | translate }}</span>
             </div>
-            <div class="start-menu-item" (click)="openWindow(8, 'Blocco Note', 'assets/icons/paper.webp')">
+            <div class="start-menu-item" (click)="openWindow(8, getWindowTitle(8), 'assets/icons/paper.webp')">
               <img src="assets/icons/paper.webp" [alt]="'icons.notepad' | translate">
               <span>{{ 'icons.notepad' | translate }}</span>
             </div>
-            <div class="start-menu-item" (click)="openWindow(7, 'Cestino', 'assets/icons/cestino.webp')">
+            <div class="start-menu-item" (click)="openWindow(7, getWindowTitle(7), 'assets/icons/cestino.webp')">
               <img src="assets/icons/cestino.webp" [alt]="'icons.trash' | translate">
               <span>{{ 'icons.trash' | translate }}</span>
             </div>
@@ -79,44 +79,46 @@
           <div class="email-window">
             <div class="email-toolbar">
               <button class="email-tool-btn" (click)="sendEmail()">
-                <img src="assets/icons/spegni.webp" style="filter: hue-rotate(90deg);" alt="Send">
-                <span>Invia</span>
+                <img src="assets/icons/spegni.webp" style="filter: hue-rotate(90deg);"
+                  [alt]="'email.sendBtn' | translate">
+                <span>{{ 'email.sendBtn' | translate }}</span>
               </button>
               <div class="email-tool-sep"></div>
               <button class="email-tool-btn">
-                <img src="assets/icons/cv.webp" style="width: 20px; height: 20px;" alt="Cut">
-                <span>Taglia</span>
+                <img src="assets/icons/cv.webp" style="width: 20px; height: 20px;" [alt]="'email.cut' | translate">
+                <span>{{ 'email.cut' | translate }}</span>
               </button>
               <button class="email-tool-btn">
-                <img src="assets/icons/computer.webp" style="width: 20px; height: 20px;" alt="Copy">
-                <span>Copia</span>
+                <img src="assets/icons/computer.webp" style="width: 20px; height: 20px;"
+                  [alt]="'email.copy' | translate">
+                <span>{{ 'email.copy' | translate }}</span>
               </button>
               <button class="email-tool-btn">
-                <img src="assets/icons/paint.webp" style="width: 20px; height: 20px;" alt="Paste">
-                <span>Incolla</span>
+                <img src="assets/icons/paint.webp" style="width: 20px; height: 20px;" [alt]="'email.paste' | translate">
+                <span>{{ 'email.paste' | translate }}</span>
               </button>
               <div class="email-tool-sep"></div>
               <button class="email-tool-btn">
-                <img src="assets/icons/readme.webp" style="width: 20px; height: 20px;" alt="Undo">
-                <span>Annulla</span>
+                <img src="assets/icons/readme.webp" style="width: 20px; height: 20px;" [alt]="'email.undo' | translate">
+                <span>{{ 'email.undo' | translate }}</span>
               </button>
             </div>
             <div class="email-headers">
               <div class="email-header-row">
-                <span class="email-label">A:</span>
+                <span class="email-label">{{ 'email.to' | translate }}</span>
                 <input class="email-input" [(ngModel)]="emailTo" readonly>
               </div>
               <div class="email-header-row">
-                <span class="email-label">Cc:</span>
+                <span class="email-label">{{ 'email.cc' | translate }}</span>
                 <input class="email-input">
               </div>
               <div class="email-header-row">
-                <span class="email-label">Oggetto:</span>
+                <span class="email-label">{{ 'email.subject' | translate }}</span>
                 <input class="email-input" [(ngModel)]="emailSubject">
               </div>
             </div>
             <div class="email-body">
-              <textarea [(ngModel)]="emailContent" placeholder="Scrivi qui il tuo messaggio..."></textarea>
+              <textarea [(ngModel)]="emailContent" [placeholder]="'email.placeholder' | translate"></textarea>
             </div>
           </div>
         </ng-container>
@@ -128,20 +130,13 @@
           <div style="display: flex; gap: 30px; align-items: flex-start; padding: 20px 0 0 20px;">
             <div *ngFor="let sub of getSubIcons(window.id)" style="text-align: center; cursor: pointer;"
               (dblclick)="openIcon($event, sub.id)">
-              <img [src]="sub.image" [alt]="sub.name" style="width:64px; height:64px;">
-              <div style="font-family: Tahoma; font-size: 11px; margin-top: 4px;">{{ sub.name }}</div>
+              <img [src]="sub.image" [alt]="sub.name | translate" style="width:64px; height:64px;">
+              <div style="font-family: Tahoma; font-size: 11px; margin-top: 4px;">{{ sub.name | translate }}</div>
             </div>
           </div>
         </ng-container>
-        <ng-container *ngIf="window.windowType === 'default' && window.id === 11">
-          <iframe [src]="'assets/file/uxability.pdf' | safe" width="100%" height="100%" style="border: none;"></iframe>
-        </ng-container>
-        <ng-container *ngIf="window.windowType === 'default' && window.id === 12">
-          <iframe [src]="'assets/file/estensioneWeb.pdf' | safe" width="100%" height="100%"
-            style="border: none;"></iframe>
-        </ng-container>
         <ng-container
-          *ngIf="window.windowType !== 'cv' && window.windowType !== 'prompt' && window.windowType !== 'email' && !(window.windowType === 'default' && window.id === 10)">
+          *ngIf="window.windowType !== 'cv' && window.windowType !== 'prompt' && window.windowType !== 'email' && !(window.windowType === 'default' && window.id === 10) && window.windowType !== 'uxability' && window.windowType !== 'web-extension'">
           <!-- Nessun testo di default -->
         </ng-container>
       </app-window>

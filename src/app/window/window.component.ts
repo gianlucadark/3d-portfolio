@@ -15,6 +15,8 @@ import {
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { Subject } from 'rxjs';
 import { WINDOW_CONFIG, PROMPT_COMMANDS, FULLSCREEN_WINDOWS } from '../constants/app.constants';
+import { TranslationService } from '../services/translation.service';
+import { takeUntil } from 'rxjs/operators';
 
 /** Posizione della finestra */
 interface Position {
@@ -95,7 +97,8 @@ export class WindowComponent implements OnInit, OnChanges, OnDestroy {
   constructor(
     private readonly el: ElementRef,
     private readonly sanitizer: DomSanitizer,
-    private readonly cdr: ChangeDetectorRef
+    private readonly cdr: ChangeDetectorRef,
+    private readonly translationService: TranslationService
   ) {
     this.position = this.calculateInitialPosition();
   }
@@ -105,6 +108,13 @@ export class WindowComponent implements OnInit, OnChanges, OnDestroy {
     this.updateFolderPath();
     this.adaptSizeForMobile();
     this.handleFullscreenWindows();
+
+    this.translationService.language$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.updateFolderPath();
+        this.cdr.markForCheck();
+      });
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -124,7 +134,7 @@ export class WindowComponent implements OnInit, OnChanges, OnDestroy {
 
   private initializeWindow(): void {
     if (!this.pdfSrc && this.windowType === 'cv') {
-      this.pdfSrc = 'assets/file/cv-gianluca.pdf';
+      this.pdfSrc = 'assets/cv.pdf';
     }
   }
 
@@ -164,7 +174,8 @@ export class WindowComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   updateFolderPath(): void {
-    this.folderPath = ['Desktop', this.title];
+    const desktopName = this.translationService.translate('common.desktop');
+    this.folderPath = [desktopName, this.title];
   }
 
   // ============================================
@@ -376,23 +387,20 @@ export class WindowComponent implements OnInit, OnChanges, OnDestroy {
 
   private executeCommand(command: string): void {
     const responses: Record<string, () => void> = {
-      [PROMPT_COMMANDS.HELP]: () => this.output.push(...this.helpCommands),
-      [PROMPT_COMMANDS.ABOUT_ME]: () => this.output.push(
-        'Ciao! Sono Gianluca, sono nato a Terracina (LT) il 25 Settembre 1997. ' +
-        'Sono un full stack developer con una forte passione per il frontend e il design UI/UX. ' +
-        'Amo creare interfacce utente intuitive e migliorare l\'esperienza utente attraverso il design.'
-      ),
-      [PROMPT_COMMANDS.WHY_XP]: () => this.output.push(
-        'Ho scelto di ispirare il design del mio portfolio a Windows XP perché rappresenta il punto di partenza del mio viaggio digitale. ' +
-        'È un omaggio nostalgico ai primi esperimenti su Paint e alle lunghe sessioni di Minesweeper. ' +
-        'Nonostante oggi lavori con tecnologie avanzate, XP resta un simbolo delle mie radici. ' +
-        'Il design fonde passato e futuro, con un\'estetica vintage che accompagna competenze moderne e progetti innovativi.'
-      ),
-      [PROMPT_COMMANDS.WHY_PROMPT]: () => this.output.push(
-        'Ho scelto di implementare questo mini prompt perché rappresenta il mio primo vero approccio al mondo della programmazione. ' +
-        'Da piccolo, il prompt di Windows era per me una porta verso un universo sconosciuto, e mi divertivo a esplorare i vari comandi, ' +
-        'quasi sentendomi un hacker. Passavo ore cercando di capire come funzionassero le istruzioni e cosa potessi fare con quel semplice schermo nero e bianco.'
-      ),
+      [PROMPT_COMMANDS.HELP]: () => {
+        const helpText = this.translationService.translate('prompt.help');
+        this.output.push(helpText);
+        this.output.push(...this.helpCommands);
+      },
+      [PROMPT_COMMANDS.ABOUT_ME]: () => {
+        this.output.push(this.translationService.translate('prompt.responses.aboutme'));
+      },
+      [PROMPT_COMMANDS.WHY_XP]: () => {
+        this.output.push(this.translationService.translate('prompt.responses.whyxp'));
+      },
+      [PROMPT_COMMANDS.WHY_PROMPT]: () => {
+        this.output.push(this.translationService.translate('prompt.responses.whyprompt'));
+      },
       [PROMPT_COMMANDS.CLEAR]: () => { this.output = []; }
     };
 
@@ -400,7 +408,8 @@ export class WindowComponent implements OnInit, OnChanges, OnDestroy {
     if (handler) {
       handler();
     } else if (command) {
-      this.output.push(`Comando non riconosciuto: ${this.currentInput}`);
+      const errorMsg = this.translationService.translate('prompt.responses.commandNotFound');
+      this.output.push(`${errorMsg} ${this.currentInput}`);
     }
   }
 
@@ -411,6 +420,10 @@ export class WindowComponent implements OnInit, OnChanges, OnDestroy {
   openCvWindow(event: Event): void {
     event.preventDefault();
     this.openOtherWindow.emit(13);
+  }
+
+  openEmailWindow(): void {
+    this.openOtherWindow.emit(9);
   }
 
   selectIcon(event: MouseEvent): void {
