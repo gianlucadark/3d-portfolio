@@ -154,6 +154,12 @@
           <div class="project-hero-icon">🔍</div>
           <h1 class="project-title">{{ 'projects.uxability.name' | translate }}</h1>
           <p class="project-subtitle">{{ 'projects.uxability.subtitle' | translate }}</p>
+          <div class="cta-buttons">
+            <a [href]="'projects.uxability.websiteUrl' | translate" target="_blank" class="cta-button website-btn">
+              🌐 {{ 'projects.uxability.visitWebsite' | translate }}
+            </a>
+            <button class="cta-button" (click)="openEmailWindow()">✉️ Email</button>
+          </div>
         </div>
 
         <div class="project-description">
@@ -198,7 +204,7 @@
               <p>{{ 'projects.uxability.feature1Desc' | translate }}</p>
             </div>
             <div class="feature-card">
-              <div class="feature-icon">🗺️</div>
+              <div class="feature-icon">🔍</div>
               <h3>{{ 'projects.uxability.feature2Title' | translate }}</h3>
               <p>{{ 'projects.uxability.feature2Desc' | translate }}</p>
             </div>
@@ -208,7 +214,7 @@
               <p>{{ 'projects.uxability.feature3Desc' | translate }}</p>
             </div>
             <div class="feature-card">
-              <div class="feature-icon">🤖</div>
+              <div class="feature-icon">🛡️</div>
               <h3>{{ 'projects.uxability.feature4Title' | translate }}</h3>
               <p>{{ 'projects.uxability.feature4Desc' | translate }}</p>
             </div>
@@ -237,7 +243,7 @@
 
         <div class="project-cta">
           <p>{{ 'projects.uxability.ctaText' | translate }}</p>
-          <button class="cta-button" (click)="openEmailWindow()">✉️ Email</button>
+
         </div>
       </div>
     </ng-container>

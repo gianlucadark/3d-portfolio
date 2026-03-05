@@ -1,39 +1,70 @@
 <div class="arcade-overlay">
-    <div class="arcade-cabinet">
+    <div class="arcade-cabinet" [class.mobile-mode]="isMobile">
+
+        <!-- HEADER -->
         <div class="arcade-header">
-            <span class="score">1UP: {{ score | number:'2.0-0' }}</span>
-            <span class="title">PAC-MAN</span>
-            <span class="high-score">HIGH: {{ highScore }}</span>
+            <span class="score" *ngIf="!isMobile">1UP: {{ score | number:'2.0-0' }}</span>
+            <span class="score" *ngIf="isMobile">{{ 'pacman.flappyScore' | translate }}: {{ flappyScore }}</span>
+            <span class="title">{{ isMobile ? 'FLAPPY BIRD' : 'PAC-MAN' }}</span>
+            <span class="high-score">{{ 'pacman.best' | translate }}: {{ isMobile ? flappyHighScore : highScore
+                }}</span>
         </div>
 
-        <div class="game-screen">
+        <!-- ======= PACMAN (DESKTOP) ======= -->
+        <div class="game-screen" *ngIf="!isMobile">
             <canvas #gameCanvas width="400" height="400"></canvas>
 
-            <div class="game-overlay" *ngIf="!isPlaying && !isMobile">
+            <!-- Start / Game Over overlay -->
+            <div class="game-overlay" *ngIf="!isPlaying">
                 <h1 *ngIf="gameOver">{{ 'pacman.gameOver' | translate }}</h1>
                 <h1 *ngIf="gameWon" class="win">{{ 'pacman.youWin' | translate }}</h1>
+
+                <!-- Difficulty selector (only at start/restart) -->
+                <div class="difficulty-selector">
+                    <p class="diff-label">{{ 'pacman.selectDifficulty' | translate }}</p>
+                    <div class="diff-buttons">
+                        <button class="diff-btn easy" [class.active]="selectedDifficulty === 'easy'"
+                            (click)="setDifficulty('easy')">{{ 'pacman.easy' | translate }}</button>
+                        <button class="diff-btn normal" [class.active]="selectedDifficulty === 'normal'"
+                            (click)="setDifficulty('normal')">{{ 'pacman.normal' | translate }}</button>
+                        <button class="diff-btn hard" [class.active]="selectedDifficulty === 'hard'"
+                            (click)="setDifficulty('hard')">{{ 'pacman.hard' | translate }}</button>
+                    </div>
+                </div>
+
                 <p class="blink">{{ gameOver || gameWon ? ('pacman.pressStartRestart' | translate) :
                     ('pacman.pressStartPlay' | translate) }}</p>
-            </div>
+                <p class="controls-hint">{{ 'pacman.controlsHint' | translate }}</p>
 
-            <!-- Mobile/Tablet Warning -->
-            <div class="mobile-warning" *ngIf="isMobile">
-                <div class="warning-content">
-                    <span class="warning-icon">👻</span>
-                    <h2>{{ 'pacman.mobileWarning' | translate }}</h2>
-                </div>
+                <!-- Riproduci tramite un comodo bottone on-screen oltre al pulsante blu in basso -->
+                <button class="diff-btn normal" *ngIf="gameOver || gameWon"
+                    style="margin-top: 10px; padding: 10px 20px; font-size: 0.8rem;" (click)="startGame()">
+                    {{ 'pacman.restart' | translate }}
+                </button>
             </div>
         </div>
 
+        <!-- ======= FLAPPY BIRD (MOBILE) ======= -->
+        <div class="game-screen flappy-screen" *ngIf="isMobile" (click)="onFlappyTap()"
+            (touchstart)="onFlappyTap(); $event.preventDefault()">
+            <canvas #flappyCanvas width="320" height="480"></canvas>
+        </div>
+
+        <!-- CONTROLS -->
         <div class="arcade-controls">
-            <div class="joystick">
+            <div class="joystick" *ngIf="!isMobile">
                 <div class="stick"></div>
+            </div>
+            <div class="mobile-hint" *ngIf="isMobile">
+                <span class="tap-hint">{{ 'pacman.tapHint' | translate }}</span>
             </div>
             <div class="buttons">
                 <button class="action-btn red" (click)="onClose()">{{ 'pacman.exit' | translate }}</button>
-                <button class="action-btn blue" (click)="startGame()" *ngIf="!isMobile">{{ 'pacman.start' | translate
-                    }}</button>
+                <button class="action-btn blue" (click)="startGame()" *ngIf="!isMobile && !isPlaying">
+                    {{ (gameOver || gameWon ? 'pacman.restart' : 'pacman.start') | translate }}
+                </button>
             </div>
         </div>
+
     </div>
 </div>

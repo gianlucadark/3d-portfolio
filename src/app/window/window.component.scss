@@ -857,6 +857,18 @@ $black: #000;
     margin: 0 0 12px;
     color: #333;
   }
+
+  .cta-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .website-btn {
+    text-decoration: none;
+    display: inline-block;
+  }
 }
 
 .cta-button {
