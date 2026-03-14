@@ -59,12 +59,11 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
             .subscribe(complete => {
                 this.isLoadingComplete = complete;
                 if (complete) {
-                    // Start BIOS -> Welcome transition
                     setTimeout(() => {
                         this.isBiosComplete = true;
                         this.showWelcome = true;
                         this.cdr.markForCheck();
-                    }, 1200); // BIOS animation optimized: was 2500ms
+                    }, 400); // Optimized BIOS -> Welcome delay
                 }
                 this.cdr.markForCheck();
             });

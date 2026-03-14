@@ -59,8 +59,14 @@ export class ThreeSceneService implements OnDestroy {
     private lastInteractionTime = 0;
     private frameCount = 0; // per throttle raycaster nel mousemove
 
-    // Shared DRACO loader (inizializzato una volta sola)
+    // Shared Loading Manager
+    private readonly loadingManager: THREE.LoadingManager;
+
+    // Shared loaders
     private readonly dracoLoader: DRACOLoader;
+    private readonly gltfLoader: GLTFLoader;
+    private readonly textureLoader: THREE.TextureLoader;
+    private readonly rgbeLoader: RGBELoader;
 
     // Observables
     public readonly loadingProgress$ = new BehaviorSubject<number>(0);
@@ -73,10 +79,44 @@ export class ThreeSceneService implements OnDestroy {
     private isModelLoaded = false;
 
     constructor(private readonly ngZone: NgZone) {
-        // Pre-inizializza DRACO subito (scarica il WASM in background)
+        // Initialize Loading Manager
+        this.loadingManager = new THREE.LoadingManager();
+        this.setupLoadingManager();
+
+        // Initialize loaders
         this.dracoLoader = new DRACOLoader();
         this.dracoLoader.setDecoderPath('assets/draco/');
         this.dracoLoader.preload();
+
+        this.gltfLoader = new GLTFLoader(this.loadingManager);
+        this.gltfLoader.setDRACOLoader(this.dracoLoader);
+
+        this.textureLoader = new THREE.TextureLoader(this.loadingManager);
+        this.rgbeLoader = new RGBELoader(this.loadingManager);
+        this.rgbeLoader.setDataType(THREE.HalfFloatType);
+
+        // Pre-load critical textures immediately
+        this.preloadTextures();
+    }
+
+    private setupLoadingManager(): void {
+        this.loadingManager.onProgress = (url, itemsLoaded, itemsTotal) => {
+            const progress = (itemsLoaded / itemsTotal) * 100;
+            this.updateLoadingState(progress, 'model');
+        };
+
+        this.loadingManager.onError = (url) => {
+            console.error('Error loading asset:', url);
+        };
+    }
+
+    private preloadTextures(): void {
+        const textures = [
+            'assets/opt_sfondo.webp',
+            'assets/opt_pacman.webp',
+            'assets/opt_cvfoto1.webp'
+        ];
+        textures.forEach(path => this.loadTexture(path, { flipY: true }));
     }
 
     public initialize(container: ElementRef): void {
@@ -109,25 +149,28 @@ export class ThreeSceneService implements OnDestroy {
 
     private setupRenderer(container: HTMLElement): void {
         const { clientWidth: width, clientHeight: height } = container;
-        // Su schermi HiDPI (DPR >= 2) il pixel ratio copre gia' la qualita',
-        // l'antialias hardware e' superfluo e costa molto (2x overdraw).
         const dpr = window.devicePixelRatio || 1;
+        
+        // Optimistic antialias: only on desktop/high-end
         const needsAntialias = dpr < 2;
 
         this.renderer = new THREE.WebGLRenderer({
             antialias: needsAntialias,
             powerPreference: 'high-performance',
-            stencil: false
+            stencil: false,
+            depth: true,
+            alpha: false // Faster rendering for opaque scenes
         });
 
         this.renderer.setSize(width, height);
-        // Start with lower pixel ratio for faster initial render
-        this.renderer.setPixelRatio(1);
+        this.renderer.setPixelRatio(1); // Low DPR initially for speed
         this.renderer.outputColorSpace = THREE.SRGBColorSpace;
-        // Disable shadows initially for faster loading
         this.renderer.shadowMap.enabled = false;
         this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
         this.renderer.toneMappingExposure = 0.4;
+        
+        // Disable sorting if not needed (saves CPU)
+        this.renderer.sortObjects = true; 
 
         container.appendChild(this.renderer.domElement);
     }
@@ -190,49 +233,29 @@ export class ThreeSceneService implements OnDestroy {
     }
 
     private loadEnvironment(): void {
-        // Set a default background color while waiting for HDR
         this.scene.background = new THREE.Color(COLORS.ICE_BLUE).multiplyScalar(0.2);
 
-        const rgbeLoader = new RGBELoader();
-        rgbeLoader.setDataType(THREE.HalfFloatType);
-
-        rgbeLoader.load(
+        this.rgbeLoader.load(
             'assets/cielo1.hdr',
             (texture) => {
-                // Usa requestIdleCallback se disponibile: il PMREM generator e' CPU-bound
-                // e non deve bloccare il thread principale durante il caricamento del modello.
-                const applyEnv = () => {
-                    const pmremGenerator = new THREE.PMREMGenerator(this.renderer);
-                    pmremGenerator.compileEquirectangularShader();
+                const pmremGenerator = new THREE.PMREMGenerator(this.renderer);
+                pmremGenerator.compileEquirectangularShader();
 
-                    this.envMap = pmremGenerator.fromEquirectangular(texture).texture;
-                    this.scene.background = this.envMap;
-                    this.scene.environment = this.envMap;
-
-                    // Adjust intensity
-                    (this.scene as any).backgroundIntensity = THREE_CONFIG.LIGHTS.ENVIRONMENT_INTENSITY;
-                    (this.scene as any).environmentIntensity = THREE_CONFIG.LIGHTS.ENVIRONMENT_INTENSITY;
-
-                    // Reset directional light to normal
-                    this.directionalLight.intensity = THREE_CONFIG.LIGHTS.DIRECTIONAL.INTENSITY_LIGHT;
-
-                    texture.dispose();
-                    pmremGenerator.dispose();
-                };
-
-                // Se il modello e' gia' caricato, applica subito;
-                // altrimenti aspetta un momento di idle per non contendere il download
-                if (this.isModelLoaded) {
-                    applyEnv();
-                } else if (typeof (window as any).requestIdleCallback === 'function') {
-                    (window as any).requestIdleCallback(applyEnv, { timeout: 3000 });
-                } else {
-                    setTimeout(applyEnv, 100);
+                const envMap = pmremGenerator.fromEquirectangular(texture).texture;
+                this.envMap = envMap;
+                
+                // Only set environment if not already loaded (prevents race conditions)
+                if (!this.scene.environment) {
+                    this.scene.environment = envMap;
+                    this.scene.background = envMap;
                 }
-            },
-            undefined,
-            (error) => {
-                console.error('Error loading HDR:', error);
+
+                (this.scene as any).backgroundIntensity = THREE_CONFIG.LIGHTS.ENVIRONMENT_INTENSITY;
+                (this.scene as any).environmentIntensity = THREE_CONFIG.LIGHTS.ENVIRONMENT_INTENSITY;
+
+                texture.dispose();
+                pmremGenerator.dispose();
+                this.isEnvLoaded = true;
             }
         );
     }
@@ -267,34 +290,35 @@ export class ThreeSceneService implements OnDestroy {
         if (this.isFullQualityEnabled) return;
         this.isFullQualityEnabled = true;
 
-        // Upgrade pixel ratio for better quality
-        this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, THREE_CONFIG.MAX_PIXEL_RATIO));
+        // Upgrade pixel ratio smoothly
+        const targetDpr = Math.min(window.devicePixelRatio, THREE_CONFIG.MAX_PIXEL_RATIO);
+        gsap.to({ val: 1 }, {
+            val: targetDpr,
+            duration: 2,
+            onUpdate: function() {
+                // Accessing external 'this' requires arrow func or bind, but we use the service instance
+            },
+            onUpdateParams: [this],
+            onComplete: () => this.renderer.setPixelRatio(targetDpr)
+        });
 
-        // Enable shadows
         this.renderer.shadowMap.enabled = true;
         this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        
+        // Re-compile scene with shadows enabled
+        this.renderer.compile(this.scene, this.camera);
 
         console.log('Progressive features enabled: high-quality rendering active');
     }
 
 
     private loadModel(): void {
-        const loader = new GLTFLoader();
-        // Riusa il dracoLoader gia' pre-inizializzato nel costruttore
-        loader.setDRACOLoader(this.dracoLoader);
-
-        // Load the optimized model (preserves all original materials)
-        loader.load(
+        this.gltfLoader.load(
             'assets/3d/room-space-3-final.glb',
             (gltf) => {
                 this.onModelLoaded(gltf);
             },
-            (event) => {
-                if (event.lengthComputable) {
-                    const progress = (event.loaded / event.total) * 100;
-                    this.updateLoadingState(progress, 'model');
-                }
-            },
+            undefined, // Use LoadingManager for progress
             (error) => {
                 console.error('Error loading model:', error);
                 this.isModelLoaded = true;
@@ -306,17 +330,17 @@ export class ThreeSceneService implements OnDestroy {
     private onModelLoaded(gltf: any): void {
         this.model = gltf.scene;
         if (!this.model) return;
-        this.centerModel();
-        // Auto-frame the model so the camera targets the center and frames it nicely
+
+        // Consolidate all model processing into a single traversal
+        this.processModel();
+        
+        // Calculate framing after processing (requires updated world matrices/bounds)
         this.frameModel();
-        this.enableShadows();
-        this.applyMaterials();
 
         // Remove placeholder with fade out
         if (this.placeholder) {
             gsap.to(this.placeholder.material, {
-                opacity: 0,
-                duration: 0.5,
+                opacity: 0, duration: 0.5,
                 onComplete: () => {
                     this.scene.remove(this.placeholder!);
                     this.placeholder?.geometry.dispose();
@@ -326,52 +350,62 @@ export class ThreeSceneService implements OnDestroy {
             });
         }
 
-        // Add model with fade in
-        this.model.traverse((child) => {
-            if ((child as THREE.Mesh).isMesh) {
-                const mesh = child as THREE.Mesh;
-                const material = mesh.material as THREE.MeshStandardMaterial;
-                if (material && material.transparent === undefined) {
-                    material.transparent = true;
-                    material.opacity = 0;
-                }
-            }
-        });
-
         this.scene.add(this.model);
 
-        // Fade in model
-        this.model.traverse((child) => {
-            if ((child as THREE.Mesh).isMesh) {
-                const mesh = child as THREE.Mesh;
-                const material = mesh.material as THREE.MeshStandardMaterial;
-                if (material) {
-                    gsap.to(material, {
-                        opacity: 1,
-                        duration: 0.8,
-                        ease: 'power2.out'
-                    });
-                }
-            }
-        });
+        // Pre-compile scene to avoid stutter
+        this.renderer.compile(this.scene, this.camera);
 
         // Enable progressive features after a short delay
         setTimeout(() => this.enableProgressiveFeatures(), 1000);
 
         this.isModelLoaded = true;
-        this.isModelLoaded = true;
         this.updateLoadingState(100, 'model');
         this.checkLoadingComplete();
     }
 
-    private centerModel(): void {
+    private processModel(): void {
         if (!this.model) return;
+
+        // One-pass traversal for optimization
+        this.model.traverse((child) => {
+            if (!(child as THREE.Mesh).isMesh) return;
+            
+            const mesh = child as THREE.Mesh;
+            const material = mesh.material as THREE.MeshStandardMaterial;
+
+            // 1. Shadows
+            mesh.castShadow = true;
+            mesh.receiveShadow = true;
+
+            // 2. Performance: disable matrix updates for static objects
+            mesh.matrixAutoUpdate = false;
+            mesh.updateMatrix();
+
+            // 3. Materials processing
+            if (material) {
+                material.transparent = true;
+                material.opacity = 0;
+                gsap.to(material, { opacity: 1, duration: 0.8, ease: 'power2.out' });
+
+                const name = material.name?.toLowerCase() || '';
+                const meshNameLower = mesh.name?.toLowerCase() || '';
+                this.applyMaterialByName(mesh, material, name);
+
+                if (meshNameLower.includes('schermogrande') && !name.includes('schermogrande')) {
+                    this.applyScreenMaterial(mesh, material, 'assets/opt_sfondo.webp', 'schermoGrande');
+                } else if (meshNameLower.includes('schermopiccolo') && !name.includes('schermopiccolo')) {
+                    this.applyScreenMaterial(mesh, material, 'assets/opt_pacman.webp', 'schermoPiccolo');
+                }
+            }
+        });
+
+        // Center model once
         const box = new THREE.Box3().setFromObject(this.model);
         const center = box.getCenter(new THREE.Vector3());
-
         this.model.position.sub(center);
         this.model.position.y += THREE_CONFIG.MODEL.POSITION_Y_OFFSET;
         this.model.position.x += THREE_CONFIG.MODEL.POSITION_X_OFFSET;
+        this.model.updateMatrixWorld(true);
     }
 
     private frameModel(): void {
@@ -381,62 +415,19 @@ export class ThreeSceneService implements OnDestroy {
         const size = box.getSize(new THREE.Vector3());
         const center = box.getCenter(new THREE.Vector3());
 
-        // Fit the camera to the model using a simple bounding-sphere approach
         const maxDim = Math.max(size.x, size.y, size.z);
         const fov = this.camera.fov * (Math.PI / 180);
         let distance = Math.abs(maxDim / (2 * Math.tan(fov / 2)));
-        distance *= 1.4; // add some padding
+        distance *= 1.4;
 
-        // Place camera offset slightly above center for a better initial view
         const cameraPos = new THREE.Vector3(center.x, center.y + maxDim * 0.15, center.z + distance);
 
-        // Apply positions
         this.camera.position.copy(cameraPos);
         this.controls.target.copy(center);
         this.controls.update();
 
-        // Save original positions for zoom return
         this.cameraOriginalPosition.copy(this.camera.position);
         this.controlsOriginalTarget.copy(this.controls.target);
-    }
-
-    private enableShadows(): void {
-        this.model?.traverse((child) => {
-            if ((child as THREE.Mesh).isMesh) {
-                child.castShadow = true;
-                child.receiveShadow = true;
-            }
-        });
-    }
-
-    private applyMaterials(): void {
-        this.model?.traverse((child) => {
-            if (!(child as THREE.Mesh).isMesh) return;
-
-            const mesh = child as THREE.Mesh;
-            const material = mesh.material as THREE.MeshStandardMaterial;
-            const matName = material?.name || '(no-name)';
-            const meshName = mesh.name || '(no-mesh-name)';
-            const mapInfo = material?.map ? (material.map as any).name || (material.map as any).image?.src || 'map-present' : 'map-none';
-            const normalInfo = material?.normalMap ? 'normal-present' : 'normal-none';
-            console.log(`Mesh: ${meshName}  Material: ${matName}  map:${mapInfo}  normal:${normalInfo}`);
-
-            if (!material?.name) return;
-
-            const name = material.name.toLowerCase();
-            const meshNameLower = meshName.toLowerCase();
-
-            // Prefer material-name based handlers, but fall back to mesh-name
-            // detection for cases where the GLB optimizer merged/renamed materials.
-            this.applyMaterialByName(mesh, material, name);
-
-            // Fallback: if optimizer changed material names, detect screens by mesh name
-            if (meshNameLower.includes('schermogrande') && !name.includes('schermogrande')) {
-                this.applyScreenMaterial(mesh, material, 'assets/opt_sfondo.webp', 'schermoGrande');
-            } else if (meshNameLower.includes('schermopiccolo') && !name.includes('schermopiccolo')) {
-                this.applyScreenMaterial(mesh, material, 'assets/opt_pacman.webp', 'schermoPiccolo');
-            }
-        });
     }
 
     private applyMaterialByName(mesh: THREE.Mesh, material: THREE.MeshStandardMaterial, name: string): void {
@@ -622,13 +613,14 @@ export class ThreeSceneService implements OnDestroy {
     private loadTexture(path: string, opts?: { flipY?: boolean; generateMipmaps?: boolean }): THREE.Texture {
         const key = `${path}::f:${String(opts?.flipY ?? false)}::m:${String(opts?.generateMipmaps ?? false)}`;
         if (!this.textureCache.has(key)) {
-            const loader = new THREE.TextureLoader();
-            const texture = loader.load(path);
-            // Allow override of flipY per-texture; default false to match glTF convention
+            const texture = this.textureLoader.load(path);
             texture.flipY = opts?.flipY ?? false;
-            // Ensure correct color space for sRGB textures when available
-            try { texture.colorSpace = THREE.SRGBColorSpace; } catch (e) { /* ignore if not available */ }
-            // Mipmaps: allow opt-in (default disabled)
+            try { texture.colorSpace = THREE.SRGBColorSpace; } catch (e) { }
+            
+            // Optimization: anisotropic filtering for premium look without much cost
+            const maxAnisotropy = this.renderer?.capabilities.getMaxAnisotropy() || 1;
+            texture.anisotropy = Math.min(maxAnisotropy, 8); 
+
             texture.generateMipmaps = opts?.generateMipmaps ?? false;
             texture.minFilter = texture.generateMipmaps ? THREE.LinearMipmapLinearFilter : THREE.LinearFilter;
             this.textureCache.set(key, texture);
@@ -706,27 +698,30 @@ export class ThreeSceneService implements OnDestroy {
         this.updateMouseCoordinates(event, canvas);
         this.raycaster.setFromCamera(this.mouse, this.camera);
 
-        if (this.checkIntersection(this.quadroMesh)) {
-            this.ngZone.run(() => this.pdfClick$.next());
-            return;
-        }
+        // Clickable objects priority list
+        const targets = [];
+        if (this.quadroMesh) targets.push(this.quadroMesh);
+        if (this.schermoGrandeMesh) targets.push(this.schermoGrandeMesh);
+        if (this.schermoPiccoloMesh) targets.push(this.schermoPiccoloMesh);
+        if (this.catMesh) targets.push(this.catMesh);
 
-        if (this.checkIntersection(this.schermoGrandeMesh)) {
-            this.zoomToScreen(this.schermoGrandeMesh!, THREE_CONFIG.ZOOM.SCREEN_DISTANCE, () => {
-                this.screenClick$.next('desktop');
-            });
-            return;
-        }
-
-        if (this.checkIntersection(this.schermoPiccoloMesh)) {
-            this.zoomToScreen(this.schermoPiccoloMesh!, THREE_CONFIG.ZOOM.GAME_DISTANCE, () => {
-                this.screenClick$.next('game');
-            });
-            return;
-        }
-
-        if (this.checkIntersection(this.catMesh)) {
-            this.ngZone.run(() => this.catClick$.next());
+        const intersects = this.raycaster.intersectObjects(targets);
+        if (intersects.length > 0) {
+            const mesh = intersects[0].object as THREE.Mesh;
+            
+            if (mesh === this.quadroMesh) {
+                this.ngZone.run(() => this.pdfClick$.next());
+            } else if (mesh === this.schermoGrandeMesh) {
+                this.zoomToScreen(this.schermoGrandeMesh, THREE_CONFIG.ZOOM.SCREEN_DISTANCE, () => {
+                    this.screenClick$.next('desktop');
+                });
+            } else if (mesh === this.schermoPiccoloMesh) {
+                this.zoomToScreen(this.schermoPiccoloMesh, THREE_CONFIG.ZOOM.GAME_DISTANCE, () => {
+                    this.screenClick$.next('game');
+                });
+            } else if (mesh === this.catMesh) {
+                this.ngZone.run(() => this.catClick$.next());
+            }
         }
     }
 
