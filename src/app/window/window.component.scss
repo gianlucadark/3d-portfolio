@@ -207,26 +207,31 @@ $black: #000;
 // TITLE BAR
 // ========================================
 .title-bar {
+  // Luna Blue theme: highlight line at top, peak at 8%, then solid, darken at bottom
   background: linear-gradient(to bottom,
-      #0058e3 0%,
-      #3c96ff 5%,
-      #0058e3 12%,
-      #0058e3 88%,
-      #003da1 100%);
-  padding: 3px 12px;
+      #1664d8 0%,
+      #1664d8 1px,
+      #1e83fa 1px,
+      #1e83fa 3px,
+      #1158c7 3px,
+      #1158c7 45%,
+      #0d49b0 45%,
+      #0d49b0 88%,
+      #0a3995 100%);
+  padding: 3px 6px 3px 12px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   color: $white;
   font-family: 'Tahoma', sans-serif;
   font-weight: bold;
-  font-size: 13px;
-  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
+  font-size: 12px;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.6);
   cursor: move;
-  border-radius: 8px 8px 0 0;
-  height: 32px;
+  border-radius: 6px 6px 0 0;
+  height: 28px;
   flex-shrink: 0;
-  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.6);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), inset 0 2px 0 rgba(255,255,255,0.15);
 
   &-text {
     @include flex-center;
@@ -277,23 +282,25 @@ $black: #000;
       }
 
       &.close-btn {
-        background: linear-gradient(to bottom, #f07455 0%, #d43c16 100%);
-        border-color: #fff;
+        background: linear-gradient(to bottom, #e9593a 0%, #c0311a 100%);
+        border-color: rgba(255,255,255,0.7);
+        width: 23px;
+        height: 21px;
 
         &::after {
           content: '×';
-          font-size: 20px;
+          font-size: 17px;
           font-weight: bold;
           color: white;
-          padding-bottom: 2px;
+          text-shadow: 1px 1px 1px rgba(0,0,0,0.4);
         }
 
         &:hover {
-          background: linear-gradient(to bottom, #ff957a 0%, #f07455 100%);
+          background: linear-gradient(to bottom, #ff7055 0%, #e04020 100%);
         }
 
         &:active {
-          background: #d43c16;
+          background: #b02a14;
           box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.5);
         }
       }

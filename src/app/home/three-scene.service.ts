@@ -163,7 +163,7 @@ export class ThreeSceneService implements OnDestroy {
         });
 
         this.renderer.setSize(width, height);
-        this.renderer.setPixelRatio(1); // Low DPR initially for speed
+        this.renderer.setPixelRatio(0.75); // Low DPR initially for speed
         this.renderer.outputColorSpace = THREE.SRGBColorSpace;
         this.renderer.shadowMap.enabled = false;
         this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -290,15 +290,14 @@ export class ThreeSceneService implements OnDestroy {
         if (this.isFullQualityEnabled) return;
         this.isFullQualityEnabled = true;
 
-        // Upgrade pixel ratio smoothly
+        // Upgrade pixel ratio smoothly from 0.75 to full device DPR
         const targetDpr = Math.min(window.devicePixelRatio, THREE_CONFIG.MAX_PIXEL_RATIO);
-        gsap.to({ val: 1 }, {
+        const proxy = { val: 0.75 };
+        gsap.to(proxy, {
             val: targetDpr,
-            duration: 2,
-            onUpdate: function() {
-                // Accessing external 'this' requires arrow func or bind, but we use the service instance
-            },
-            onUpdateParams: [this],
+            duration: 1.5,
+            ease: 'power1.inOut',
+            onUpdate: () => this.renderer.setPixelRatio(proxy.val),
             onComplete: () => this.renderer.setPixelRatio(targetDpr)
         });
 

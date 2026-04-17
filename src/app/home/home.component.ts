@@ -112,19 +112,26 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     enterPortfolio(): void {
-        // 1. Mostra il desktop e sposta la camera (istantaneo)
+        // 1. Rendi il desktop presente nel DOM prima ancora di fare qualsiasi fade
         this.showDesktop = true;
         this.threeSceneService.setInitialPositionOnScreen();
-
-        // 2. Avvia l'animazione di fade-out
-        this.isEndingLoading = true;
         this.cdr.markForCheck();
 
-        // 3. Rimuovi definitivamente il loading screen dopo che il fade è finito
-        setTimeout(() => {
-            this.isLoading = false;
-            this.cdr.markForCheck();
-        }, 800); // Coincide con la durata della transizione CSS
+        // 2. Aspetta due frame (double-rAF) per garantire che Angular abbia
+        //    dipinto il desktop nel browser prima di iniziare il fade-out.
+        //    Senza questo, il loading screen diventa trasparente prima che la
+        //    wallpaper sia disegnata, rivelando il renderer 3D per ~1 frame.
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                this.isEndingLoading = true;
+                this.cdr.markForCheck();
+
+                setTimeout(() => {
+                    this.isLoading = false;
+                    this.cdr.markForCheck();
+                }, 800);
+            });
+        });
     }
 
     returnFromDesktop(): void {

@@ -39,7 +39,8 @@ $white: #fff;
   background: $blue-gradient;
   @include flex-center;
   padding: 0;
-  border-top: 1px solid #001a91;
+  border-top: 2px solid #0831d9;
+  box-shadow: 0 -1px 0 #4a7de8 inset;
   z-index: 1000;
 }
 
