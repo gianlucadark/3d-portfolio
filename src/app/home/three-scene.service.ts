@@ -51,6 +51,9 @@ export class ThreeSceneService implements OnDestroy {
     private readonly controlsOriginalTarget = new THREE.Vector3();
     private readonly textureCache = new Map<string, THREE.Texture>();
     private isHovering = false;
+    private catGlowTween: gsap.core.Tween | null = null;
+    private pacmanGlowTween: gsap.core.Tween | null = null;
+    private catMeshes: THREE.Mesh[] = [];
     private placeholder: THREE.Mesh | null = null;
     private isFullQualityEnabled = false;
 
@@ -457,7 +460,11 @@ export class ThreeSceneService implements OnDestroy {
 
     private applyCatMaterial(mesh: THREE.Mesh): void {
         this.catMesh = mesh;
+        this.catMeshes.push(mesh);
         mesh.userData['isClickable'] = true;
+        // Avvia il glow dopo che tutti i mesh sono stati raccolti
+        if (this.catGlowTween) return;
+        setTimeout(() => this.startCatGlow(), 0);
     }
 
     // Material application helpers
@@ -577,7 +584,10 @@ export class ThreeSceneService implements OnDestroy {
         material.needsUpdate = true;
 
         if (target === 'schermoGrande') this.schermoGrandeMesh = mesh;
-        else this.schermoPiccoloMesh = mesh;
+        else {
+            this.schermoPiccoloMesh = mesh;
+            this.startPacmanGlow();
+        }
 
         mesh.userData['isClickable'] = true;
     }
@@ -737,7 +747,11 @@ export class ThreeSceneService implements OnDestroy {
         let isHoveringSomething = false;
 
         if (this.handleQuadroHover()) isHoveringSomething = true;
-        if (!isHoveringSomething && (this.checkIntersection(this.schermoGrandeMesh) || this.checkIntersection(this.schermoPiccoloMesh) || this.checkIntersection(this.catMesh))) {
+
+        const isPacmanHit = this.checkIntersection(this.schermoPiccoloMesh);
+        const isCatHit = this.checkIntersection(this.catMesh);
+
+        if (!isHoveringSomething && (this.checkIntersection(this.schermoGrandeMesh) || isPacmanHit || isCatHit)) {
             isHoveringSomething = true;
         }
 
@@ -823,6 +837,40 @@ export class ThreeSceneService implements OnDestroy {
             duration,
             ease: 'power2.out',
             onComplete: () => { material.emissive = new THREE.Color(COLORS.BLACK); }
+        });
+    }
+
+    private startCatGlow(): void {
+        if (!this.catMeshes.length) return;
+        this.catMeshes.forEach(mesh => {
+            const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+            mats.forEach(mat => {
+                const m = mat as THREE.MeshStandardMaterial;
+                if (!m || !('emissive' in m)) return;
+                m.emissive = new THREE.Color(0xffe0aa);
+                m.emissiveIntensity = 0.05;
+                this.catGlowTween = gsap.to(m, {
+                    emissiveIntensity: 0.18,
+                    duration: 0.9,
+                    ease: 'sine.inOut',
+                    yoyo: true,
+                    repeat: -1
+                });
+            });
+        });
+    }
+
+    private startPacmanGlow(): void {
+        if (!this.schermoPiccoloMesh) return;
+        const material = this.schermoPiccoloMesh.material as THREE.MeshStandardMaterial;
+        if (!material) return;
+        this.pacmanGlowTween = gsap.to(material, {
+            emissiveIntensity: 3.5,
+            duration: 0.9,
+            ease: 'sine.inOut',
+            yoyo: true,
+            repeat: -1,
+            startAt: { emissiveIntensity: MATERIAL_CONFIG.SCREEN.EMISSIVE_INTENSITY }
         });
     }
 
@@ -942,6 +990,8 @@ export class ThreeSceneService implements OnDestroy {
         if (this.animationId !== null) {
             cancelAnimationFrame(this.animationId);
         }
+        this.catGlowTween?.kill();
+        this.pacmanGlowTween?.kill();
         this.textureCache.forEach(texture => texture.dispose());
         this.textureCache.clear();
         this.model?.traverse((child) => {
