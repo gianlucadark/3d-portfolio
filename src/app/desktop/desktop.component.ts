@@ -26,25 +26,26 @@ import {
 
 /** Configurazione delle icone del desktop */
 const DESKTOP_ICONS: Icon[] = [
-  { id: 1, name: 'icons.computer', image: 'assets/icons/computer.webp', position: { x: 0, y: 0 } },
-  { id: 13, name: 'icons.curriculum', image: 'assets/icons/folder.webp', position: { x: 0, y: 0 } },
+  { id: 1, name: 'icons.computer', image: 'assets/icons/computer.ico', position: { x: 0, y: 0 } },
+  { id: 13, name: 'icons.curriculum', image: 'assets/icons/folder.ico', position: { x: 0, y: 0 } },
   { id: 4, name: 'icons.prompt', image: 'assets/icons/prompt.webp', position: { x: 0, y: 0 } },
-  { id: 5, name: 'icons.readme', image: 'assets/icons/readme.webp', position: { x: 0, y: 0 } },
+  { id: 5, name: 'icons.readme', image: 'assets/icons/readme.ico', position: { x: 0, y: 0 } },
   { id: 6, name: 'icons.paint', image: 'assets/icons/paint.webp', position: { x: 0, y: 0 } },
-  { id: 8, name: 'icons.notepad', image: 'assets/icons/paper.webp', position: { x: 0, y: 0 } },
+  { id: 8, name: 'icons.notepad', image: 'assets/icons/paper.ico', position: { x: 0, y: 0 } },
   { id: 9, name: 'icons.email', image: 'assets/icons/email.png', position: { x: 0, y: 0 } },
-  { id: 10, name: 'icons.projects', image: 'assets/icons/folder.webp', position: { x: 0, y: 0 } },
+  { id: 7, name: 'icons.trash', image: 'assets/icons/cestino.webp', position: { x: 0, y: 0 } },
+  { id: 10, name: 'icons.projects', image: 'assets/icons/folder.ico', position: { x: 0, y: 0 } },
   {
     id: 11,
     name: 'icons.uxability',
-    image: 'assets/icons/folder.webp',
+    image: 'assets/icons/folder.ico',
     position: { x: 0, y: 0 },
     parentId: 10
   },
   {
     id: 12,
     name: 'icons.webExtension',
-    image: 'assets/icons/folder.webp',
+    image: 'assets/icons/folder.ico',
     position: { x: 0, y: 0 },
     parentId: 10
   }
@@ -88,7 +89,7 @@ export class DesktopComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.calculateIconPositions();
-    this.openWindow(5, this.getWindowTitle(5), 'assets/icons/readme.webp');
+    this.openWindow(5, this.getWindowTitle(5), 'assets/icons/readme.ico');
 
     this.translationService.language$
       .pipe(takeUntil(this.destroy$))
@@ -115,14 +116,23 @@ export class DesktopComponent implements OnInit, OnDestroy {
     const availableHeight = window.innerHeight - WINDOW_CONFIG.TASKBAR_HEIGHT - 60; // 60px margin for top/bottom
     const itemsPerColumn = Math.max(1, Math.floor(availableHeight / ICON_GRID_CONFIG.ITEM_HEIGHT));
 
-    desktopIcons.forEach((icon, index) => {
-      const col = Math.floor(index / itemsPerColumn);
-      const row = index % itemsPerColumn;
+    let standardIconIndex = 0;
+    desktopIcons.forEach((icon) => {
+      if (icon.id === 7) {
+        icon.position = {
+          x: window.innerWidth - ICON_GRID_CONFIG.ITEM_WIDTH - 20,
+          y: window.innerHeight - WINDOW_CONFIG.TASKBAR_HEIGHT - ICON_GRID_CONFIG.ITEM_HEIGHT - 20
+        };
+      } else {
+        const col = Math.floor(standardIconIndex / itemsPerColumn);
+        const row = standardIconIndex % itemsPerColumn;
 
-      icon.position = {
-        x: ICON_GRID_CONFIG.PADDING_LEFT + (col * ICON_GRID_CONFIG.ITEM_WIDTH),
-        y: ICON_GRID_CONFIG.PADDING_TOP + (row * ICON_GRID_CONFIG.ITEM_HEIGHT)
-      };
+        icon.position = {
+          x: ICON_GRID_CONFIG.PADDING_LEFT + (col * ICON_GRID_CONFIG.ITEM_WIDTH),
+          y: ICON_GRID_CONFIG.PADDING_TOP + (row * ICON_GRID_CONFIG.ITEM_HEIGHT)
+        };
+        standardIconIndex++;
+      }
     });
   }
 
