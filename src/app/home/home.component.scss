@@ -98,49 +98,118 @@ $transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
     animation: crtFlicker 0.15s infinite;
 }
 
-// BIOS Sequence
-.bios-sequence {
+// Windows XP Boot Screen
+.xp-boot-screen {
     position: fixed;
     inset: 0;
     background: #000;
-    color: #ccc;
-    font-family: 'Courier New', Courier, monospace;
-    padding: 40px;
-    font-size: 16px;
-    line-height: 1.4;
     z-index: 10000;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    align-items: center;
+    justify-content: center;
+    animation: xpBootFadeIn 0.5s ease-out;
+}
 
-    p {
-        opacity: 0;
-        animation: biosLineFade 0.1s forwards;
+.xp-boot-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+}
 
-        @for $i from 1 through 20 {
-            &:nth-child(#{$i}) {
-                animation-delay: #{$i * 0.1}s;
-            }
-        }
+.xp-boot-logo {
+    width: 200px;
+    height: auto;
+    margin-bottom: 20px;
+    filter: drop-shadow(0 0 30px rgba(255, 255, 255, 0.15));
+}
+
+.xp-boot-title {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    margin: 0 0 30px 0;
+}
+
+.xp-boot-name {
+    font-family: 'Franklin Gothic Medium', 'Tahoma', 'Arial', sans-serif;
+    font-size: 24px;
+    font-weight: normal;
+    color: #ffffff;
+    letter-spacing: 8px;
+    text-transform: uppercase;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+.xp-boot-portfolio {
+    font-family: 'Franklin Gothic Medium', 'Tahoma', 'Arial', sans-serif;
+    font-size: 42px;
+    font-weight: bold;
+    color: #ffffff;
+    letter-spacing: 3px;
+    text-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+    margin-top: -4px;
+
+    .xp-boot-highlight {
+        font-weight: normal;
+        color: rgba(255, 255, 255, 0.7);
     }
 }
 
-@keyframes biosLineFade {
-    to {
-        opacity: 1;
-    }
+// Iconic XP 3-block loading animation
+.xp-boot-loader {
+    margin-top: 10px;
 }
 
-.bios-main {
-    flex: 1;
-    margin-top: 40px;
+.xp-boot-loader-track {
+    width: 220px;
+    height: 22px;
+    background: transparent;
+    border: 2px solid rgba(255, 255, 255, 0.6);
+    border-radius: 3px;
+    padding: 2px;
+    position: relative;
+    overflow: hidden;
 }
 
-.bios-blink {
-    &::after {
-        content: '_';
-        animation: biosCursor 0.5s infinite;
-    }
+.xp-boot-loader-blocks {
+    display: flex;
+    gap: 5px;
+    position: absolute;
+    left: -80px;
+    top: 0;
+    height: 100%;
+    animation: xpBootBlockSlide 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.xp-boot-block {
+    width: 18px;
+    height: 100%;
+    border-radius: 3px;
+    background: linear-gradient(to bottom, #7cb5f5 0%, #3a7bd5 40%, #2a5fb0 100%);
+    box-shadow: 0 0 8px rgba(59, 130, 246, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.xp-boot-copyright {
+    position: absolute;
+    bottom: 40px;
+    color: rgba(255, 255, 255, 0.4);
+    font-family: 'Tahoma', 'Arial', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+}
+
+// XP Boot Animations
+@keyframes xpBootFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes xpBootBlockSlide {
+    0% { left: -80px; }
+    100% { left: 220px; }
 }
 
 // XP Welcome Screen
@@ -417,17 +486,7 @@ $transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
     }
 }
 
-@keyframes biosCursor {
 
-    0%,
-    100% {
-        opacity: 1;
-    }
-
-    50% {
-        opacity: 0;
-    }
-}
 
 @keyframes xpProgressMove {
     0% {
@@ -726,9 +785,22 @@ $transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
 // RESPONSIVE
 // ========================================
 @media (max-width: 768px) {
-    .bios-sequence {
-        padding: 20px;
-        font-size: 14px;
+    .xp-boot-logo {
+        width: 140px;
+    }
+
+    .xp-boot-name {
+        font-size: 18px;
+        letter-spacing: 5px;
+    }
+
+    .xp-boot-portfolio {
+        font-size: 30px;
+    }
+
+    .xp-boot-copyright {
+        bottom: 24px;
+        font-size: 10px;
     }
 
     .welcome-container {

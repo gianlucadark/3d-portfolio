@@ -38,27 +38,25 @@
     <!-- CRT Scanline Overlay (always on during loading) -->
     <div class="crt-overlay"></div>
 
-    <!-- BIOS Sequence -->
-    <div class="bios-sequence" *ngIf="!isBiosComplete">
-        <div class="bios-header">
-            <p>Gianluca's Portfolio BIOS</p>
-            <p>Copyright (C) 2026, Gianluca Software, Inc.</p>
+    <!-- Windows XP Boot Screen -->
+    <div class="xp-boot-screen" *ngIf="!isBiosComplete">
+        <div class="xp-boot-content">
+            <img src="assets/icons/start.png" alt="Windows XP Logo" class="xp-boot-logo">
+            <h1 class="xp-boot-title">
+                <span class="xp-boot-name">Gianluca's</span>
+                <span class="xp-boot-portfolio">XP<span class="xp-boot-highlight">orfolio</span></span>
+            </h1>
+            <div class="xp-boot-loader">
+                <div class="xp-boot-loader-track">
+                    <div class="xp-boot-loader-blocks">
+                        <div class="xp-boot-block"></div>
+                        <div class="xp-boot-block"></div>
+                        <div class="xp-boot-block"></div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="bios-main">
-            <p>Main Processor : BORED DEVELOPER @ 4.20GHz</p>
-            <p>Memory Test : 65536K OK</p>
-            <p>&nbsp;</p>
-            <p>Detecting Primary Master ... [STORAGE_PORTFOLIO]</p>
-            <p>Detecting Primary Slave ... [NONE]</p>
-            <p>Detecting Secondary Master... [DISK_RESUME]</p>
-            <p>&nbsp;</p>
-            <p class="bios-blink">Verifying DMI Pool Data ........... Success</p>
-            <p>Booting from Hard Disk...</p>
-        </div>
-        <div class="bios-footer">
-            <p>Press <b>DEL</b> to enter SETUP , <b>ESC</b> to Skip</p>
-            <p>04/20/2001-IA-64-82371-G-L-U-C-A-00</p>
-        </div>
+        <p class="xp-boot-copyright">Copyright &copy; Gianluca. All rights reserved.</p>
     </div>
 
     <!-- XP Iconic Welcome Screen -->
