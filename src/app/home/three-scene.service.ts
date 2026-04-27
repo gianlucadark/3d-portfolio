@@ -81,7 +81,11 @@ export class ThreeSceneService implements OnDestroy {
     private isEnvLoaded = false;
     private isModelLoaded = false;
 
+    private readonly webGLAvailable: boolean;
+
     constructor(private readonly ngZone: NgZone) {
+        this.webGLAvailable = this.detectWebGL();
+
         // Initialize Loading Manager
         this.loadingManager = new THREE.LoadingManager();
         this.setupLoadingManager();
@@ -98,8 +102,23 @@ export class ThreeSceneService implements OnDestroy {
         this.rgbeLoader = new RGBELoader(this.loadingManager);
         this.rgbeLoader.setDataType(THREE.HalfFloatType);
 
+        if (!this.webGLAvailable) {
+            // Headless/no-GPU environment (e.g. Lighthouse): skip 3D and unblock UI immediately
+            setTimeout(() => this.ngZone.run(() => this.loadingComplete$.next(true)), 0);
+            return;
+        }
+
         // Pre-load critical textures immediately
         this.preloadTextures();
+    }
+
+    private detectWebGL(): boolean {
+        try {
+            const canvas = document.createElement('canvas');
+            return !!(canvas.getContext('webgl2') || canvas.getContext('webgl') || canvas.getContext('experimental-webgl'));
+        } catch {
+            return false;
+        }
     }
 
     private setupLoadingManager(): void {
@@ -123,6 +142,8 @@ export class ThreeSceneService implements OnDestroy {
     }
 
     public initialize(container: ElementRef): void {
+        if (!this.webGLAvailable) return;
+
         this.ngZone.runOutsideAngular(() => {
             this.initScene(container);
             this.createPlaceholder();
