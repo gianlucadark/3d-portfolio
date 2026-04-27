@@ -37,6 +37,22 @@ $black: #000;
   background: #000 url('/assets/icons/wallpaper.png') center/cover;
   position: relative;
   overflow: hidden;
+  cursor: url('/assets/icons/cursor-opt.png') 0 0, auto;
+
+  // Tutti i figli ereditano il cursore XP; i clickable mantengono il puntatore
+  * {
+    cursor: url('/assets/icons/cursor-opt.png') 0 0, auto;
+  }
+
+  button,
+  a,
+  [role="button"],
+  [draggable="true"],
+  .icon,
+  .taskbar-app,
+  .start-menu-item {
+    cursor: url('/assets/icons/cursor-opt.png') 0 0, pointer;
+  }
 }
 
 // ========================================

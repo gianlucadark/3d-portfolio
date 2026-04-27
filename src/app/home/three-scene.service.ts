@@ -11,7 +11,8 @@ import { THREE_CONFIG, MATERIAL_CONFIG, COLORS } from '../constants/app.constant
 
 // Throttle render: ms per frame target
 const FPS_ACTIVE = 1000 / 60;  // 60fps durante interazione
-const FPS_IDLE = 1000 / 30;  // 30fps a riposo
+const FPS_IDLE = 1000 / 30;    // 30fps a riposo
+const FPS_LOADING = 1000 / 5;  // 5fps mentre la scena è nascosta dal loading screen
 const INTERACTION_COOLDOWN_MS = 2000; // torna a idle dopo 2s senza input
 
 @Injectable({
@@ -61,6 +62,7 @@ export class ThreeSceneService implements OnDestroy {
     private lastFrameTime = 0;
     private lastInteractionTime = 0;
     private frameCount = 0; // per throttle raycaster nel mousemove
+    private sceneVisible = false; // false finché il loading screen copre la scena
 
     // Event listener references (needed for proper removal)
     private resizeListener!: () => void;
@@ -213,10 +215,14 @@ export class ThreeSceneService implements OnDestroy {
         this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
         this.renderer.toneMappingExposure = 0.4;
         
-        // Disable sorting if not needed (saves CPU)
-        this.renderer.sortObjects = true; 
+        this.renderer.sortObjects = false; // scena opaca: nessun sort necessario
 
         container.appendChild(this.renderer.domElement);
+
+        // Le texture pre-caricate nel costruttore non avevano il renderer disponibile,
+        // quindi la loro anisotropy era 1. Aggiorniamo ora che il renderer esiste.
+        const maxAnisotropy = this.renderer.capabilities.getMaxAnisotropy();
+        this.textureCache.forEach(t => { t.anisotropy = Math.min(maxAnisotropy, 8); });
     }
 
     private setupControls(): void {
@@ -300,6 +306,7 @@ export class ThreeSceneService implements OnDestroy {
                 texture.dispose();
                 pmremGenerator.dispose();
                 this.isEnvLoaded = true;
+                this.checkLoadingComplete();
             }
         );
     }
@@ -350,8 +357,6 @@ export class ThreeSceneService implements OnDestroy {
         
         // Re-compile scene with shadows enabled
         this.renderer.compile(this.scene, this.camera);
-
-        console.log('Progressive features enabled: high-quality rendering active');
     }
 
 
@@ -512,9 +517,6 @@ export class ThreeSceneService implements OnDestroy {
     // Material application helpers
     private applyGlassMaterial(mesh: THREE.Mesh, material: THREE.MeshStandardMaterial): void {
         const { GLASS } = MATERIAL_CONFIG;
-        // Preserve original material: update non-physical properties in-place
-        material.map = material.map || material.map;
-        material.normalMap = material.normalMap || material.normalMap;
         material.color = (material.color || new THREE.Color(0xffffff)).clone();
         material.transparent = true;
         material.opacity = 1;
@@ -522,22 +524,16 @@ export class ThreeSceneService implements OnDestroy {
         material.metalness = GLASS.METALNESS;
         material.side = THREE.DoubleSide;
 
-        // Only set physical-only properties if material is a MeshPhysicalMaterial
         if ((material as any).isMeshPhysicalMaterial) {
             (material as any).transmission = GLASS.TRANSMISSION;
             (material as any).ior = GLASS.IOR;
             (material as any).thickness = 0.05;
-        } else {
-            console.log(`Skipping physical props for material '${material.name}' (not MeshPhysicalMaterial)`);
         }
         material.needsUpdate = true;
     }
 
     private applyMarbleMaterial(mesh: THREE.Mesh, material: THREE.MeshStandardMaterial): void {
         const { MARBLE } = MATERIAL_CONFIG;
-        // Preserve original material: tweak properties in-place
-        material.map = material.map || material.map;
-        material.normalMap = material.normalMap || material.normalMap;
         material.color = (material.color || new THREE.Color(0xffffff)).clone();
         material.roughness = MARBLE.ROUGHNESS;
         material.metalness = MARBLE.METALNESS;
@@ -546,8 +542,6 @@ export class ThreeSceneService implements OnDestroy {
         if ((material as any).isMeshPhysicalMaterial) {
             (material as any).clearcoat = MARBLE.CLEARCOAT;
             (material as any).clearcoatRoughness = 0.1;
-        } else {
-            console.log(`Skipping clearcoat props for material '${material.name}' (not MeshPhysicalMaterial)`);
         }
         material.needsUpdate = true;
     }
@@ -695,12 +689,27 @@ export class ThreeSceneService implements OnDestroy {
     }
 
     private checkLoadingComplete(): void {
-        if (this.isModelLoaded) {
-            this.updateProgress(100);
-            setTimeout(() => {
-                this.ngZone.run(() => this.loadingComplete$.next(true));
-            }, 400);
+        if (!this.isModelLoaded) return;
+
+        if (this.isEnvLoaded) {
+            this.commitLoadingComplete();
+        } else {
+            // Modello pronto ma HDR ancora in caricamento: aspetta fino a 4s poi procedi
+            const id = setTimeout(() => this.commitLoadingComplete(), 4000);
+            this.pendingTimeouts.push(id);
         }
+    }
+
+    private commitLoadingComplete(): void {
+        if (this.loadingComplete$.value) return; // già emesso, evita doppia emissione
+        this.updateProgress(100);
+        const id = setTimeout(() => this.ngZone.run(() => this.loadingComplete$.next(true)), 400);
+        this.pendingTimeouts.push(id);
+    }
+
+    public setSceneVisible(visible: boolean): void {
+        this.sceneVisible = visible;
+        if (visible) this.markInteraction(); // garantisce subito 60fps al reveal
     }
 
     private startAnimation(): void {
@@ -710,9 +719,13 @@ export class ThreeSceneService implements OnDestroy {
     private animate(now: number = 0): void {
         this.animationId = requestAnimationFrame(this.animate.bind(this));
 
-        // Render throttling: 60fps durante interazione, 30fps a riposo
+        // Mentre il loading screen copre la scena: 5fps (GPU/batteria risparmiati)
+        // Dopo il reveal: 60fps durante interazione, 30fps a riposo
         const isActive = (now - this.lastInteractionTime) < INTERACTION_COOLDOWN_MS;
-        const targetFps = isActive ? FPS_ACTIVE : FPS_IDLE;
+        const targetFps = !this.sceneVisible
+            ? FPS_LOADING
+            : isActive ? FPS_ACTIVE : FPS_IDLE;
+
         const elapsed = now - this.lastFrameTime;
         if (elapsed < targetFps) return;
         this.lastFrameTime = now - (elapsed % targetFps);

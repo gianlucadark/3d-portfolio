@@ -122,12 +122,11 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
         document.fonts.load('700 16px Syne');
         document.fonts.load('400 16px Inter');
 
-        // 2. Aspetta due frame (double-rAF) per garantire che Angular abbia
-        //    dipinto il desktop nel browser prima di iniziare il fade-out.
-        //    Senza questo, il loading screen diventa trasparente prima che la
-        //    wallpaper sia disegnata, rivelando il renderer 3D per ~1 frame.
+        // 2. Double-rAF: garantisce che Angular dipinga il desktop prima del fade-out,
+        //    evitando il flash del renderer 3D. Al momento del reveal passiamo a 60fps.
         requestAnimationFrame(() => {
             requestAnimationFrame(() => {
+                this.threeSceneService.setSceneVisible(true);
                 this.isEndingLoading = true;
                 this.cdr.markForCheck();
 
