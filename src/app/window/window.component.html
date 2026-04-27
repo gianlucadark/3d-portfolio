@@ -1,7 +1,10 @@
 <div class="window" *ngIf="isVisible"
   [ngClass]="{'minimized': isMinimized, 'prompt-window': windowType === 'prompt', 'fullscreen': isFullscreen}"
   [ngStyle]="{'top.px': position.y, 'left.px': position.x, 'width.px': size.width, 'height.px': size.height, 'z-index': zIndex}"
-  (mousedown)="onWindowClick()">
+  (mousedown)="onWindowClick()"
+  role="dialog"
+  aria-modal="true"
+  [attr.aria-label]="title">
 
   <div class="title-bar" (mousedown)="onDragStart($event)" [ngClass]="{'prompt-title-bar': windowType === 'prompt'}">
     <div class="title-bar-text">

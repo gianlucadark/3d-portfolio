@@ -1,0 +1,35 @@
+{
+  "name": "Gianluca D'Arcangelo — 3D XP Portfolio",
+  "short_name": "Gianluca's World",
+  "description": "Portfolio immersivo 3D ispirato a Windows XP. Full Stack Developer & UI/UX Designer.",
+  "start_url": "/home",
+  "display": "standalone",
+  "background_color": "#080D14",
+  "theme_color": "#080D14",
+  "orientation": "any",
+  "lang": "it",
+  "categories": ["portfolio", "design", "developer"],
+  "icons": [
+    {
+      "src": "assets/icons/profile.webp",
+      "sizes": "192x192",
+      "type": "image/webp",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/icons/profile.webp",
+      "sizes": "512x512",
+      "type": "image/webp",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "assets/og-preview.webp",
+      "sizes": "1200x630",
+      "type": "image/webp",
+      "form_factor": "wide",
+      "label": "3D XP Portfolio Desktop"
+    }
+  ]
+}

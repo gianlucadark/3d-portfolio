@@ -1,43 +1,90 @@
 <!doctype html>
-<html lang="en">
+<html lang="it">
 
 <head>
   <meta charset="utf-8">
-  <title>Gianluca's World</title>
+  <title>Gianluca D'Arcangelo — 3D XP Portfolio</title>
   <base href="/">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+  <!-- ── Favicons & App Icons ───────────────────────────────── -->
   <link rel="icon" type="image/webp" href="assets/icons/profile.webp">
-  <meta name="description" content="Gianluca D'Arcangelo's Portfolio - A 3D Windows XP style experience. Full Stack Developer & UI/UX Designer.">
-  <meta name="keywords" content="Gianluca D'Arcangelo, Portfolio, Web Developer, Full Stack, Frontend, UI/UX, 3D, Windows XP">
+  <link rel="apple-touch-icon" href="assets/icons/profile.webp">
+  <link rel="manifest" href="manifest.json">
+
+  <!-- ── Theme ──────────────────────────────────────────────── -->
+  <meta name="theme-color" content="#080D14">
+  <meta name="msapplication-TileColor" content="#080D14">
+  <meta name="color-scheme" content="dark">
+
+  <!-- ── SEO ────────────────────────────────────────────────── -->
+  <meta name="description" content="Portfolio di Gianluca D'Arcangelo — Full Stack Developer &amp; UI/UX Designer. Un'esperienza immersiva 3D ispirata a Windows XP.">
+  <meta name="keywords" content="Gianluca D'Arcangelo, Portfolio, Web Developer, Full Stack, Frontend, UI/UX, 3D, WebGL, Three.js, Angular, Windows XP">
   <meta name="author" content="Gianluca D'Arcangelo">
   <meta name="robots" content="index, follow">
-  <meta property="og:title" content="Gianluca's World | 3D XP Portfolio">
-  <meta property="og:description" content="Explore my portfolio in a nostalgic 3D Windows XP environment.">
-  <meta property="og:image" content="assets/icons/profile.webp">
+  <link rel="canonical" href="https://gianlucadarcangelo.vercel.app/home">
+
+  <!-- ── Open Graph ─────────────────────────────────────────── -->
+  <meta property="og:title" content="Gianluca D'Arcangelo — 3D XP Portfolio">
+  <meta property="og:description" content="Portfolio immersivo 3D ispirato a Windows XP. Full Stack Developer &amp; UI/UX Designer.">
+  <meta property="og:image" content="https://gianlucadarcangelo.vercel.app/assets/og-preview.webp">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
   <meta property="og:type" content="website">
+  <meta property="og:url" content="https://gianlucadarcangelo.vercel.app/home">
+  <meta property="og:site_name" content="Gianluca's World">
+  <meta property="og:locale" content="it_IT">
+
+  <!-- ── Twitter Card ───────────────────────────────────────── -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Gianluca's World | 3D XP Portfolio">
-  <meta name="twitter:description" content="Explore my portfolio in a nostalgic 3D Windows XP environment.">
-  <meta name="twitter:image" content="assets/icons/profile.webp">
+  <meta name="twitter:title" content="Gianluca D'Arcangelo — 3D XP Portfolio">
+  <meta name="twitter:description" content="Portfolio immersivo 3D ispirato a Windows XP. Full Stack Developer &amp; UI/UX Designer.">
+  <meta name="twitter:image" content="https://gianlucadarcangelo.vercel.app/assets/og-preview.webp">
+  <meta name="twitter:creator" content="@gianlucadark">
+
+  <!-- ── JSON-LD Structured Data ────────────────────────────── -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "Gianluca D'Arcangelo",
+    "url": "https://gianlucadarcangelo.vercel.app/home",
+    "image": "https://gianlucadarcangelo.vercel.app/assets/icons/profile.webp",
+    "jobTitle": "Full Stack Developer & UI/UX Designer",
+    "description": "Portfolio immersivo 3D ispirato a Windows XP, costruito con Angular, Three.js e WebGL.",
+    "knowsAbout": ["Angular", "Three.js", "WebGL", "UI/UX Design", "Full Stack Development", "TypeScript"],
+    "sameAs": [],
+    "email": "gianlucadark1@gmail.com"
+  }
+  </script>
+
+  <!-- ── DNS Prefetch & Preconnect ──────────────────────────── -->
+  <link rel="dns-prefetch" href="//fonts.googleapis.com">
+  <link rel="dns-prefetch" href="//fonts.gstatic.com">
+  <link rel="dns-prefetch" href="//www.googletagmanager.com">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <!-- ── Critical Asset Preloads ────────────────────────────── -->
+  <link rel="preload" href="assets/icons/start.png" as="image" fetchpriority="high">
   <link rel="preload" href="assets/3d/room-space-3-final.glb" as="fetch" crossorigin="anonymous" fetchpriority="low">
   <link rel="preload" href="assets/cielo1.hdr" as="fetch" crossorigin="anonymous" fetchpriority="low">
-  <link rel="preload" href="assets/icons/start.png" as="image" fetchpriority="high">
-  <!-- Preload texture principali: scaricano in parallelo al GLB -->
+  <link rel="preload" href="assets/draco/draco_decoder.wasm" as="fetch" crossorigin="anonymous" fetchpriority="low">
   <link rel="preload" href="assets/opt_sfondo.webp" as="image" fetchpriority="low">
   <link rel="preload" href="assets/opt_cvfoto1.webp" as="image" fetchpriority="low">
   <link rel="preload" href="assets/opt_pacman.webp" as="image" fetchpriority="low">
-  <!-- Preload DRACO WASM decoder: scarica insieme al GLB anziche' dopo -->
-  <link rel="preload" href="assets/draco/draco_decoder.wasm" as="fetch" crossorigin="anonymous" fetchpriority="low">
-  <!-- Typography: dual-environment fonts (Syne for 3D brand, Inter for body, JetBrains Mono for code, Press Start 2P for arcade) -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Press+Start+2P&display=swap" rel="stylesheet">
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XE0CH7MY4Q"></script>
+
+  <!-- ── Non-blocking Google Fonts ──────────────────────────── -->
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Press+Start+2P&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Press+Start+2P&display=swap"></noscript>
+
+  <!-- ── Analytics (deferred) ───────────────────────────────── -->
+  <script defer src="https://www.googletagmanager.com/gtag/js?id=G-XE0CH7MY4Q"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag() { dataLayer.push(arguments); }
     gtag('js', new Date());
-    gtag('config', 'G-XE0CH7MY4Q');
+    gtag('config', 'G-XE0CH7MY4Q', { send_page_view: false });
   </script>
 </head>
 

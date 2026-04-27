@@ -120,7 +120,8 @@ $transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
     background: #000;
     position: fixed;
     inset: 0;
-    z-index: 1; // Always below loading and overlays
+    z-index: 1;
+    contain: strict;
 }
 
 .loading-screen {
@@ -134,6 +135,8 @@ $transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
     transition: opacity 0.8s $transition-smooth, visibility 0.8s;
     opacity: 1;
     visibility: visible;
+    contain: layout style;
+    will-change: opacity;
 
     &.ending {
         opacity: 0;
@@ -254,6 +257,7 @@ $transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
     top: 0;
     height: 100%;
     animation: xpBootBlockSlide 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    will-change: transform;
 }
 
 .xp-boot-block {
@@ -280,8 +284,8 @@ $transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @keyframes xpBootBlockSlide {
-    0% { left: -80px; }
-    100% { left: 220px; }
+    0% { transform: translateX(0); }
+    100% { transform: translateX(300px); }
 }
 
 // XP Welcome Screen
@@ -423,6 +427,7 @@ $transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
     position: absolute;
     left: -90px;
     animation: xpProgressMove 1.8s infinite linear;
+    will-change: transform;
 }
 
 .xp-block {
@@ -562,13 +567,8 @@ $transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
 
 
 @keyframes xpProgressMove {
-    0% {
-        transform: translateX(0);
-    }
-
-    100% {
-        transform: translateX(220px);
-    }
+    0% { transform: translateX(0); }
+    100% { transform: translateX(290px); }
 }
 
 .enter-text {
@@ -674,6 +674,7 @@ $transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
     z-index: 9999;
     padding: 20px;
     animation: fadeIn 0.3s $transition-smooth;
+    contain: layout style;
 }
 
 .pdf-modal-container {
@@ -717,6 +718,7 @@ $transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
     font-weight: 700;
     font-family: var(--font-brand);
     letter-spacing: -0.02em;
+    text-rendering: optimizeLegibility;
     @include aurora-text;
     filter: drop-shadow(0 0 24px rgba($lux, 0.35));
 }
@@ -993,6 +995,7 @@ $transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
     z-index: 10000;
     padding: 20px;
     animation: fadeIn 0.3s $transition-smooth;
+    contain: layout style;
 
     @media (max-width: 480px) {
         padding: 0;

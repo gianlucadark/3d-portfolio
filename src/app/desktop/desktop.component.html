@@ -134,7 +134,7 @@
             <div *ngFor="let sub of getSubIcons(window.id)" style="text-align: center; cursor: pointer;"
               (dblclick)="openIcon($event, sub.id)">
               <img [src]="sub.image" [alt]="sub.name | translate" style="width:64px; height:64px;">
-              <div style="font-family: Tahoma; font-size: 11px; margin-top: 4px;">{{ sub.name | translate }}</div>
+              <div style="font-family: Tahoma; font-size: 11px; margin-top: 4px; color: #333;">{{ sub.name | translate }}</div>
             </div>
           </div>
         </ng-container>

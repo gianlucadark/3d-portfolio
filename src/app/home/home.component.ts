@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild, AfterViewInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild, AfterViewInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef, HostListener } from '@angular/core';
 import { TranslationService, Language } from '../services/translation.service';
 import { ThreeSceneService } from './three-scene.service';
 import { Subject } from 'rxjs';
@@ -169,6 +169,15 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
     toggleLanguage(): void {
         this.translationService.toggleLanguage();
+    }
+
+    @HostListener('document:keydown.escape')
+    onEscapeKey(): void {
+        if (this.showPdfModal) {
+            this.closePdfModal();
+        } else if (this.showCatModal) {
+            this.closeCatModal();
+        }
     }
 }
 

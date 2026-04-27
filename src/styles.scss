@@ -1,14 +1,12 @@
-/* You can add global styles to this file, and also import other style files */
-
 :root {
     /* ── Brand Identity v1.0 — Palette ────────────────────────── */
-    --color-cosmos:  #080D14;                    /* base dark background     */
-    --color-lux:     #4AADDC;                    /* primario — celeste        */
-    --color-violet:  #B07EFF;                    /* accento — viola           */
-    --color-dawn:    #D4EEF7;                    /* badge, accenti light      */
-    --color-paper:   #F4F8FA;                    /* light mode bg             */
-    --bg-card:       #0C1420;                    /* superfici card dark       */
-    --border-subtle: rgba(255, 255, 255, 0.06);  /* bordi card dark           */
+    --color-cosmos:  #080D14;
+    --color-lux:     #4AADDC;
+    --color-violet:  #B07EFF;
+    --color-dawn:    #D4EEF7;
+    --color-paper:   #F4F8FA;
+    --bg-card:       #0C1420;
+    --border-subtle: rgba(255, 255, 255, 0.06);
 
     /* ── Border radii ─────────────────────────────────────────── */
     --r-sm:   4px;
@@ -17,22 +15,51 @@
     --r-full: 9999px;
 
     /* ── Typography ───────────────────────────────────────────── */
-    --font-legacy: "Tahoma", "Arial", sans-serif;          /* XP legacy UI   */
-    --font-brand:  "Syne", sans-serif;                     /* titoli 3D      */
-    --font-sans:   "Inter", system-ui, sans-serif;         /* body brand     */
-    --font-mono:   "JetBrains Mono", "Courier New", monospace; /* codice     */
-    --font-arcade: "Press Start 2P", cursive, monospace;   /* cabinato Pac-Man */
+    --font-legacy: "Tahoma", "Arial", sans-serif;
+    --font-brand:  "Syne", sans-serif;
+    --font-sans:   "Inter", system-ui, sans-serif;
+    --font-mono:   "JetBrains Mono", "Courier New", monospace;
+    --font-arcade: "Press Start 2P", cursive, monospace;
 }
 
 /* ── Reset base ────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
 body {
     margin: 0;
     padding: 0;
     background: #000 !important;
     font-family: var(--font-legacy);
+    overflow: hidden;
 }
 
-/* ── Focus-visible globale: visibile a tastiera, invisibile a mouse ── */
+/* ── Screen-reader only utility ────────────────────────────── */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* ── Focus-visible globale ─────────────────────────────────── */
 *:focus {
     outline: none;
 }
@@ -43,7 +70,6 @@ body {
     border-radius: 2px;
 }
 
-/* Override contestuale: sui componenti XP usa il blu XP */
 .xp-focus:focus-visible,
 .window-body *:focus-visible,
 .desktop-component *:focus-visible,
@@ -52,7 +78,7 @@ body {
     outline-offset: 2px;
 }
 
-/* ── prefers-reduced-motion: rispetta le preferenze di sistema ── */
+/* ── prefers-reduced-motion ────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
     *,
     *::before,
@@ -62,4 +88,10 @@ body {
         transition-duration: 0.01ms !important;
         scroll-behavior: auto !important;
     }
+}
+
+/* ── Selection color ───────────────────────────────────────── */
+::selection {
+    background: rgba(74, 173, 220, 0.25);
+    color: #fff;
 }

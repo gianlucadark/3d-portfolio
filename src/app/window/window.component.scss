@@ -152,6 +152,7 @@ $black: #000;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
+  will-change: transform;
 
   &.fullscreen {
     position: fixed;

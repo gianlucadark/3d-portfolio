@@ -1,5 +1,5 @@
 <!-- Loading Screen -->
-<div class="loading-screen" *ngIf="isLoading" [class.ending]="isEndingLoading">
+<div class="loading-screen" *ngIf="isLoading" [class.ending]="isEndingLoading" role="status" aria-live="polite" aria-label="Caricamento portfolio in corso">
     <!-- Language Toggle in Loading Screen -->
     <div class="loading-language-toggle">
         <button class="control-toggle language-toggle" (click)="toggleLanguage()"
@@ -123,7 +123,7 @@
     </div>
 </div>
 
-<div #rendererContainer class="renderer-container" [class.loaded]="!isLoading"></div>
+<div #rendererContainer class="renderer-container" [class.loaded]="!isLoading" role="main" aria-label="Portfolio 3D interattivo"></div>
 
 <!-- Controls Container -->
 <div class="controls-container" *ngIf="!isLoading">
@@ -181,36 +181,36 @@
 </div>
 
 <!-- Modale PDF premium -->
-<div class="pdf-modal-overlay" *ngIf="showPdfModal" (click)="closePdfModal()">
+<div class="pdf-modal-overlay" *ngIf="showPdfModal" (click)="closePdfModal()" role="dialog" aria-modal="true" aria-labelledby="pdf-modal-title">
     <div class="pdf-modal-container" (click)="$event.stopPropagation()">
         <div class="pdf-modal-header">
-            <h2 class="pdf-modal-title">{{ 'pdfModal.title' | translate }}</h2>
+            <h2 class="pdf-modal-title" id="pdf-modal-title">{{ 'pdfModal.title' | translate }}</h2>
             <button class="pdf-modal-close" (click)="closePdfModal()" [attr.aria-label]="'pdfModal.close' | translate">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                     <line x1="18" y1="6" x2="6" y2="18"></line>
                     <line x1="6" y1="6" x2="18" y2="18"></line>
                 </svg>
             </button>
         </div>
         <div class="pdf-modal-body">
-            <iframe src="assets/cv.pdf" class="pdf-viewer" frameborder="0" title="Curriculum Vitae PDF" loading="lazy">
+            <iframe src="assets/cv.pdf" class="pdf-viewer" frameborder="0" title="Curriculum Vitae — Gianluca D'Arcangelo" loading="lazy">
             </iframe>
         </div>
     </div>
 </div>
 
 <!-- Modale Gatta Dolly -->
-<div class="cat-modal-overlay" *ngIf="showCatModal" (click)="closeCatModal()">
+<div class="cat-modal-overlay" *ngIf="showCatModal" (click)="closeCatModal()" role="dialog" aria-modal="true" aria-labelledby="cat-modal-title">
     <div class="cat-modal-container" (click)="$event.stopPropagation()">
         <div class="cat-modal-header">
             <div class="cat-title-group">
-                <span class="cat-emoji">🐾</span>
-                <h2 class="cat-modal-title">{{ 'catModal.title' | translate }}</h2>
+                <span class="cat-emoji" aria-hidden="true">🐾</span>
+                <h2 class="cat-modal-title" id="cat-modal-title">{{ 'catModal.title' | translate }}</h2>
             </div>
             <button class="pdf-modal-close" (click)="closeCatModal()" [attr.aria-label]="'catModal.close' | translate">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                     <line x1="18" y1="6" x2="6" y2="18"></line>
                     <line x1="6" y1="6" x2="18" y2="18"></line>
                 </svg>
@@ -219,9 +219,12 @@
         <div class="cat-modal-body">
             <div class="cat-image-container">
                 <div class="cat-image-wrapper">
-                    <img src="assets/dolly.png" alt="Dolly the Siberian Cat" class="cat-photo" loading="lazy">
+                    <picture>
+                        <source srcset="assets/dolly.webp" type="image/webp">
+                        <img src="assets/dolly.png" alt="Dolly, la gatta Siberiana di Gianluca" class="cat-photo" loading="lazy" width="400" height="600">
+                    </picture>
                 </div>
-                <div class="cat-badge">Dolly</div>
+                <div class="cat-badge" aria-hidden="true">Dolly</div>
             </div>
             <div class="cat-content">
                 <p class="cat-intro">{{ 'catModal.intro' | translate }}</p>
