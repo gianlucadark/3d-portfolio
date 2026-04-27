@@ -223,7 +223,7 @@ $black: #000;
   justify-content: space-between;
   align-items: center;
   color: $white;
-  font-family: 'Tahoma', sans-serif;
+  font-family: var(--font-legacy);
   font-weight: bold;
   font-size: 12px;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.6);
@@ -327,7 +327,7 @@ $black: #000;
 
 .menu-item {
   padding: 2px 8px;
-  font-family: 'Tahoma', sans-serif;
+  font-family: var(--font-legacy);
   font-size: 11px;
   color: $black;
   cursor: default;
@@ -362,7 +362,7 @@ $black: #000;
   border-radius: 3px;
   padding: 4px 8px;
   cursor: pointer;
-  font-family: 'Tahoma', sans-serif;
+  font-family: var(--font-legacy);
   font-size: 11px;
   color: $black;
 
@@ -421,7 +421,7 @@ $black: #000;
 }
 
 .address-label {
-  font-family: 'Tahoma', sans-serif;
+  font-family: var(--font-legacy);
   font-size: 11px;
   color: #666;
 }
@@ -444,7 +444,7 @@ $black: #000;
 
 .address-text {
   flex-grow: 1;
-  font-family: 'Tahoma', sans-serif;
+  font-family: var(--font-legacy);
   font-size: 11px;
   color: $black;
 }
@@ -462,7 +462,7 @@ $black: #000;
   border: 1px solid transparent;
   padding: 2px 8px;
   cursor: pointer;
-  font-family: 'Tahoma', sans-serif;
+  font-family: var(--font-legacy);
   font-size: 11px;
 
   img {
@@ -523,7 +523,7 @@ $black: #000;
     }
 
     span {
-      font-family: 'Tahoma', sans-serif;
+      font-family: var(--font-legacy);
       font-size: 11px;
       color: $black;
       word-wrap: break-word;
@@ -541,7 +541,7 @@ $black: #000;
 // ========================================
 .readme-content {
   padding: 24px;
-  font-family: 'Tahoma', sans-serif;
+  font-family: var(--font-legacy);
   color: #333;
   line-height: 1.5;
 
@@ -574,10 +574,14 @@ $black: #000;
   width: 100%;
   border: none;
   padding: 6px;
-  font-family: 'Lucida Console', monospace;
+  font-family: var(--font-mono);
   font-size: 12px;
   resize: none;
-  outline: none;
+
+  &:focus-visible {
+    outline: 2px solid $xp-blue;
+    outline-offset: -2px;
+  }
 }
 
 .notepad-footer {
@@ -593,7 +597,7 @@ $black: #000;
   color: #0000ee;
   text-decoration: underline;
   cursor: pointer;
-  font-family: 'Tahoma', sans-serif;
+  font-family: var(--font-legacy);
   font-size: 10px;
 }
 
@@ -603,7 +607,7 @@ $black: #000;
 
 .prompt-content {
   color: #fff;
-  font-family: 'Lucida Console', monospace;
+  font-family: var(--font-mono);
   font-size: 12px;
   padding: 8px;
 }
@@ -618,8 +622,12 @@ $black: #000;
     color: #fff;
     font-family: inherit;
     font-size: inherit;
-    outline: none;
     flex-grow: 1;
+    // caret-color: $prompt-green;
+
+    &:focus-visible {
+      outline: none;
+    }
   }
 }
 
@@ -627,7 +635,7 @@ $black: #000;
 // PROJECT PAGES (XP STYLE)
 // ========================================
 .project-page {
-  font-family: 'Tahoma', sans-serif;
+  font-family: var(--font-legacy);
   color: #333;
   overflow-y: auto;
   height: 100%;
@@ -879,7 +887,7 @@ $black: #000;
 }
 
 .cta-button {
-  font-family: 'Tahoma', sans-serif;
+  font-family: var(--font-legacy);
   font-size: 12px;
   font-weight: bold;
   padding: 8px 24px;

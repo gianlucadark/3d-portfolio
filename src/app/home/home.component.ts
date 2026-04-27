@@ -117,6 +117,11 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
         this.threeSceneService.setInitialPositionOnScreen();
         this.cdr.markForCheck();
 
+        // Pre-warm brand fonts in background while user is on XP desktop,
+        // so Syne is guaranteed loaded before any 3D modal opens (no FOUT).
+        document.fonts.load('700 16px Syne');
+        document.fonts.load('400 16px Inter');
+
         // 2. Aspetta due frame (double-rAF) per garantire che Angular abbia
         //    dipinto il desktop nel browser prima di iniziare il fade-out.
         //    Senza questo, il loading screen diventa trasparente prima che la

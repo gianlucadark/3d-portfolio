@@ -24,9 +24,10 @@ $xp-shadow: inset 1px 1px 0 $xp-white, inset -1px -1px 0 $xp-border;
   transition: box-shadow 0.1s;
 
   &.active,
-  &:focus {
+  &:focus-visible {
     border-color: $xp-blue;
     box-shadow: 0 0 5px $xp-blue;
+    outline: none;  // sostituito da border-color highlight (stile XP autentico)
   }
 }
 
@@ -49,7 +50,7 @@ $xp-shadow: inset 1px 1px 0 $xp-white, inset -1px -1px 0 $xp-border;
   @include xp-container;
   padding: 8px 12px;
   margin-bottom: 0;
-  font-family: 'Tahoma', sans-serif;
+  font-family: var(--font-legacy);
 
   button {
     @include xp-button;
@@ -90,6 +91,12 @@ $xp-shadow: inset 1px 1px 0 $xp-white, inset -1px -1px 0 $xp-border;
   &:hover {
     border: 2px solid $xp-blue;
   }
+
+  &:focus-visible {
+    outline: 2px solid $xp-blue;
+    outline-offset: 1px;
+    border: 2px solid $xp-blue;
+  }
 }
 
 // ========================================
@@ -105,7 +112,7 @@ canvas {
   @include xp-container;
   box-shadow: $xp-shadow, 1px 1px 0 $xp-white, -1px -1px 0 $xp-border;
   padding: 5px 10px;
-  font-family: 'Tahoma', sans-serif;
+  font-family: var(--font-legacy);
   font-size: 12px;
   color: #000;
   cursor: pointer;
@@ -114,5 +121,10 @@ canvas {
   &:active {
     box-shadow: inset -1px -1px 0 $xp-white, inset 1px 1px 0 $xp-border,
       -1px -1px 0 $xp-white, 1px 1px 0 $xp-border;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $xp-blue;
+    outline-offset: 2px;
   }
 }

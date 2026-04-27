@@ -7,6 +7,7 @@ $blue-hover: linear-gradient(to bottom, #5A9BEF, #3C7AD0);
 $blue-current: linear-gradient(to bottom, #6AABFF, #4889FF);
 $tray-gradient: linear-gradient(to bottom, #0997ff 0%, #0053ee 100%);
 $start-gradient: linear-gradient(to bottom, #388a18 0%, #4ea32a 12%, #388a18 20%, #388a18 90%, #2a6310 100%);
+$xp-blue: #0054E3;
 $white: #fff;
 
 // ========================================
@@ -71,7 +72,7 @@ $white: #fff;
 
   .start-text {
     color: #fff;
-    font-family: 'Tahoma', sans-serif;
+    font-family: var(--font-legacy);
     font-size: 18px;
     font-weight: 900;
     font-style: italic;
@@ -87,6 +88,11 @@ $white: #fff;
   &:active {
     background: linear-gradient(to bottom, #2a6310 0%, #388a18 100%);
     box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.5);
+  }
+
+  &:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: -3px;
   }
 }
 
@@ -131,6 +137,12 @@ $white: #fff;
     background-color: rgba(0, 0, 0, 0.1);
     @include sunken-3d;
   }
+
+  &:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 1px;
+    border-radius: 3px;
+  }
 }
 
 // ========================================
@@ -154,7 +166,7 @@ $white: #fff;
   height: 100%;
   cursor: pointer;
   color: $white;
-  font-family: 'Tahoma', sans-serif;
+  font-family: var(--font-legacy);
   font-size: 11px;
   width: 160px;
   max-width: 180px;
@@ -185,6 +197,11 @@ $white: #fff;
     &:hover {
       background: #2C6AC0;
     }
+  }
+
+  &:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: -2px;
   }
 }
 
@@ -220,8 +237,8 @@ $white: #fff;
   background: transparent;
   border: 1px solid rgba(255, 255, 255, 0.3);
   color: #fff;
-  font-family: 'Tahoma', sans-serif;
-  font-size: 10px;
+  font-family: var(--font-legacy);
+  font-size: 11px;  // era 10px → WCAG min 11px
   font-weight: bold;
   padding: 2px 4px;
   border-radius: 2px;
@@ -231,6 +248,11 @@ $white: #fff;
   &:hover {
     background: rgba(255, 255, 255, 0.1);
   }
+
+  &:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 2px;
+  }
 }
 
 .clock {
@@ -238,7 +260,7 @@ $white: #fff;
   justify-content: center;
   padding: 0 10px;
   color: $white;
-  font-family: 'Tahoma', sans-serif;
+  font-family: var(--font-legacy);
   font-size: 11px;
   font-weight: bold;
   height: 100%;

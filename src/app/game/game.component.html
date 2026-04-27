@@ -12,7 +12,9 @@
 
         <!-- ======= PACMAN (DESKTOP) ======= -->
         <div class="game-screen" *ngIf="!isMobile">
-            <canvas #gameCanvas width="400" height="400"></canvas>
+            <canvas #gameCanvas width="400" height="400"
+                role="img"
+                aria-label="Pac-Man arcade game — usa i tasti freccia per muovere il personaggio"></canvas>
 
             <!-- Start / Game Over overlay -->
             <div class="game-overlay" *ngIf="!isPlaying">
@@ -47,7 +49,9 @@
         <!-- ======= FLAPPY BIRD (MOBILE) ======= -->
         <div class="game-screen flappy-screen" *ngIf="isMobile" (click)="onFlappyTap()"
             (touchstart)="onFlappyTap(); $event.preventDefault()">
-            <canvas #flappyCanvas width="320" height="480"></canvas>
+            <canvas #flappyCanvas width="320" height="480"
+                role="img"
+                aria-label="Flappy Bird mobile game — tocca lo schermo per far volare il personaggio"></canvas>
         </div>
 
         <!-- CONTROLS -->

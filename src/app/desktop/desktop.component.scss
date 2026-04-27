@@ -48,7 +48,7 @@ $black: #000;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  cursor: default;
+  cursor: pointer;        // pointer: è un elemento cliccabile
   padding: 10px;
   width: 100px;
   border: 1px solid transparent;
@@ -62,7 +62,7 @@ $black: #000;
   }
 
   span {
-    font-family: 'Tahoma', sans-serif;
+    font-family: var(--font-legacy);
     font-size: 11px;
     @include icon-text-shadow;
     word-wrap: break-word;
@@ -76,14 +76,21 @@ $black: #000;
   }
 
   &.selected {
-    background-color: rgba(49, 106, 197, 0.5); // Authentic XP selection blue
+    background-color: rgba(49, 106, 197, 0.5);
     border: 1px solid rgba(255, 255, 255, 0.3);
     border-radius: 2px;
 
     span {
-      background-color: #0b61ff; // Selection blue for text
+      background-color: #0b61ff;
       border-color: rgba(255, 255, 255, 0.4);
     }
+  }
+
+  // Focus keyboard: visibile per navigazione tastiera
+  &:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 2px;
+    border-radius: 3px;
   }
 }
 
@@ -94,7 +101,6 @@ $black: #000;
   position: absolute;
   top: 20px;
   left: 50%;
-  // transform: translate(-50%, -50%);
   z-index: 10000;
 }
 
@@ -106,7 +112,7 @@ $black: #000;
   cursor: pointer;
   @include flex-center;
   gap: 8px;
-  font-family: 'Tahoma', sans-serif;
+  font-family: var(--font-legacy);
   font-weight: bold;
   color: $white;
   text-transform: uppercase;
@@ -116,6 +122,11 @@ $black: #000;
   &:hover {
     transform: translateY(-2px);
     filter: brightness(1.1);
+  }
+
+  &:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 3px;
   }
 }
 
@@ -144,7 +155,6 @@ $black: #000;
   flex: 1;
 }
 
-// XP Left Blue Strip
 .start-menu-left-strip {
   width: 28px;
   background: linear-gradient(to bottom, #0c2785 0%, #0a1f6b 100%);
@@ -159,7 +169,7 @@ $black: #000;
   writing-mode: vertical-rl;
   transform: rotate(180deg);
   color: rgba(255, 255, 255, 0.45);
-  font-family: 'Tahoma', sans-serif;
+  font-family: var(--font-legacy);
   font-size: 11px;
   font-weight: bold;
   letter-spacing: 3px;
@@ -187,7 +197,7 @@ $black: #000;
   }
 
   span {
-    font-family: 'Tahoma', sans-serif;
+    font-family: var(--font-legacy);
     font-size: 14px;
     font-weight: bold;
     color: $white;
@@ -206,7 +216,7 @@ $black: #000;
   @include flex-center;
   padding: 6px 12px;
   cursor: pointer;
-  font-family: 'Tahoma', sans-serif;
+  font-family: var(--font-legacy);
   font-size: 11px;
   color: #333;
 
@@ -229,6 +239,15 @@ $black: #000;
     span {
       color: #fff;
     }
+  }
+
+  &:focus-visible {
+    outline: 2px solid $xp-blue;
+    outline-offset: -2px;
+    background: linear-gradient(to right, #2c6fda, #3a7ee8);
+    color: #fff;
+
+    span { color: #fff; }
   }
 }
 
@@ -293,7 +312,7 @@ $black: #000;
   flex-direction: column;
   height: 100%;
   background-color: #ECE9D8;
-  font-family: 'Tahoma', sans-serif;
+  font-family: var(--font-legacy);
 }
 
 .email-toolbar {
@@ -334,6 +353,12 @@ $black: #000;
   &:active {
     background-color: #98B5E2;
   }
+
+  &:focus-visible {
+    outline: 2px solid $xp-blue;
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
 }
 
 .email-tool-sep {
@@ -369,8 +394,13 @@ $black: #000;
   background-color: #fff;
   padding: 2px 4px;
   font-size: 12px;
-  font-family: 'Tahoma', sans-serif;
-  outline: none;
+  font-family: var(--font-legacy);
+  // non usiamo outline: none — il focus visibile è gestito globalmente
+
+  &:focus-visible {
+    outline: 2px solid $xp-blue;
+    outline-offset: 0;
+  }
 
   &[readonly] {
     background-color: #F1F1F1;
@@ -388,10 +418,14 @@ $black: #000;
     flex-grow: 1;
     border: none;
     resize: none;
-    outline: none;
-    font-family: 'Tahoma', sans-serif;
+    font-family: var(--font-legacy);
     font-size: 13px;
     line-height: 1.4;
+
+    &:focus-visible {
+      outline: 2px solid $xp-blue;
+      outline-offset: 0;
+    }
   }
 }
 
@@ -403,7 +437,7 @@ $black: #000;
   bottom: 50px;
   left: 50%;
   transform: translateX(-50%);
-  font-family: 'Tahoma', sans-serif;
+  font-family: var(--font-legacy);
   font-weight: bold;
   font-size: 18px;
   color: rgba(255, 255, 255, 0.3);

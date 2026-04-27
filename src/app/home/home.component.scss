@@ -1,13 +1,31 @@
 // ========================================
-// VARIABILI
+// VARIABILI — Brand Identity v1.0
 // ========================================
-$ice-blue: #ADD8E6;
+
+// -- Legacy palette (XP boot/welcome) --
+$ice-blue:       #ADD8E6;
 $ice-blue-light: #87CEEB;
-$ice-blue-dark: #00CED1;
-$dark-bg: rgba(15, 23, 42, 0.98);
-$dark-bg-mid: rgba(30, 41, 59, 0.95);
-$border-glow: rgba(173, 216, 230, 0.2);
-$backdrop-blur: blur(20px);
+$ice-blue-dark:  #00CED1;
+
+// -- Brand palette (3D room & modali) — da brand guide --
+$cosmos:        #080D14;   // base dark background
+$lux:           #4AADDC;   // primario — celeste  ← COLORE LUX CORRETTO
+$violet:        #B07EFF;   // accento — viola
+$dawn:          #D4EEF7;   // badge, accenti light
+$bg-card:       #0C1420;   // superfici card dark
+$border-subtle: rgba(255, 255, 255, 0.06); // bordi card dark (brand guide)
+
+// Aurora gradient: Lux → mid → Violet
+$aurora-1: $lux;           // #4AADDC
+$aurora-2: #8B7EFF;        // mid violet
+$aurora-3: $violet;        // #B07EFF
+
+// Lux tinted per bordi 0.5px (btn-ghost style per brand guide)
+$lux-border: rgba(74, 173, 220, 0.40);
+$lux-glow:   rgba(74, 173, 220, 0.12);
+
+// -- Shared --
+$backdrop-blur:    blur(24px);
 $transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
 
 // ========================================
@@ -26,14 +44,68 @@ $transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
     border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-@mixin gradient-text {
-    background: linear-gradient(135deg, $ice-blue 0%, $ice-blue-light 50%, $ice-blue-dark 100%);
+// Glassmorphism brand — bg-card + bordo Lux 0.5px (btn-ghost pattern)
+@mixin lux-glass {
+    background: rgba(12, 20, 32, 0.96);         // ~bg-card con alfa
+    backdrop-filter: $backdrop-blur saturate(180%);
+    -webkit-backdrop-filter: $backdrop-blur saturate(180%);
+    border: 0.5px solid $lux-border;             // border LUX 0.5px
+    box-shadow:
+        0 0 0 0.5px rgba($lux, 0.08),
+        0 24px 64px rgba(0, 0, 0, 0.65),
+        0 0 60px $lux-glow,
+        inset 0 1px 0 rgba($lux, 0.06);
+}
+
+// Aurora gradient text — titoli modali brand
+@mixin aurora-text {
+    background: linear-gradient(135deg, $aurora-1 0%, $aurora-2 50%, $aurora-3 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
 }
 
-@mixin glow-shadow($color: $ice-blue, $intensity: 0.3) {
+@mixin gradient-text {
+    @include aurora-text;
+}
+
+// btn-primary brand: gradient LUX → VIOLET · r-full
+@mixin btn-primary {
+    background: linear-gradient(90deg, $lux 0%, $violet 100%);
+    border: none;
+    border-radius: var(--r-full);
+    color: #fff;
+    font-family: var(--font-sans);
+    font-weight: 600;
+    cursor: pointer;
+    transition: filter 0.2s ease, transform 0.2s ease;
+
+    &:hover {
+        filter: brightness(1.1);
+        transform: translateY(-1px);
+    }
+
+    &:active { transform: translateY(0); }
+}
+
+// btn-ghost brand: border LUX 0.5px · transparent
+@mixin btn-ghost {
+    background: transparent;
+    border: 0.5px solid $lux-border;
+    border-radius: var(--r-full);
+    color: $lux;
+    font-family: var(--font-sans);
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease;
+
+    &:hover {
+        background: rgba($lux, 0.08);
+        border-color: rgba($lux, 0.7);
+    }
+}
+
+@mixin glow-shadow($color: $lux, $intensity: 0.25) {
     box-shadow: 0 0 20px rgba($color, $intensity);
 }
 
@@ -134,7 +206,7 @@ $transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .xp-boot-name {
-    font-family: 'Franklin Gothic Medium', 'Tahoma', 'Arial', sans-serif;
+    font-family: var(--font-legacy);
     font-size: 24px;
     font-weight: normal;
     color: #ffffff;
@@ -144,7 +216,7 @@ $transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .xp-boot-portfolio {
-    font-family: 'Franklin Gothic Medium', 'Tahoma', 'Arial', sans-serif;
+    font-family: var(--font-legacy);
     font-size: 42px;
     font-weight: bold;
     color: #ffffff;
@@ -195,8 +267,8 @@ $transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
 .xp-boot-copyright {
     position: absolute;
     bottom: 40px;
-    color: rgba(255, 255, 255, 0.4);
-    font-family: 'Tahoma', 'Arial', sans-serif;
+    color: rgba(255, 255, 255, 0.65);  /* WCAG AA: contrasto sufficiente su sfondo nero */
+    font-family: var(--font-legacy);
     font-size: 11px;
     letter-spacing: 0.5px;
 }
@@ -294,15 +366,16 @@ $transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .welcome-title {
-    font-family: 'Franklin Gothic Medium', 'Tahoma', sans-serif;
+    font-family: var(--font-legacy);
     font-size: 38px;
     font-weight: normal;
+    line-height: 1.2;
     margin-bottom: 5px;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .welcome-portfolio-title {
-    font-family: 'Tahoma', sans-serif;
+    font-family: var(--font-legacy);
     font-size: 16px;
     font-weight: normal;
     opacity: 0.8;
@@ -324,7 +397,7 @@ $transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
     margin-top: 10px;
 
     .status-text {
-        font-family: 'Tahoma', sans-serif;
+        font-family: var(--font-legacy);
         font-size: 14px;
         margin-bottom: 10px;
         opacity: 0.9;
@@ -409,7 +482,7 @@ $transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .user-name {
-        font-family: 'Tahoma', sans-serif;
+        font-family: var(--font-legacy);
         font-size: 20px;
         font-weight: bold;
         color: #fff;
@@ -417,9 +490,9 @@ $transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .login-action {
-        font-family: 'Tahoma', sans-serif;
+        font-family: var(--font-legacy);
         font-size: 14px;
-        color: rgba(255, 255, 255, 0.8);
+        color: rgba(255, 255, 255, 0.92);  /* WCAG AA fix: contrasto >4.5:1 su sfondo hover */
     }
 }
 
@@ -436,7 +509,7 @@ $transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
     align-items: center;
     cursor: pointer;
     color: #fff;
-    font-family: 'Tahoma', sans-serif;
+    font-family: var(--font-legacy);
     font-size: 14px;
     opacity: 0.8;
     transition: opacity 0.2s;
@@ -507,7 +580,7 @@ $transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
     position: relative;
     z-index: 1;
     transition: transform 0.3s ease;
-    filter: drop-shadow(0 0 4px rgba($ice-blue, 0.5));
+    filter: drop-shadow(0 0 4px rgba($lux, 0.5));
 }
 
 /* duplicate removed */
@@ -608,14 +681,8 @@ $transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
     width: 90%;
     max-width: 1200px;
     height: 90vh;
-    background: linear-gradient(135deg, $dark-bg 0%, $dark-bg-mid 50%, $dark-bg 100%);
+    @include lux-glass;
     border-radius: 20px;
-    border: 1px solid $border-glow;
-    box-shadow:
-        0 0 0 1px rgba(173, 216, 230, 0.1),
-        0 20px 60px rgba(0, 0, 0, 0.5),
-        0 0 80px rgba(173, 216, 230, 0.15),
-        inset 0 1px 0 rgba(173, 216, 230, 0.1);
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -627,9 +694,9 @@ $transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
     align-items: center;
     justify-content: space-between;
     padding: 28px 36px;
-    background: linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(30, 41, 59, 0.8) 100%);
-    border-bottom: 1px solid $border-glow;
-    box-shadow: 0 1px 0 rgba(173, 216, 230, 0.1), 0 4px 30px rgba(173, 216, 230, 0.1);
+    background: linear-gradient(135deg, rgba($cosmos, 0.95) 0%, rgba($bg-card, 0.9) 100%);
+    border-bottom: 0.5px solid $lux-border;
+    box-shadow: 0 1px 0 rgba($lux, 0.06), 0 4px 30px $lux-glow;
     position: relative;
 
     &::before {
@@ -638,8 +705,8 @@ $transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
         top: 0;
         left: 0;
         right: 0;
-        height: 2px;
-        background: linear-gradient(90deg, transparent, rgba(173, 216, 230, 0.6), transparent);
+        height: 1px;
+        background: linear-gradient(90deg, transparent, $lux, $aurora-2, $violet, transparent);
         animation: headerGlow 3s ease-in-out infinite;
     }
 }
@@ -648,44 +715,32 @@ $transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
     margin: 0;
     font-size: 26px;
     font-weight: 700;
-    @include gradient-text;
-    letter-spacing: 0.5px;
-    text-shadow: 0 0 30px rgba(173, 216, 230, 0.3);
-    font-family: 'Tahoma', sans-serif;
+    font-family: var(--font-brand);
+    letter-spacing: -0.02em;
+    @include aurora-text;
+    filter: drop-shadow(0 0 24px rgba($lux, 0.35));
 }
 
+// btn-ghost pattern (brand guide: border LUX 0.5px · transparent)
 .pdf-modal-close {
     @include flex-center;
-    width: 48px;
-    height: 48px;
+    width: 44px;
+    height: 44px;
     padding: 0;
-    background: rgba(173, 216, 230, 0.05);
-    border: 1px solid rgba(173, 216, 230, 0.3);
-    border-radius: 12px;
-    color: $ice-blue;
+    background: transparent;
+    border: 0.5px solid $lux-border;
+    border-radius: var(--r-md);
+    color: $lux;
     cursor: pointer;
-    transition: all 0.3s $transition-smooth;
+    transition: all 0.25s $transition-smooth;
     position: relative;
     overflow: hidden;
 
-    &::before {
-        content: '';
-        position: absolute;
-        inset: 0;
-        background: linear-gradient(135deg, rgba(173, 216, 230, 0.1), rgba(173, 216, 230, 0.2));
-        opacity: 0;
-        transition: opacity 0.3s ease;
-    }
-
     &:hover {
-        background: rgba(173, 216, 230, 0.15);
-        border-color: rgba(173, 216, 230, 0.6);
+        background: rgba($lux, 0.08);
+        border-color: rgba($lux, 0.7);
         @include glow-shadow;
         transform: scale(1.05);
-
-        &::before {
-            opacity: 1;
-        }
     }
 
     &:active {
@@ -695,7 +750,7 @@ $transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
     svg {
         position: relative;
         z-index: 1;
-        filter: drop-shadow(0 0 4px rgba(173, 216, 230, 0.5));
+        filter: drop-shadow(0 0 4px rgba($lux, 0.4));
     }
 }
 
@@ -703,7 +758,7 @@ $transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
     flex: 1;
     padding: 0;
     overflow: hidden;
-    background: linear-gradient(180deg, rgba(15, 23, 42, 0.5) 0%, rgba(30, 41, 59, 0.3) 100%);
+    background: linear-gradient(180deg, rgba($cosmos, 0.5) 0%, rgba(12, 20, 34, 0.3) 100%);
     position: relative;
 
     &::before,
@@ -712,7 +767,7 @@ $transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
         position: absolute;
         width: 100px;
         height: 100px;
-        border: 1px solid $border-glow;
+        border: 0.5px solid $lux;
         pointer-events: none;
     }
 
@@ -950,12 +1005,8 @@ $transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
     max-width: 900px;
     max-height: 90vh;
     overflow-y: auto;
-    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    @include lux-glass;
     border-radius: 24px;
-    border: 1px solid rgba(255, 182, 193, 0.3); // Rose gold hint
-    box-shadow:
-        0 25px 50px -12px rgba(0, 0, 0, 0.5),
-        0 0 40px rgba(255, 182, 193, 0.1);
     overflow: hidden;
     animation: modalSlideIn 0.5s $transition-smooth;
 
@@ -973,8 +1024,20 @@ $transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
     align-items: center;
     justify-content: space-between;
     padding: 24px 32px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    background: rgba(255, 255, 255, 0.02);
+    border-bottom: 0.5px solid $lux-border;
+    background: rgba($cosmos, 0.7);
+    position: relative;
+
+    &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, $lux, $aurora-2, $violet, transparent);
+        animation: headerGlow 3s ease-in-out infinite;
+    }
 
     @media (max-width: 480px) {
         padding: 16px 20px;
@@ -996,9 +1059,10 @@ $transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
     margin: 0;
     font-size: 24px;
     font-weight: 700;
-    color: #fff;
-    font-family: 'Tahoma', sans-serif;
-    letter-spacing: -0.5px;
+    font-family: var(--font-brand);
+    letter-spacing: -0.02em;
+    @include aurora-text;
+    filter: drop-shadow(0 0 16px rgba($lux, 0.35));
 
     @media (max-width: 480px) {
         font-size: 20px;
@@ -1081,7 +1145,9 @@ $transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
 
 .cat-intro {
     font-size: 24px;
-    font-weight: 700;
+    font-weight: 800;
+    font-family: var(--font-brand);
+    letter-spacing: -0.02em;
     color: #ffb6c1;
     line-height: 1.3;
     margin: 0;
@@ -1092,19 +1158,21 @@ $transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .cat-description-box {
-    background: rgba(255, 255, 255, 0.03);
-    border-radius: 16px;
+    background: rgba($bg-card, 0.8);
+    border-radius: var(--r-lg);
     padding: 24px;
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    border: 0.5px solid $lux-border;
 
     p {
+        font-family: var(--font-sans);
         color: rgba(255, 255, 255, 0.85);
-        line-height: 1.6;
-        font-size: 17px;
+        line-height: 1.7;
+        font-size: 16px;
+        font-weight: 400;
         margin-bottom: 16px;
 
         @media (max-width: 480px) {
-            font-size: 15px;
+            font-size: 14px;
             margin-bottom: 12px;
         }
 
@@ -1126,18 +1194,19 @@ $transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
     margin-top: auto;
     background: linear-gradient(90deg, #ffb6c1 0%, #ff69b4 100%);
     border: none;
-    padding: 16px;
-    border-radius: 12px;
-    color: white;
-    font-weight: 700;
-    font-size: 16px;
+    padding: 14px 24px;
+    border-radius: var(--r-full);   // brand guide: btn → r-full
+    color: #fff;
+    font-family: var(--font-sans);
+    font-weight: 600;
+    font-size: 15px;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: filter 0.2s ease, transform 0.2s ease;
 
     &:hover {
         transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(255, 105, 180, 0.4);
         filter: brightness(1.1);
+        box-shadow: 0 8px 20px rgba(255, 105, 180, 0.35);
     }
 
     &:active {

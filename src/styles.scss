@@ -1,8 +1,65 @@
 /* You can add global styles to this file, and also import other style files */
 
+:root {
+    /* ── Brand Identity v1.0 — Palette ────────────────────────── */
+    --color-cosmos:  #080D14;                    /* base dark background     */
+    --color-lux:     #4AADDC;                    /* primario — celeste        */
+    --color-violet:  #B07EFF;                    /* accento — viola           */
+    --color-dawn:    #D4EEF7;                    /* badge, accenti light      */
+    --color-paper:   #F4F8FA;                    /* light mode bg             */
+    --bg-card:       #0C1420;                    /* superfici card dark       */
+    --border-subtle: rgba(255, 255, 255, 0.06);  /* bordi card dark           */
+
+    /* ── Border radii ─────────────────────────────────────────── */
+    --r-sm:   4px;
+    --r-md:   8px;
+    --r-lg:   12px;
+    --r-full: 9999px;
+
+    /* ── Typography ───────────────────────────────────────────── */
+    --font-legacy: "Tahoma", "Arial", sans-serif;          /* XP legacy UI   */
+    --font-brand:  "Syne", sans-serif;                     /* titoli 3D      */
+    --font-sans:   "Inter", system-ui, sans-serif;         /* body brand     */
+    --font-mono:   "JetBrains Mono", "Courier New", monospace; /* codice     */
+    --font-arcade: "Press Start 2P", cursive, monospace;   /* cabinato Pac-Man */
+}
+
+/* ── Reset base ────────────────────────────────────────────── */
 body {
     margin: 0;
     padding: 0;
     background: #000 !important;
-    font-family: 'Tahoma', sans-serif;
+    font-family: var(--font-legacy);
+}
+
+/* ── Focus-visible globale: visibile a tastiera, invisibile a mouse ── */
+*:focus {
+    outline: none;
+}
+
+*:focus-visible {
+    outline: 2px solid var(--color-lux);
+    outline-offset: 2px;
+    border-radius: 2px;
+}
+
+/* Override contestuale: sui componenti XP usa il blu XP */
+.xp-focus:focus-visible,
+.window-body *:focus-visible,
+.desktop-component *:focus-visible,
+.taskbar-component *:focus-visible {
+    outline: 2px solid #0054E3;
+    outline-offset: 2px;
+}
+
+/* ── prefers-reduced-motion: rispetta le preferenze di sistema ── */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
 }

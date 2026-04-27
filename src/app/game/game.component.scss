@@ -38,7 +38,7 @@ $white: #fff;
     background: rgba(0, 0, 0, 0.92);
     z-index: 2000;
     @include flex-center;
-    font-family: 'Press Start 2P', cursive, monospace;
+    font-family: var(--font-arcade);
     animation: turnOn 0.5s ease-out;
 }
 
@@ -133,6 +133,7 @@ $white: #fff;
     h1 {
         font-size: 2.2rem;
         margin-bottom: 4px;
+        line-height: 1.2;
         text-shadow: 4px 4px $blue;
 
         &.win {
@@ -141,9 +142,10 @@ $white: #fff;
         }
     }
 
+    // WCAG fix: #888 su nero = 2.4:1 (FAIL). #bbb su nero = ~5.9:1 (PASS)
     p.controls-hint {
-        color: #888;
-        font-size: 0.55rem;
+        color: #bbb;
+        font-size: 0.7rem;   // era 0.55rem (~9px) → 0.7rem (~11px) WCAG min
         margin-top: 4px;
     }
 }
@@ -166,8 +168,8 @@ $white: #fff;
 }
 
 .diff-label {
-    color: #aaa;
-    font-size: 0.6rem;
+    color: #ccc;          // era #aaa → #ccc per contrasto migliore su sfondo scuro
+    font-size: 0.7rem;    // era 0.6rem (~10px) → 0.7rem (~11px)
     letter-spacing: 2px;
     margin: 0;
 }
@@ -181,8 +183,8 @@ $white: #fff;
     padding: 8px 14px;
     border: 2px solid transparent;
     border-radius: 4px;
-    font-family: 'Press Start 2P', cursive, monospace;
-    font-size: 0.6rem;
+    font-family: var(--font-arcade);
+    font-size: 0.65rem;   // era 0.6rem → 0.65rem per leggibilità
     cursor: pointer;
     transition: all 0.15s ease;
     color: $white;
@@ -192,6 +194,11 @@ $white: #fff;
     &:active {
         transform: translateY(3px);
         box-shadow: none;
+    }
+
+    &:focus-visible {
+        outline: 2px solid $white;
+        outline-offset: 2px;
     }
 
     &.easy {
@@ -280,8 +287,8 @@ $white: #fff;
     border: none;
     cursor: pointer;
     font-weight: bold;
-    font-family: 'Press Start 2P', cursive, monospace;
-    font-size: 0.45rem;
+    font-family: var(--font-arcade);
+    font-size: 0.5rem;    // era 0.45rem → leggibilità minima arcade
     color: $white;
     box-shadow: 0 5px 0 $screen-bg;
     transition: transform 0.1s, box-shadow 0.1s;
@@ -289,6 +296,11 @@ $white: #fff;
     &:active {
         transform: translateY(5px);
         box-shadow: none;
+    }
+
+    &:focus-visible {
+        outline: 3px solid #fff;
+        outline-offset: 3px;
     }
 
     &.red {
@@ -305,15 +317,8 @@ $white: #fff;
 // ANIMATIONS
 // ========================================
 @keyframes blink {
-
-    0%,
-    100% {
-        opacity: 1;
-    }
-
-    50% {
-        opacity: 0;
-    }
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0; }
 }
 
 @keyframes turnOn {
@@ -321,65 +326,12 @@ $white: #fff;
         transform: scaleY(0.005) scaleX(0);
         opacity: 0;
     }
-
     50% {
         transform: scaleY(0.005) scaleX(1);
         opacity: 1;
     }
-
     100% {
         transform: scaleY(1) scaleX(1);
         opacity: 1;
-    }
-}
-
-// ========================================
-// RESPONSIVE – DESKTOP SMALL
-// ========================================
-@media (max-width: 860px) and (min-width: 1025px) {
-    .arcade-cabinet {
-        width: 95%;
-        height: auto;
-    }
-}
-
-// ========================================
-// RESPONSIVE – MOBILE / TABLET
-// ========================================
-@media (max-width: 1024px) {
-    .arcade-cabinet {
-        width: min(520px, 98vw) !important;
-        height: auto !important;
-        border-width: 10px !important;
-        padding: 10px !important;
-    }
-
-    .arcade-header {
-        font-size: 0.85rem !important;
-        margin-bottom: 10px !important;
-    }
-
-    .game-screen.flappy-screen {
-        height: auto !important;
-
-        canvas {
-            width: 100% !important;
-            height: auto !important;
-        }
-    }
-
-    .arcade-controls {
-        padding: 0 20px !important;
-        height: 70px !important;
-    }
-
-    .action-btn {
-        width: 50px !important;
-        height: 50px !important;
-        font-size: 0.4rem !important;
-    }
-
-    .joystick {
-        display: none;
     }
 }
