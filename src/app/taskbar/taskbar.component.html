@@ -1,6 +1,6 @@
 <div class="taskbar">
   <button class="start-button" (click)="onStartClick()">
-    <img src="assets/icons/start.png" alt="" class="start-flag">
+    <img src="assets/icons/start.webp" alt="" class="start-flag">
     <span class="start-text">{{ 'desktop.startText' | translate }}</span>
   </button>
 
@@ -8,10 +8,10 @@
   <div class="quick-launch">
     <div class="taskbar-separator"></div>
     <button class="quick-launch-item" (click)="onWindowClick(1)" [attr.title]="'icons.computer' | translate">
-      <img src="assets/icons/computer.png" [alt]="'icons.computer' | translate">
+      <img src="assets/icons/computer.webp" [alt]="'icons.computer' | translate">
     </button>
     <button class="quick-launch-item" [attr.title]="'common.desktop' | translate" (click)="onStartClick()">
-      <img src="assets/icons/computer.png" [alt]="'common.desktop' | translate" style="filter: hue-rotate(90deg);">
+      <img src="assets/icons/computer.webp" [alt]="'common.desktop' | translate" style="filter: hue-rotate(90deg);">
     </button>
     <button class="quick-launch-item" (click)="onWindowClick(6)" [attr.title]="'icons.paint' | translate">
       <img src="assets/icons/paint.png" [alt]="'icons.paint' | translate">
@@ -34,7 +34,7 @@
       <button class="tray-lang-toggle" (click)="onLanguageToggle()">
         {{ currentLanguage | uppercase }}
       </button>
-      <img src="assets/icons/volume.png" alt="Volume" class="tray-icon">
+      <img src="assets/icons/volume.webp" alt="Volume" class="tray-icon">
     </div>
     <div class="clock">{{ currentTime }}</div>
   </div>
