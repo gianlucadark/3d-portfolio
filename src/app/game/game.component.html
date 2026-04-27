@@ -16,12 +16,50 @@
                 role="img"
                 aria-label="Pac-Man arcade game — usa i tasti freccia per muovere il personaggio"></canvas>
 
-            <!-- Start / Game Over overlay -->
-            <div class="game-overlay" *ngIf="!isPlaying">
-                <h1 *ngIf="gameOver">{{ 'pacman.gameOver' | translate }}</h1>
-                <h1 *ngIf="gameWon" class="win">{{ 'pacman.youWin' | translate }}</h1>
+            <!-- ── START OVERLAY ── -->
+            <div class="game-overlay start-overlay" *ngIf="!isPlaying && !gameOver && !gameWon">
+                <div class="difficulty-selector">
+                    <p class="diff-label">{{ 'pacman.selectDifficulty' | translate }}</p>
+                    <div class="diff-buttons">
+                        <button class="diff-btn easy" [class.active]="selectedDifficulty === 'easy'"
+                            (click)="setDifficulty('easy')">{{ 'pacman.easy' | translate }}</button>
+                        <button class="diff-btn normal" [class.active]="selectedDifficulty === 'normal'"
+                            (click)="setDifficulty('normal')">{{ 'pacman.normal' | translate }}</button>
+                        <button class="diff-btn hard" [class.active]="selectedDifficulty === 'hard'"
+                            (click)="setDifficulty('hard')">{{ 'pacman.hard' | translate }}</button>
+                    </div>
+                </div>
+                <p class="blink">{{ 'pacman.pressStartPlay' | translate }}</p>
+                <p class="controls-hint">{{ 'pacman.controlsHint' | translate }}</p>
+            </div>
 
-                <!-- Difficulty selector (only at start/restart) -->
+            <!-- ── WIN OVERLAY ── -->
+            <div class="game-overlay win-overlay" *ngIf="!isPlaying && gameWon"
+                 role="status" aria-label="Livello completato">
+                <!-- Confetti -->
+                <div class="confetti-container" aria-hidden="true">
+                    <i class="confetti-piece" *ngFor="let i of confettiRange"></i>
+                </div>
+
+                <span class="win-trophy" aria-hidden="true">🏆</span>
+                <h1 class="win-title">STAGE CLEAR!</h1>
+
+                <div class="result-scores">
+                    <div class="score-row">
+                        <span class="score-label">SCORE</span>
+                        <span class="score-value gold">{{ score | number:'1.0-0' }}</span>
+                    </div>
+                    <div class="score-divider"></div>
+                    <div class="score-row">
+                        <span class="score-label">RECORD</span>
+                        <span class="score-value">{{ highScore | number:'1.0-0' }}</span>
+                    </div>
+                </div>
+
+                <div class="new-record-badge" *ngIf="isNewHighScore" aria-label="Nuovo record!">
+                    ★ NEW RECORD ★
+                </div>
+
                 <div class="difficulty-selector">
                     <p class="diff-label">{{ 'pacman.selectDifficulty' | translate }}</p>
                     <div class="diff-buttons">
@@ -34,15 +72,50 @@
                     </div>
                 </div>
 
-                <p class="blink">{{ gameOver || gameWon ? ('pacman.pressStartRestart' | translate) :
-                    ('pacman.pressStartPlay' | translate) }}</p>
-                <p class="controls-hint">{{ 'pacman.controlsHint' | translate }}</p>
-
-                <!-- Riproduci tramite un comodo bottone on-screen oltre al pulsante blu in basso -->
-                <button class="diff-btn normal" *ngIf="gameOver || gameWon"
-                    style="margin-top: 10px; padding: 10px 20px; font-size: 0.8rem;" (click)="startGame()">
+                <p class="blink">{{ 'pacman.pressStartRestart' | translate }}</p>
+                <button class="diff-btn normal restart-btn" (click)="startGame()">
                     {{ 'pacman.restart' | translate }}
                 </button>
+            </div>
+
+            <!-- ── GAME OVER OVERLAY ── -->
+            <div class="game-overlay lose-overlay" *ngIf="!isPlaying && gameOver"
+                 role="alert" aria-label="Game over">
+                <h1 class="lose-title">{{ 'pacman.gameOver' | translate }}</h1>
+
+                <div class="result-scores">
+                    <div class="score-row">
+                        <span class="score-label">SCORE</span>
+                        <span class="score-value lose-score-val">{{ score | number:'1.0-0' }}</span>
+                    </div>
+                    <div class="score-divider"></div>
+                    <div class="score-row">
+                        <span class="score-label">RECORD</span>
+                        <span class="score-value">{{ highScore | number:'1.0-0' }}</span>
+                    </div>
+                </div>
+
+                <div class="new-record-badge" *ngIf="isNewHighScore" aria-label="Nuovo record!">
+                    ★ NEW RECORD ★
+                </div>
+
+                <div class="difficulty-selector">
+                    <p class="diff-label">{{ 'pacman.selectDifficulty' | translate }}</p>
+                    <div class="diff-buttons">
+                        <button class="diff-btn easy" [class.active]="selectedDifficulty === 'easy'"
+                            (click)="setDifficulty('easy')">{{ 'pacman.easy' | translate }}</button>
+                        <button class="diff-btn normal" [class.active]="selectedDifficulty === 'normal'"
+                            (click)="setDifficulty('normal')">{{ 'pacman.normal' | translate }}</button>
+                        <button class="diff-btn hard" [class.active]="selectedDifficulty === 'hard'"
+                            (click)="setDifficulty('hard')">{{ 'pacman.hard' | translate }}</button>
+                    </div>
+                </div>
+
+                <p class="blink">{{ 'pacman.pressStartRestart' | translate }}</p>
+                <button class="diff-btn normal restart-btn" (click)="startGame()">
+                    {{ 'pacman.restart' | translate }}
+                </button>
+                <p class="controls-hint">{{ 'pacman.controlsHint' | translate }}</p>
             </div>
         </div>
 

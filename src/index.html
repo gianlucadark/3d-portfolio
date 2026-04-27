@@ -58,6 +58,9 @@
   }
   </script>
 
+  <!-- ── Critical inline styles: prevent white flash before Angular renders ── -->
+  <style>body{margin:0;background:#000;overflow:hidden}</style>
+
   <!-- ── DNS Prefetch & Preconnect ──────────────────────────── -->
   <link rel="dns-prefetch" href="//fonts.googleapis.com">
   <link rel="dns-prefetch" href="//fonts.gstatic.com">
@@ -66,13 +69,11 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <!-- ── Critical Asset Preloads ────────────────────────────── -->
+  <!-- Only preload what's visible before Angular boots (LCP element) -->
   <link rel="preload" href="assets/icons/start.png" as="image" fetchpriority="high">
-  <link rel="preload" href="assets/3d/room-space-3-final.glb" as="fetch" crossorigin="anonymous" fetchpriority="low">
-  <link rel="preload" href="assets/cielo1.hdr" as="fetch" crossorigin="anonymous" fetchpriority="low">
-  <link rel="preload" href="assets/draco/draco_decoder.wasm" as="fetch" crossorigin="anonymous" fetchpriority="low">
-  <link rel="preload" href="assets/opt_sfondo.webp" as="image" fetchpriority="low">
-  <link rel="preload" href="assets/opt_cvfoto1.webp" as="image" fetchpriority="low">
-  <link rel="preload" href="assets/opt_pacman.webp" as="image" fetchpriority="low">
+  <!-- 3D assets (GLB, HDR, WASM) are fetched on-demand by Three.js after the
+       loading screen is visible — preloading them here only wastes bandwidth
+       that the main JS bundle needs to boot Angular faster. -->
 
   <!-- ── Non-blocking Google Fonts ──────────────────────────── -->
   <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Press+Start+2P&display=swap" onload="this.onload=null;this.rel='stylesheet'">
@@ -89,6 +90,11 @@
 </head>
 
 <body>
+  <!--
+    Sfondo scuro inline: evita il white flash prima che Angular renderizzi.
+    Con il bundle iniziale da 82KB Angular boota in ~300ms, quindi non serve
+    un vero "loading screen" qui — solo il colore di sfondo corretto.
+  -->
   <app-root></app-root>
 </body>
 

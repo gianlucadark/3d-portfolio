@@ -65,10 +65,13 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
   isPlaying = false;
   gameOver = false;
   gameWon = false;
+  isNewHighScore = false;
   score = 0;
   highScore = 0;
   isMobile = false;
   selectedDifficulty: Difficulty = 'normal';
+
+  readonly confettiRange = Array.from({ length: 24 }, (_, i) => i);
 
   // Flappy Bird State
   flappyPlaying = false;
@@ -167,6 +170,7 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
     this.isPlaying = true;
     this.gameOver = false;
     this.gameWon = false;
+    this.isNewHighScore = false;
 
     this.ngZone.runOutsideAngular(() => {
       this.gameLoop();
@@ -411,20 +415,84 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     if (this.flappyOver) {
-      ctx.fillStyle = 'rgba(0,0,0,0.6)';
+      ctx.fillStyle = 'rgba(0,0,0,0.72)';
       ctx.fillRect(0, 0, W, H);
+
+      const cx = W / 2;
+      const panelX = cx - 115;
+      const panelY = H / 2 - 95;
+      const panelW = 230;
+      const panelH = 190;
+
+      // Panel shadow
+      ctx.shadowColor = '#FF6B6B';
+      ctx.shadowBlur = 18;
+      ctx.fillStyle = 'rgba(8, 0, 0, 0.92)';
+      ctx.fillRect(panelX, panelY, panelW, panelH);
+      ctx.shadowBlur = 0;
+
+      // Panel border
+      ctx.strokeStyle = '#FF6B6B';
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(panelX, panelY, panelW, panelH);
+      ctx.lineWidth = 1;
+
+      // Title
       ctx.textAlign = 'center';
       ctx.fillStyle = '#FF6B6B';
-      ctx.font = 'bold 16px "Press Start 2P", monospace';
-      ctx.fillText('GAME OVER', W / 2, H / 2 - 60);
+      ctx.font = 'bold 14px "Press Start 2P", monospace';
+      ctx.fillText('GAME OVER', cx, panelY + 32);
+
+      // Horizontal divider
+      ctx.strokeStyle = 'rgba(255, 107, 107, 0.25)';
+      ctx.beginPath();
+      ctx.moveTo(panelX + 16, panelY + 46);
+      ctx.lineTo(panelX + panelW - 16, panelY + 46);
+      ctx.stroke();
+
+      // Score label & value
+      ctx.fillStyle = '#888';
+      ctx.font = '7px "Press Start 2P", monospace';
+      ctx.textAlign = 'left';
+      ctx.fillText('SCORE', panelX + 18, panelY + 70);
       ctx.fillStyle = '#FFD700';
-      ctx.font = '10px "Press Start 2P", monospace';
-      ctx.fillText('SCORE: ' + this.flappyScore, W / 2, H / 2 - 20);
-      ctx.fillStyle = 'white';
-      ctx.fillText('BEST: ' + this.flappyHighScore, W / 2, H / 2 + 10);
-      ctx.fillStyle = '#4ECDC4';
-      ctx.font = '8px "Press Start 2P", monospace';
-      ctx.fillText('TAP TO RETRY', W / 2, H / 2 + 50);
+      ctx.font = '13px "Press Start 2P", monospace';
+      ctx.textAlign = 'right';
+      ctx.fillText(String(this.flappyScore), panelX + panelW - 18, panelY + 72);
+
+      // Mid divider
+      ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+      ctx.beginPath();
+      ctx.moveTo(panelX + 16, panelY + 84);
+      ctx.lineTo(panelX + panelW - 16, panelY + 84);
+      ctx.stroke();
+
+      // Best label & value
+      const isFlappyNewBest = this.flappyScore > 0 && this.flappyScore >= this.flappyHighScore;
+      ctx.fillStyle = '#888';
+      ctx.font = '7px "Press Start 2P", monospace';
+      ctx.textAlign = 'left';
+      ctx.fillText('BEST', panelX + 18, panelY + 108);
+      ctx.fillStyle = isFlappyNewBest ? '#FFD700' : '#fff';
+      ctx.font = '13px "Press Start 2P", monospace';
+      ctx.textAlign = 'right';
+      ctx.fillText(String(this.flappyHighScore), panelX + panelW - 18, panelY + 110);
+
+      // New best badge
+      if (isFlappyNewBest) {
+        ctx.fillStyle = '#FFD700';
+        ctx.font = '6px "Press Start 2P", monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText('★ NEW BEST ★', cx, panelY + 130);
+      }
+
+      // Blinking retry text
+      if (Math.floor(Date.now() / 450) % 2 === 0) {
+        ctx.fillStyle = '#4ECDC4';
+        ctx.font = '7px "Press Start 2P", monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText('TAP TO RETRY', cx, panelY + panelH - 16);
+      }
     }
   }
 
@@ -916,6 +984,7 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
         this.stopGameLoop();
         if (this.score > this.highScore) {
           this.highScore = this.score;
+          this.isNewHighScore = true;
           localStorage.setItem('pacmanHigh', String(this.highScore));
         }
       });
@@ -927,6 +996,7 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
     this.stopGameLoop();
     if (this.score > this.highScore) {
       this.highScore = this.score;
+      this.isNewHighScore = true;
       localStorage.setItem('pacmanHigh', String(this.highScore));
     }
   }

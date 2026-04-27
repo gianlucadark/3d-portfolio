@@ -122,31 +122,239 @@ $white: #fff;
 .game-overlay {
     position: absolute;
     inset: 0;
-    background: rgba(0, 0, 0, 0.8);
     @include flex-center;
     flex-direction: column;
     color: $red;
     text-align: center;
     z-index: 10;
-    gap: 12px;
+    gap: 10px;
+    padding: 16px 12px;
+    overflow: hidden;
 
-    h1 {
-        font-size: 2.2rem;
-        margin-bottom: 4px;
-        line-height: 1.2;
-        text-shadow: 4px 4px $blue;
-
-        &.win {
-            color: $yellow;
-            text-shadow: 4px 4px $red;
-        }
-    }
-
-    // WCAG fix: #888 su nero = 2.4:1 (FAIL). #bbb su nero = ~5.9:1 (PASS)
     p.controls-hint {
         color: #bbb;
-        font-size: 0.7rem;   // era 0.55rem (~9px) → 0.7rem (~11px) WCAG min
+        font-size: 0.7rem;
         margin-top: 4px;
+    }
+}
+
+// ── Start overlay ──
+.start-overlay {
+    background: rgba(0, 0, 0, 0.82);
+    animation: overlayFadeIn 0.3s ease-out;
+}
+
+// ── Win overlay ──
+.win-overlay {
+    background: rgba(0, 0, 0, 0.88);
+    animation: overlayFadeIn 0.4s ease-out;
+    color: $yellow;
+}
+
+.win-trophy {
+    font-size: 3.6rem;
+    display: block;
+    line-height: 1;
+    animation: trophyPop 0.65s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    filter: drop-shadow(0 0 18px rgba(255, 215, 0, 0.75));
+}
+
+.win-title {
+    font-size: 2rem;
+    line-height: 1.2;
+    color: $yellow;
+    text-shadow: 0 0 20px rgba(255, 215, 0, 0.8), 3px 3px 0 #c87000;
+    margin: 4px 0 6px;
+    animation: winTitleIn 0.4s ease-out 0.15s both,
+               winTitleGlow 2s ease-in-out 0.55s infinite alternate;
+}
+
+// ── Lose overlay ──
+.lose-overlay {
+    background: rgba(0, 0, 0, 0.88);
+    animation: loseFlash 0.5s ease-out;
+    color: $red;
+}
+
+.lose-title {
+    font-size: 2.4rem;
+    line-height: 1.2;
+    color: $red;
+    text-shadow: 0 0 28px rgba(255, 0, 0, 0.85), 4px 4px 0 #000;
+    margin: 0 0 6px;
+    animation: loseShake 0.55s ease-out both;
+}
+
+// ── Score panel ──
+.result-scores {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    padding: 10px 28px;
+    min-width: 230px;
+    animation: scoresSlideIn 0.35s ease-out 0.1s both;
+}
+
+.score-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 0;
+}
+
+.score-label {
+    color: #777;
+    font-size: 0.6rem;
+    letter-spacing: 2px;
+}
+
+.score-value {
+    color: $white;
+    font-size: 0.95rem;
+
+    &.gold {
+        color: $yellow;
+        text-shadow: 0 0 8px rgba(255, 215, 0, 0.55);
+    }
+
+    &.lose-score-val {
+        color: #FF6B6B;
+    }
+}
+
+.score-divider {
+    height: 1px;
+    background: rgba(255, 255, 255, 0.1);
+    margin: 2px 0;
+}
+
+// ── New record badge ──
+.new-record-badge {
+    background: linear-gradient(90deg, #FF6B6B, $yellow, #FF6B6B);
+    background-size: 200% 100%;
+    color: #000;
+    font-family: var(--font-arcade);
+    font-size: 0.6rem;
+    letter-spacing: 1px;
+    padding: 5px 18px;
+    border-radius: 100px;
+    animation: recordPop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) 0.25s both,
+               recordShine 2.5s linear 0.7s infinite;
+}
+
+// ── Confetti ──
+.confetti-container {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.confetti-piece {
+    position: absolute;
+    top: -16px;
+    width: 7px;
+    height: 11px;
+    border-radius: 2px;
+    animation: confettiFall linear infinite;
+    opacity: 0;
+
+    // Colors
+    &:nth-child(6n+1) { background: $yellow; }
+    &:nth-child(6n+2) { background: #FF6B6B; }
+    &:nth-child(6n+3) { background: #4ECDC4; }
+    &:nth-child(6n+4) { background: #4AADDC; }
+    &:nth-child(6n+5) { background: #B07EFF; }
+    &:nth-child(6n+6) { background: $white; }
+
+    // Circles for variety
+    &:nth-child(4n) { border-radius: 50%; width: 7px; height: 7px; }
+
+    // Staggered positions + timings (24 pieces across full width)
+    @for $i from 1 through 24 {
+        &:nth-child(#{$i}) {
+            left: #{($i - 1) * 4.35%};
+            animation-delay: #{($i - 1) * 0.09s};
+            animation-duration: #{1.6 + ($i % 5) * 0.22s};
+        }
+    }
+}
+
+// ── Restart button override ──
+.restart-btn {
+    margin-top: 4px;
+    padding: 8px 24px;
+    font-size: 0.7rem;
+}
+
+// ========================================
+// ANIMATIONS
+// ========================================
+@keyframes overlayFadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+@keyframes trophyPop {
+    from { transform: scale(0) rotate(-180deg); opacity: 0; }
+    to   { transform: scale(1) rotate(0deg);    opacity: 1; }
+}
+
+@keyframes winTitleIn {
+    from { transform: translateY(-16px); opacity: 0; }
+    to   { transform: translateY(0);     opacity: 1; }
+}
+
+@keyframes winTitleGlow {
+    from { text-shadow: 0 0 20px rgba(255, 215, 0, 0.6), 3px 3px 0 #c87000; }
+    to   { text-shadow: 0 0 40px rgba(255, 215, 0, 0.9), 0 0 60px rgba(255, 215, 0, 0.35), 3px 3px 0 #c87000; }
+}
+
+@keyframes loseFlash {
+    0%   { background: rgba(160, 0, 0, 0.92); }
+    40%  { background: rgba(60,  0, 0, 0.90); }
+    100% { background: rgba(0,   0, 0, 0.88); }
+}
+
+@keyframes loseShake {
+    0%   { transform: translateX(0); }
+    15%  { transform: translateX(-7px); }
+    30%  { transform: translateX(7px); }
+    45%  { transform: translateX(-5px); }
+    60%  { transform: translateX(5px); }
+    75%  { transform: translateX(-2px); }
+    90%  { transform: translateX(2px); }
+    100% { transform: translateX(0); }
+}
+
+@keyframes scoresSlideIn {
+    from { transform: translateY(8px); opacity: 0; }
+    to   { transform: translateY(0);   opacity: 1; }
+}
+
+@keyframes recordPop {
+    from { transform: scale(0); opacity: 0; }
+    to   { transform: scale(1); opacity: 1; }
+}
+
+@keyframes recordShine {
+    0%   { background-position: 0%   center; }
+    100% { background-position: 200% center; }
+}
+
+@keyframes confettiFall {
+    0% {
+        top: -16px;
+        transform: translateX(0) rotate(0deg);
+        opacity: 1;
+    }
+    25% { transform: translateX(18px)  rotate(90deg); }
+    50% { transform: translateX(-14px) rotate(180deg); }
+    75% { transform: translateX(22px)  rotate(270deg); }
+    100% {
+        top: 108%;
+        transform: translateX(-18px) rotate(360deg);
+        opacity: 0;
     }
 }
 

@@ -15,9 +15,7 @@ const FPS_IDLE = 1000 / 30;    // 30fps a riposo
 const FPS_LOADING = 1000 / 5;  // 5fps mentre la scena è nascosta dal loading screen
 const INTERACTION_COOLDOWN_MS = 2000; // torna a idle dopo 2s senza input
 
-@Injectable({
-    providedIn: 'root'
-})
+@Injectable()
 export class ThreeSceneService implements OnDestroy {
     // Three.js core objects
     private scene!: THREE.Scene;
@@ -106,7 +104,8 @@ export class ThreeSceneService implements OnDestroy {
         // Initialize loaders
         this.dracoLoader = new DRACOLoader();
         this.dracoLoader.setDecoderPath('assets/draco/');
-        this.dracoLoader.preload();
+        // dracoLoader.preload() is called inside initialize() to avoid
+        // fetching the WASM decoder during the critical JS-boot window.
 
         this.gltfLoader = new GLTFLoader(this.loadingManager);
         this.gltfLoader.setDRACOLoader(this.dracoLoader);
@@ -121,9 +120,8 @@ export class ThreeSceneService implements OnDestroy {
             this.pendingTimeouts.push(id);
             return;
         }
-
-        // Pre-load critical textures immediately
-        this.preloadTextures();
+        // Textures and Draco WASM are fetched inside initialize() (called from
+        // ngAfterViewInit) so they don't compete with the main JS bundle download.
     }
 
     private detectWebGL(): boolean {
@@ -167,6 +165,11 @@ export class ThreeSceneService implements OnDestroy {
         if (!this.webGLAvailable) return;
 
         this.ngZone.runOutsideAngular(() => {
+            // Start Draco WASM fetch and texture pre-fetch here (loading screen
+            // is already visible, so these no longer compete with the JS bundle).
+            this.dracoLoader.preload();
+            this.preloadTextures();
+
             this.initScene(container);
             this.createPlaceholder();
             this.loadModel();
@@ -694,8 +697,9 @@ export class ThreeSceneService implements OnDestroy {
         if (this.isEnvLoaded) {
             this.commitLoadingComplete();
         } else {
-            // Modello pronto ma HDR ancora in caricamento: aspetta fino a 4s poi procedi
-            const id = setTimeout(() => this.commitLoadingComplete(), 4000);
+            // Modello pronto ma HDR ancora in caricamento: aspetta fino a 1s poi procedi.
+            // L'HDR migliora le riflessioni ma non blocca il rendering della scena.
+            const id = setTimeout(() => this.commitLoadingComplete(), 1000);
             this.pendingTimeouts.push(id);
         }
     }
