@@ -454,7 +454,7 @@ $transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
     display: flex;
     align-items: center;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: background-color 0.2s, transform 0.2s;
     border-radius: 8px;
     text-align: left;
 
@@ -478,7 +478,7 @@ $transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
         border: 2px solid rgba(255, 255, 255, 0.5);
         border-radius: 4px;
         background: #fff;
-        transition: all 0.2s;
+        transition: border-color 0.2s, transform 0.2s;
     }
 
     .login-text {
@@ -617,7 +617,7 @@ $transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
     color: white;
     cursor: pointer;
     @include flex-center;
-    transition: all 0.3s ease;
+    transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 
     &:hover {
@@ -734,7 +734,7 @@ $transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
     border-radius: var(--r-md);
     color: $lux;
     cursor: pointer;
-    transition: all 0.25s $transition-smooth;
+    transition: background-color 0.25s $transition-smooth, border-color 0.25s $transition-smooth, transform 0.25s $transition-smooth, box-shadow 0.25s $transition-smooth;
     position: relative;
     overflow: hidden;
 

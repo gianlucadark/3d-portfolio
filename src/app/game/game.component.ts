@@ -59,6 +59,7 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
   private flappyCtx!: CanvasRenderingContext2D;
   private animationId: number | null = null;
   private flappyAnimationId: number | null = null;
+  private wallCache: HTMLCanvasElement | null = null;
 
   // Game State
   isPlaying = false;
@@ -133,7 +134,10 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
     if (!this.isMobile) {
       const canvas = this.canvasRef.nativeElement;
       this.ctx = canvas.getContext('2d')!;
-      window.addEventListener('keydown', this.handleInput);
+      // Outside Angular zone: keyboard events don't trigger change detection
+      this.ngZone.runOutsideAngular(() => {
+        window.addEventListener('keydown', this.handleInput);
+      });
       this.resetGame();
       this.draw();
     } else {
@@ -563,6 +567,37 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
     this.pacman = this.createPacman();
     this.ghosts = this.createGhosts();
     this.score = 0;
+    this.buildWallCache();
+  }
+
+  private buildWallCache(): void {
+    const canvas = this.canvasRef?.nativeElement;
+    if (!canvas) return;
+
+    const offscreen = document.createElement('canvas');
+    offscreen.width = canvas.width;
+    offscreen.height = canvas.height;
+    const offCtx = offscreen.getContext('2d')!;
+
+    offCtx.fillStyle = '#000';
+    offCtx.fillRect(0, 0, offscreen.width, offscreen.height);
+
+    for (let r = 0; r < this.ROWS; r++) {
+      for (let c = 0; c < this.COLS; c++) {
+        if (this.initialMap[r][c] === 0) {
+          const x = c * this.TILE_SIZE;
+          const y = r * this.TILE_SIZE;
+          offCtx.fillStyle = '#1919A6';
+          offCtx.fillRect(x, y, this.TILE_SIZE, this.TILE_SIZE);
+          offCtx.fillStyle = '#000';
+          offCtx.fillRect(x + 3, y + 3, this.TILE_SIZE - 6, this.TILE_SIZE - 6);
+          offCtx.strokeStyle = '#3333cc';
+          offCtx.lineWidth = 1;
+          offCtx.strokeRect(x + 1, y + 1, this.TILE_SIZE - 2, this.TILE_SIZE - 2);
+        }
+      }
+    }
+    this.wallCache = offscreen;
   }
 
   // ============================================
@@ -901,42 +936,32 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
   // ============================================
 
   private draw(): void {
-    const canvas = this.canvasRef.nativeElement;
-    this.ctx.fillStyle = '#000';
-    this.ctx.fillRect(0, 0, canvas.width, canvas.height);
-    this.drawMap();
+    // Blit pre-rendered wall cache (O(1) drawImage vs O(n²) per-tile loop)
+    if (this.wallCache) {
+      this.ctx.drawImage(this.wallCache, 0, 0);
+    } else {
+      const canvas = this.canvasRef.nativeElement;
+      this.ctx.fillStyle = '#000';
+      this.ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+    this.drawDynamicTiles();
     this.drawPacman();
     this.drawGhosts();
   }
 
-  private drawMap(): void {
+  private drawDynamicTiles(): void {
     for (let r = 0; r < this.ROWS; r++) {
       for (let c = 0; c < this.COLS; c++) {
         const tile = this.map[r][c];
-        const x = c * this.TILE_SIZE;
-        const y = r * this.TILE_SIZE;
-
-        if (tile === 0) {
-          this.drawWall(x, y);
-        } else if (tile === 1) {
-          this.drawDot(x, y, 2);
+        if (tile === 1) {
+          this.drawDot(c * this.TILE_SIZE, r * this.TILE_SIZE, 2);
         } else if (tile === 3) {
-          this.drawPowerPellet(x, y);
+          this.drawPowerPellet(c * this.TILE_SIZE, r * this.TILE_SIZE);
         }
       }
     }
   }
 
-  private drawWall(x: number, y: number): void {
-    this.ctx.fillStyle = '#1919A6';
-    this.ctx.fillRect(x, y, this.TILE_SIZE, this.TILE_SIZE);
-    this.ctx.fillStyle = '#000';
-    this.ctx.fillRect(x + 3, y + 3, this.TILE_SIZE - 6, this.TILE_SIZE - 6);
-    // Blue glow border
-    this.ctx.strokeStyle = '#3333cc';
-    this.ctx.lineWidth = 1;
-    this.ctx.strokeRect(x + 1, y + 1, this.TILE_SIZE - 2, this.TILE_SIZE - 2);
-  }
 
   private drawDot(x: number, y: number, radius: number): void {
     this.ctx.fillStyle = '#ffb8ae';

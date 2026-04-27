@@ -117,7 +117,7 @@ $black: #000;
   color: $white;
   text-transform: uppercase;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-  transition: all 0.2s;
+  transition: filter 0.2s, transform 0.2s, box-shadow 0.2s;
 
   &:hover {
     transform: translateY(-2px);

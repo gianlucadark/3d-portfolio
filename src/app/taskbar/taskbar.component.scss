@@ -121,7 +121,7 @@ $white: #fff;
   @include flex-center;
   cursor: pointer;
   border-radius: 3px;
-  transition: all 0.1s;
+  transition: background-color 0.1s, box-shadow 0.1s;
 
   img {
     width: 18px;
