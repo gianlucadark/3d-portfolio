@@ -578,6 +578,9 @@ $black: #000;
   font-family: var(--font-mono);
   font-size: 12px;
   resize: none;
+  background-color: #fff;
+  color: #000;
+  color-scheme: light;
 
   &:focus-visible {
     outline: 2px solid $xp-blue;

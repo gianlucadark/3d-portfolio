@@ -63,6 +63,12 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
                 if (complete) {
                     this.isBiosComplete = true;
                     this.showWelcome = true;
+                    // Three.js finished loading while user is on desktop: position
+                    // the camera at the screen so returnFromDesktop() has a visible
+                    // zoom-out animation (screen → room) instead of a no-op tween.
+                    if (this.showDesktop && !this.showGame) {
+                        this.threeSceneService.setInitialPositionOnScreen();
+                    }
                     this.cdr.markForCheck();
                 }
                 this.cdr.markForCheck();

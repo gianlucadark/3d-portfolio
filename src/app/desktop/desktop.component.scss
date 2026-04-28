@@ -408,6 +408,8 @@ $black: #000;
   flex-grow: 1;
   border: 1px solid #7F9DB9;
   background-color: #fff;
+  color: #000;
+  color-scheme: light;
   padding: 2px 4px;
   font-size: 12px;
   font-family: var(--font-legacy);
@@ -437,6 +439,9 @@ $black: #000;
     font-family: var(--font-legacy);
     font-size: 13px;
     line-height: 1.4;
+    background-color: #fff;
+    color: #000;
+    color-scheme: light;
 
     &:focus-visible {
       outline: 2px solid $xp-blue;
