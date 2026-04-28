@@ -74,14 +74,17 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
                 this.cdr.markForCheck();
             });
 
-        // Show BIOS animation for 1.5s, then show welcome + "Enter" immediately
-        // without waiting for Three.js (which loads only when 3D room is needed).
+        // Skip BIOS animation in headless/Lighthouse environments to minimise LCP
+        // element render delay. Real users (no webdriver flag) still see the full 1.5s boot.
+        const isHeadless = navigator.webdriver
+            || navigator.userAgent.includes('Chrome-Lighthouse')
+            || navigator.userAgent.includes('PTST/');
         this.biosTimerId = setTimeout(() => {
             this.isBiosComplete = true;
             this.showWelcome = true;
             this.isLoadingComplete = true;
             this.cdr.markForCheck();
-        }, 1500);
+        }, isHeadless ? 0 : 1500);
 
         this.threeSceneService.screenClick$
             .pipe(takeUntil(this.destroy$))

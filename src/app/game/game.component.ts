@@ -1,4 +1,4 @@
-import { Component, ElementRef, EventEmitter, OnDestroy, OnInit, Output, ViewChild, AfterViewInit, NgZone } from '@angular/core';
+import { Component, ElementRef, EventEmitter, OnDestroy, OnInit, Output, ViewChild, AfterViewInit, NgZone, ChangeDetectorRef } from '@angular/core';
 import { PACMAN_CONFIG } from '../constants/app.constants';
 
 /** Difficulty modes */
@@ -123,7 +123,7 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
   private flappyStarted = false; // waiting for tap
   private flappyParticles: Array<{ x: number; y: number; vx: number; vy: number; life: number; color: string }> = [];
 
-  constructor(private readonly ngZone: NgZone) { }
+  constructor(private readonly ngZone: NgZone, private readonly cdr: ChangeDetectorRef) { }
 
   ngOnInit(): void {
     this.isMobile = window.innerWidth <= 1024 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
@@ -325,6 +325,7 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
     this.ngZone.run(() => {
       this.flappyOver = true;
       this.flappyPlaying = false;
+      this.cdr.markForCheck();
     });
   }
 
@@ -987,6 +988,7 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
           this.isNewHighScore = true;
           localStorage.setItem('pacmanHigh', String(this.highScore));
         }
+        this.cdr.markForCheck();
       });
     }
   }
@@ -999,6 +1001,7 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
       this.isNewHighScore = true;
       localStorage.setItem('pacmanHigh', String(this.highScore));
     }
+    this.cdr.markForCheck();
   }
 
   // ============================================
