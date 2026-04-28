@@ -148,7 +148,7 @@ export class ThreeSceneImpl {
 
     private preloadTextures(): void {
         const textures = [
-            'assets/opt_sfondo.webp',
+            'assets/sfondo.webp',
             'assets/opt_pacman.webp',
             'assets/opt_cvfoto1.webp'
         ];
@@ -384,7 +384,7 @@ export class ThreeSceneImpl {
                 this.applyMaterialByName(mesh, material, name);
 
                 if (meshNameLower.includes('schermogrande') && !name.includes('schermogrande')) {
-                    this.applyScreenMaterial(mesh, material, 'assets/opt_sfondo.webp', 'schermoGrande');
+                    this.applyScreenMaterial(mesh, material, 'assets/sfondo.webp', 'schermoGrande');
                 } else if (meshNameLower.includes('schermopiccolo') && !name.includes('schermopiccolo')) {
                     this.applyScreenMaterial(mesh, material, 'assets/opt_pacman.webp', 'schermoPiccolo');
                 }
@@ -430,7 +430,7 @@ export class ThreeSceneImpl {
         } else if (name.includes('led')) {
             this.applyLedMaterial(mesh, material);
         } else if (name.includes('schermogrande')) {
-            this.applyScreenMaterial(mesh, material, 'assets/opt_sfondo.webp', 'schermoGrande');
+            this.applyScreenMaterial(mesh, material, 'assets/sfondo.webp', 'schermoGrande');
         } else if (name.includes('schermopiccolo')) {
             this.applyScreenMaterial(mesh, material, 'assets/opt_pacman.webp', 'schermoPiccolo');
         } else if (name.includes('quadro')) {

@@ -12,7 +12,7 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef
 } from '@angular/core';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { DomSanitizer } from '@angular/platform-browser';
 import { Subject } from 'rxjs';
 import { WINDOW_CONFIG, PROMPT_COMMANDS, FULLSCREEN_WINDOWS } from '../constants/app.constants';
 import { TranslationService } from '../services/translation.service';
@@ -86,7 +86,6 @@ export class WindowComponent implements OnInit, OnChanges, OnDestroy {
   readonly helpCommands = ['- aboutme', '- whyxp', '- whyprompt', '- clear'];
   output: string[] = [];
   currentInput = '';
-  showHelp = false;
 
   // Notepad
   notepadText = '';

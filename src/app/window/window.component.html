@@ -135,9 +135,6 @@
         </div>
       </div>
     </ng-container>
-    <ng-container *ngIf="windowType === 'documenti'">
-      <!-- <app-documenti></app-documenti> -->
-    </ng-container>
     <ng-container *ngIf="windowType === 'paint'">
       <app-paint></app-paint>
     </ng-container>
@@ -346,13 +343,10 @@
     </ng-container>
 
     <ng-container
-      *ngIf="windowType !== 'cv' && windowType !== 'readme' && windowType !== 'prompt' && windowType !== 'computer' && windowType !== 'recycle-bin' && windowType !== 'documenti' && windowType !== 'paint' && windowType !== 'uxability' && windowType !== 'web-extension'">
+      *ngIf="windowType !== 'cv' && windowType !== 'readme' && windowType !== 'prompt' && windowType !== 'computer' && windowType !== 'recycle-bin' && windowType !== 'paint' && windowType !== 'uxability' && windowType !== 'web-extension'">
       <ng-content></ng-content>
     </ng-container>
   </div>
-  <!-- <div class="output">
-    <div *ngFor="let line of output">{{ line }}</div>
-  </div> -->
   <div class="resize-handle top" (mousedown)="onResizeStart($event, 'top')"></div>
   <div class="resize-handle right" (mousedown)="onResizeStart($event, 'right')"></div>
   <div class="resize-handle bottom" (mousedown)="onResizeStart($event, 'bottom')"></div>
@@ -363,8 +357,3 @@
   <div class="resize-handle bottom-right" (mousedown)="onResizeStart($event, 'bottom right')"></div>
 </div>
 
-<div *ngIf="showHelp" class="help-commands">
-  <ul>
-    <li *ngFor="let command of helpCommands">{{ command }}</li>
-  </ul>
-</div>
