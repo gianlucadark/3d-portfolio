@@ -1,4 +1,35 @@
-import * as THREE from 'three';
+import {
+    Scene,
+    PerspectiveCamera,
+    WebGLRenderer,
+    Raycaster,
+    Vector2,
+    Vector3,
+    Box3,
+    Color,
+    AmbientLight,
+    DirectionalLight,
+    RectAreaLight,
+    PointLight,
+    BoxGeometry,
+    MeshBasicMaterial,
+    MeshStandardMaterial,
+    MeshPhysicalMaterial,
+    Mesh,
+    Group,
+    Texture,
+    LoadingManager,
+    TextureLoader,
+    PMREMGenerator,
+    OrthographicCamera,
+    HalfFloatType,
+    SRGBColorSpace,
+    ACESFilmicToneMapping,
+    PCFSoftShadowMap,
+    DoubleSide,
+    LinearFilter,
+    LinearMipmapLinearFilter,
+} from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
@@ -15,38 +46,38 @@ const FPS_LOADING = 1000 / 5;
 const INTERACTION_COOLDOWN_MS = 2000;
 
 export class ThreeSceneImpl {
-    private scene!: THREE.Scene;
-    private camera!: THREE.PerspectiveCamera;
-    private renderer!: THREE.WebGLRenderer;
+    private scene!: Scene;
+    private camera!: PerspectiveCamera;
+    private renderer!: WebGLRenderer;
     private controls!: OrbitControls;
-    private model: THREE.Group | null = null;
+    private model: Group | null = null;
     private animationId: number | null = null;
 
-    private readonly raycaster = new THREE.Raycaster();
-    private readonly mouse = new THREE.Vector2();
+    private readonly raycaster = new Raycaster();
+    private readonly mouse = new Vector2();
 
-    private quadroMesh: THREE.Mesh | null = null;
-    private corniceMesh: THREE.Mesh | null = null;
-    private schermoGrandeMesh: THREE.Mesh | null = null;
-    private schermoPiccoloMesh: THREE.Mesh | null = null;
-    private catMesh: THREE.Mesh | null = null;
-    private quadroOriginalScale = new THREE.Vector3();
-    private corniceOriginalScale = new THREE.Vector3();
+    private quadroMesh: Mesh | null = null;
+    private corniceMesh: Mesh | null = null;
+    private schermoGrandeMesh: Mesh | null = null;
+    private schermoPiccoloMesh: Mesh | null = null;
+    private catMesh: Mesh | null = null;
+    private quadroOriginalScale = new Vector3();
+    private corniceOriginalScale = new Vector3();
 
-    private ambientLight!: THREE.AmbientLight;
-    private directionalLight!: THREE.DirectionalLight;
-    private rectLight!: THREE.RectAreaLight;
-    private envMap: THREE.Texture | null = null;
+    private ambientLight!: AmbientLight;
+    private directionalLight!: DirectionalLight;
+    private rectLight!: RectAreaLight;
+    private envMap: Texture | null = null;
 
     private isZooming = false;
-    private readonly cameraOriginalPosition = new THREE.Vector3();
-    private readonly controlsOriginalTarget = new THREE.Vector3();
-    private readonly textureCache = new Map<string, THREE.Texture>();
+    private readonly cameraOriginalPosition = new Vector3();
+    private readonly controlsOriginalTarget = new Vector3();
+    private readonly textureCache = new Map<string, Texture>();
     private isHovering = false;
     private catGlowTween: gsap.core.Tween | null = null;
     private pacmanGlowTween: gsap.core.Tween | null = null;
-    private catMeshes: THREE.Mesh[] = [];
-    private placeholder: THREE.Mesh | null = null;
+    private catMeshes: Mesh[] = [];
+    private placeholder: Mesh | null = null;
     private isFullQualityEnabled = false;
 
     private lastFrameTime = 0;
@@ -63,16 +94,14 @@ export class ThreeSceneImpl {
 
     private readonly pendingTimeouts: ReturnType<typeof setTimeout>[] = [];
 
-    private readonly loadingManager: THREE.LoadingManager;
+    private readonly loadingManager: LoadingManager;
     private readonly dracoLoader: DRACOLoader;
     private readonly gltfLoader: GLTFLoader;
-    private readonly textureLoader: THREE.TextureLoader;
+    private readonly textureLoader: TextureLoader;
     private readonly rgbeLoader: RGBELoader;
 
     private isEnvLoaded = false;
     private isModelLoaded = false;
-    private currentEnvProgress = 0;
-    private currentModelProgress = 0;
 
     constructor(
         private readonly ngZone: NgZone,
@@ -83,7 +112,7 @@ export class ThreeSceneImpl {
         private readonly pdfClick$: Subject<void>,
         private readonly catClick$: Subject<void>
     ) {
-        this.loadingManager = new THREE.LoadingManager();
+        this.loadingManager = new LoadingManager();
         this.setupLoadingManager();
 
         this.dracoLoader = new DRACOLoader();
@@ -92,9 +121,9 @@ export class ThreeSceneImpl {
         this.gltfLoader = new GLTFLoader(this.loadingManager);
         this.gltfLoader.setDRACOLoader(this.dracoLoader);
 
-        this.textureLoader = new THREE.TextureLoader(this.loadingManager);
+        this.textureLoader = new TextureLoader(this.loadingManager);
         this.rgbeLoader = new RGBELoader(this.loadingManager);
-        this.rgbeLoader.setDataType(THREE.HalfFloatType);
+        this.rgbeLoader.setDataType(HalfFloatType);
 
         this.ngZone.runOutsideAngular(() => {
             this.dracoLoader.preload();
@@ -112,8 +141,8 @@ export class ThreeSceneImpl {
             const progress = (itemsLoaded / itemsTotal) * 100;
             this.updateLoadingState(progress, 'model');
         };
-        this.loadingManager.onError = (url) => {
-            console.error('Error loading asset:', url);
+        this.loadingManager.onError = (_url) => {
+            console.error('Error loading asset:', _url);
         };
     }
 
@@ -127,7 +156,7 @@ export class ThreeSceneImpl {
     }
 
     private initScene(container: ElementRef): void {
-        this.scene = new THREE.Scene();
+        this.scene = new Scene();
         this.setupCamera(container.nativeElement);
         this.setupRenderer(container.nativeElement);
         this.setupControls();
@@ -138,7 +167,7 @@ export class ThreeSceneImpl {
     private setupCamera(container: HTMLElement): void {
         const { clientWidth: width, clientHeight: height } = container;
         const { CAMERA } = THREE_CONFIG;
-        this.camera = new THREE.PerspectiveCamera(CAMERA.FOV, width / height, CAMERA.NEAR, CAMERA.FAR);
+        this.camera = new PerspectiveCamera(CAMERA.FOV, width / height, CAMERA.NEAR, CAMERA.FAR);
         this.camera.position.z = CAMERA.INITIAL_Z;
         this.camera.position.x += CAMERA.INITIAL_X_OFFSET;
     }
@@ -148,7 +177,7 @@ export class ThreeSceneImpl {
         const dpr = window.devicePixelRatio || 1;
         const needsAntialias = dpr < 2;
 
-        this.renderer = new THREE.WebGLRenderer({
+        this.renderer = new WebGLRenderer({
             antialias: needsAntialias,
             powerPreference: 'high-performance',
             stencil: false,
@@ -158,9 +187,9 @@ export class ThreeSceneImpl {
 
         this.renderer.setSize(width, height);
         this.renderer.setPixelRatio(0.75);
-        this.renderer.outputColorSpace = THREE.SRGBColorSpace;
+        this.renderer.outputColorSpace = SRGBColorSpace;
         this.renderer.shadowMap.enabled = false;
-        this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        this.renderer.toneMapping = ACESFilmicToneMapping;
         this.renderer.toneMappingExposure = 0.4;
         this.renderer.sortObjects = false;
 
@@ -183,16 +212,16 @@ export class ThreeSceneImpl {
 
     private setupLights(): void {
         const { LIGHTS } = THREE_CONFIG;
-        this.ambientLight = new THREE.AmbientLight(COLORS.WHITE, LIGHTS.AMBIENT.INTENSITY_LIGHT);
+        this.ambientLight = new AmbientLight(COLORS.WHITE, LIGHTS.AMBIENT.INTENSITY_LIGHT);
         this.scene.add(this.ambientLight);
 
-        this.directionalLight = new THREE.DirectionalLight(COLORS.WHITE, LIGHTS.DIRECTIONAL.INTENSITY_LIGHT);
+        this.directionalLight = new DirectionalLight(COLORS.WHITE, LIGHTS.DIRECTIONAL.INTENSITY_LIGHT);
         this.configureDirectionalLight();
         this.scene.add(this.directionalLight);
         this.scene.add(this.directionalLight.target);
 
         RectAreaLightUniformsLib.init();
-        this.rectLight = new THREE.RectAreaLight(0xDDEEFF, LIGHTS.RECT.INTENSITY_LIGHT, 8, 8);
+        this.rectLight = new RectAreaLight(0xDDEEFF, LIGHTS.RECT.INTENSITY_LIGHT, 8, 8);
         this.rectLight.position.set(5, 5, 5);
         this.rectLight.lookAt(0, 0, 0);
         this.scene.add(this.rectLight);
@@ -207,7 +236,7 @@ export class ThreeSceneImpl {
 
         const shadow = this.directionalLight.shadow;
         if (shadow?.camera) {
-            const cam = shadow.camera as THREE.OrthographicCamera;
+            const cam = shadow.camera as OrthographicCamera;
             cam.left = -d;
             cam.right = d;
             cam.top = d;
@@ -224,12 +253,12 @@ export class ThreeSceneImpl {
     }
 
     private loadEnvironment(): void {
-        this.scene.background = new THREE.Color(COLORS.ICE_BLUE).multiplyScalar(0.2);
+        this.scene.background = new Color(COLORS.ICE_BLUE).multiplyScalar(0.2);
 
         this.rgbeLoader.load(
             'assets/cielo1.hdr',
             (texture) => {
-                const pmremGenerator = new THREE.PMREMGenerator(this.renderer);
+                const pmremGenerator = new PMREMGenerator(this.renderer);
                 pmremGenerator.compileEquirectangularShader();
 
                 const envMap = pmremGenerator.fromEquirectangular(texture).texture;
@@ -252,14 +281,14 @@ export class ThreeSceneImpl {
     }
 
     private createPlaceholder(): void {
-        const geometry = new THREE.BoxGeometry(10, 6, 10);
-        const material = new THREE.MeshBasicMaterial({
+        const geometry = new BoxGeometry(10, 6, 10);
+        const material = new MeshBasicMaterial({
             color: 0x4a9eff,
             wireframe: true,
             transparent: true,
             opacity: 0.2
         });
-        this.placeholder = new THREE.Mesh(geometry, material);
+        this.placeholder = new Mesh(geometry, material);
         this.placeholder.position.y = 0;
         this.scene.add(this.placeholder);
 
@@ -284,7 +313,7 @@ export class ThreeSceneImpl {
         });
 
         this.renderer.shadowMap.enabled = true;
-        this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        this.renderer.shadowMap.type = PCFSoftShadowMap;
         this.renderer.compile(this.scene, this.camera);
     }
 
@@ -314,7 +343,7 @@ export class ThreeSceneImpl {
                 onComplete: () => {
                     this.scene.remove(this.placeholder!);
                     this.placeholder?.geometry.dispose();
-                    (this.placeholder?.material as THREE.Material).dispose();
+                    (this.placeholder?.material as MeshBasicMaterial).dispose();
                     this.placeholder = null;
                 }
             });
@@ -335,10 +364,10 @@ export class ThreeSceneImpl {
         if (!this.model) return;
 
         this.model.traverse((child) => {
-            if (!(child as THREE.Mesh).isMesh) return;
+            if (!(child as Mesh).isMesh) return;
 
-            const mesh = child as THREE.Mesh;
-            const material = mesh.material as THREE.MeshStandardMaterial;
+            const mesh = child as Mesh;
+            const material = mesh.material as MeshStandardMaterial;
 
             mesh.castShadow = true;
             mesh.receiveShadow = true;
@@ -362,8 +391,8 @@ export class ThreeSceneImpl {
             }
         });
 
-        const box = new THREE.Box3().setFromObject(this.model);
-        const center = box.getCenter(new THREE.Vector3());
+        const box = new Box3().setFromObject(this.model);
+        const center = box.getCenter(new Vector3());
         this.model.position.sub(center);
         this.model.position.y += THREE_CONFIG.MODEL.POSITION_Y_OFFSET;
         this.model.position.x += THREE_CONFIG.MODEL.POSITION_X_OFFSET;
@@ -373,16 +402,16 @@ export class ThreeSceneImpl {
     private frameModel(): void {
         if (!this.model || !this.camera || !this.controls) return;
 
-        const box = new THREE.Box3().setFromObject(this.model);
-        const size = box.getSize(new THREE.Vector3());
-        const center = box.getCenter(new THREE.Vector3());
+        const box = new Box3().setFromObject(this.model);
+        const size = box.getSize(new Vector3());
+        const center = box.getCenter(new Vector3());
 
         const maxDim = Math.max(size.x, size.y, size.z);
         const fov = this.camera.fov * (Math.PI / 180);
         let distance = Math.abs(maxDim / (2 * Math.tan(fov / 2)));
         distance *= 1.4;
 
-        const cameraPos = new THREE.Vector3(center.x, center.y + maxDim * 0.15, center.z + distance);
+        const cameraPos = new Vector3(center.x, center.y + maxDim * 0.15, center.z + distance);
         this.camera.position.copy(cameraPos);
         this.controls.target.copy(center);
         this.controls.update();
@@ -391,7 +420,7 @@ export class ThreeSceneImpl {
         this.controlsOriginalTarget.copy(this.controls.target);
     }
 
-    private applyMaterialByName(mesh: THREE.Mesh, material: THREE.MeshStandardMaterial, name: string): void {
+    private applyMaterialByName(mesh: Mesh, material: MeshStandardMaterial, name: string): void {
         if (name.includes('muro1')) {
             this.applyGlassMaterial(mesh, material);
         } else if (name.includes('pavimento')) {
@@ -417,7 +446,7 @@ export class ThreeSceneImpl {
         }
     }
 
-    private applyCatMaterial(mesh: THREE.Mesh): void {
+    private applyCatMaterial(mesh: Mesh): void {
         this.catMesh = mesh;
         this.catMeshes.push(mesh);
         mesh.userData['isClickable'] = true;
@@ -425,14 +454,14 @@ export class ThreeSceneImpl {
         setTimeout(() => this.startCatGlow(), 0);
     }
 
-    private applyGlassMaterial(mesh: THREE.Mesh, material: THREE.MeshStandardMaterial): void {
+    private applyGlassMaterial(_mesh: Mesh, material: MeshStandardMaterial): void {
         const { GLASS } = MATERIAL_CONFIG;
-        material.color = (material.color || new THREE.Color(0xffffff)).clone();
+        material.color = (material.color || new Color(0xffffff)).clone();
         material.transparent = true;
         material.opacity = 1;
         material.roughness = GLASS.ROUGHNESS;
         material.metalness = GLASS.METALNESS;
-        material.side = THREE.DoubleSide;
+        material.side = DoubleSide;
 
         if ((material as any).isMeshPhysicalMaterial) {
             (material as any).transmission = GLASS.TRANSMISSION;
@@ -442,12 +471,12 @@ export class ThreeSceneImpl {
         material.needsUpdate = true;
     }
 
-    private applyMarbleMaterial(mesh: THREE.Mesh, material: THREE.MeshStandardMaterial): void {
+    private applyMarbleMaterial(_mesh: Mesh, material: MeshStandardMaterial): void {
         const { MARBLE } = MATERIAL_CONFIG;
-        material.color = (material.color || new THREE.Color(0xffffff)).clone();
+        material.color = (material.color || new Color(0xffffff)).clone();
         material.roughness = MARBLE.ROUGHNESS;
         material.metalness = MARBLE.METALNESS;
-        material.side = THREE.DoubleSide;
+        material.side = DoubleSide;
 
         if ((material as any).isMeshPhysicalMaterial) {
             (material as any).clearcoat = MARBLE.CLEARCOAT;
@@ -456,10 +485,10 @@ export class ThreeSceneImpl {
         material.needsUpdate = true;
     }
 
-    private applyWallMaterial(mesh: THREE.Mesh, material: THREE.MeshStandardMaterial): void {
+    private applyWallMaterial(mesh: Mesh, material: MeshStandardMaterial): void {
         const oldMap = material.map || null;
         const oldNormal = material.normalMap || undefined;
-        const color = (material.color || new THREE.Color(0xffffff)).clone();
+        const color = (material.color || new Color(0xffffff)).clone();
 
         if ((material as any).isMeshPhysicalMaterial) {
             material.transparent = true;
@@ -469,17 +498,17 @@ export class ThreeSceneImpl {
             (material as any).transmission = 0.9;
             (material as any).ior = 1.45;
             (material as any).thickness = 0.05;
-            material.side = THREE.DoubleSide;
+            material.side = DoubleSide;
             material.needsUpdate = true;
             return;
         }
 
-        const glass = new THREE.MeshPhysicalMaterial({
+        const glass = new MeshPhysicalMaterial({
             map: oldMap, normalMap: oldNormal, color,
             transparent: true, opacity: 0.2,
             roughness: 0.02, metalness: 0,
             transmission: 0.9, ior: 1.1, thickness: 0,
-            side: THREE.DoubleSide
+            side: DoubleSide
         });
         glass.name = material.name || 'stanza-glass';
         mesh.material = glass;
@@ -487,23 +516,23 @@ export class ThreeSceneImpl {
         glass.needsUpdate = true;
     }
 
-    private applyCeilingMaterial(material: THREE.MeshStandardMaterial): void {
-        material.emissive = new THREE.Color(COLORS.ICE_BLUE);
+    private applyCeilingMaterial(material: MeshStandardMaterial): void {
+        material.emissive = new Color(COLORS.ICE_BLUE);
         material.emissiveIntensity = MATERIAL_CONFIG.CEILING.EMISSIVE_INTENSITY;
     }
 
-    private applyLedMaterial(mesh: THREE.Mesh, material: THREE.MeshStandardMaterial): void {
+    private applyLedMaterial(mesh: Mesh, material: MeshStandardMaterial): void {
         const { LED } = MATERIAL_CONFIG;
-        material.emissive = new THREE.Color(LED.COLOR);
+        material.emissive = new Color(LED.COLOR);
         material.emissiveIntensity = LED.EMISSIVE_INTENSITY;
         material.toneMapped = false;
-        const light = new THREE.PointLight(LED.COLOR, LED.POINT_LIGHT_INTENSITY, LED.POINT_LIGHT_DISTANCE, 2);
+        const light = new PointLight(LED.COLOR, LED.POINT_LIGHT_INTENSITY, LED.POINT_LIGHT_DISTANCE, 2);
         mesh.add(light);
     }
 
-    private applyScreenMaterial(mesh: THREE.Mesh, material: THREE.MeshStandardMaterial, texturePath: string, target: 'schermoGrande' | 'schermoPiccolo'): void {
+    private applyScreenMaterial(mesh: Mesh, material: MeshStandardMaterial, texturePath: string, target: 'schermoGrande' | 'schermoPiccolo'): void {
         const { SCREEN } = MATERIAL_CONFIG;
-        material.emissive = new THREE.Color(COLORS.WHITE);
+        material.emissive = new Color(COLORS.WHITE);
         material.emissiveIntensity = SCREEN.EMISSIVE_INTENSITY * 0.3;
         material.roughness = SCREEN.ROUGHNESS;
         material.metalness = SCREEN.METALNESS;
@@ -522,8 +551,8 @@ export class ThreeSceneImpl {
         mesh.userData['isClickable'] = true;
     }
 
-    private applyQuadroMaterial(mesh: THREE.Mesh, material: THREE.MeshStandardMaterial): void {
-        material.emissive = new THREE.Color(COLORS.WHITE);
+    private applyQuadroMaterial(mesh: Mesh, material: MeshStandardMaterial): void {
+        material.emissive = new Color(COLORS.WHITE);
         const texture = this.loadTexture('assets/opt_cvfoto1.webp', { flipY: true });
         material.map = texture;
         material.emissiveMap = texture;
@@ -535,27 +564,27 @@ export class ThreeSceneImpl {
         mesh.userData['isClickable'] = true;
     }
 
-    private cacheCornice(mesh: THREE.Mesh, material: THREE.MeshStandardMaterial): void {
+    private cacheCornice(mesh: Mesh, _material: MeshStandardMaterial): void {
         this.corniceMesh = mesh;
         this.corniceOriginalScale.copy(mesh.scale);
     }
 
-    private applyYellowMaterial(material: THREE.MeshStandardMaterial): void {
+    private applyYellowMaterial(material: MeshStandardMaterial): void {
         material.needsUpdate = true;
-        material.emissive = new THREE.Color(COLORS.YELLOW);
+        material.emissive = new Color(COLORS.YELLOW);
         material.emissiveIntensity = MATERIAL_CONFIG.SCREEN.EMISSIVE_INTENSITY;
     }
 
-    private loadTexture(path: string, opts?: { flipY?: boolean; generateMipmaps?: boolean }): THREE.Texture {
+    private loadTexture(path: string, opts?: { flipY?: boolean; generateMipmaps?: boolean }): Texture {
         const key = `${path}::f:${String(opts?.flipY ?? false)}::m:${String(opts?.generateMipmaps ?? false)}`;
         if (!this.textureCache.has(key)) {
             const texture = this.textureLoader.load(path);
             texture.flipY = opts?.flipY ?? false;
-            try { texture.colorSpace = THREE.SRGBColorSpace; } catch (e) { }
+            try { texture.colorSpace = SRGBColorSpace; } catch (e) { }
             const maxAnisotropy = this.renderer?.capabilities.getMaxAnisotropy() || 1;
             texture.anisotropy = Math.min(maxAnisotropy, 8);
             texture.generateMipmaps = opts?.generateMipmaps ?? false;
-            texture.minFilter = texture.generateMipmaps ? THREE.LinearMipmapLinearFilter : THREE.LinearFilter;
+            texture.minFilter = texture.generateMipmaps ? LinearMipmapLinearFilter : LinearFilter;
             this.textureCache.set(key, texture);
         }
         return this.textureCache.get(key)!;
@@ -563,7 +592,6 @@ export class ThreeSceneImpl {
 
     private updateLoadingState(progress: number, type: 'env' | 'model'): void {
         if (type === 'model') {
-            this.currentModelProgress = progress;
             this.updateProgress(progress);
         }
     }
@@ -657,7 +685,7 @@ export class ThreeSceneImpl {
 
         const intersects = this.raycaster.intersectObjects(targets);
         if (intersects.length > 0) {
-            const mesh = intersects[0].object as THREE.Mesh;
+            const mesh = intersects[0].object as Mesh;
 
             if (mesh === this.quadroMesh) {
                 this.ngZone.run(() => this.pdfClick$.next());
@@ -704,7 +732,7 @@ export class ThreeSceneImpl {
         this.mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
     }
 
-    private checkIntersection(mesh: THREE.Mesh | null): boolean {
+    private checkIntersection(mesh: Mesh | null): boolean {
         if (!mesh) return false;
         return this.raycaster.intersectObject(mesh, false).length > 0;
     }
@@ -740,10 +768,10 @@ export class ThreeSceneImpl {
             duration, ease: 'power2.out'
         });
 
-        const material = this.corniceMesh!.material as THREE.MeshStandardMaterial;
+        const material = this.corniceMesh!.material as MeshStandardMaterial;
         gsap.to(material, {
             emissiveIntensity: 0.8, duration, ease: 'power2.out',
-            onStart: () => { material.emissive = new THREE.Color(COLORS.ICE_BLUE); }
+            onStart: () => { material.emissive = new Color(COLORS.ICE_BLUE); }
         });
     }
 
@@ -759,10 +787,10 @@ export class ThreeSceneImpl {
             duration, ease: 'power2.out'
         });
 
-        const material = this.corniceMesh!.material as THREE.MeshStandardMaterial;
+        const material = this.corniceMesh!.material as MeshStandardMaterial;
         gsap.to(material, {
             emissiveIntensity: 0, duration, ease: 'power2.out',
-            onComplete: () => { material.emissive = new THREE.Color(COLORS.BLACK); }
+            onComplete: () => { material.emissive = new Color(COLORS.BLACK); }
         });
     }
 
@@ -771,9 +799,9 @@ export class ThreeSceneImpl {
         this.catMeshes.forEach(mesh => {
             const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
             mats.forEach(mat => {
-                const m = mat as THREE.MeshStandardMaterial;
+                const m = mat as MeshStandardMaterial;
                 if (!m || !('emissive' in m)) return;
-                m.emissive = new THREE.Color(0xffe0aa);
+                m.emissive = new Color(0xffe0aa);
                 m.emissiveIntensity = 0.05;
                 this.catGlowTween = gsap.to(m, {
                     emissiveIntensity: 0.18, duration: 0.9,
@@ -785,7 +813,7 @@ export class ThreeSceneImpl {
 
     private startPacmanGlow(): void {
         if (!this.schermoPiccoloMesh) return;
-        const material = this.schermoPiccoloMesh.material as THREE.MeshStandardMaterial;
+        const material = this.schermoPiccoloMesh.material as MeshStandardMaterial;
         if (!material) return;
         this.pacmanGlowTween = gsap.to(material, {
             emissiveIntensity: 3.5, duration: 0.9,
@@ -794,16 +822,16 @@ export class ThreeSceneImpl {
         });
     }
 
-    private zoomToScreen(mesh: THREE.Mesh, distance: number, onComplete: () => void): void {
+    private zoomToScreen(mesh: Mesh, distance: number, onComplete: () => void): void {
         if (!this.camera || !this.controls) return;
         this.isZooming = true;
 
         this.cameraOriginalPosition.copy(this.camera.position);
         this.controlsOriginalTarget.copy(this.controls.target);
 
-        const screenPos = new THREE.Vector3();
+        const screenPos = new Vector3();
         mesh.getWorldPosition(screenPos);
-        const targetCameraPos = new THREE.Vector3(screenPos.x, screenPos.y, screenPos.z + distance);
+        const targetCameraPos = new Vector3(screenPos.x, screenPos.y, screenPos.z + distance);
         const duration = THREE_CONFIG.ZOOM.ANIMATION_DURATION;
 
         gsap.to(this.camera.position, {
@@ -827,7 +855,7 @@ export class ThreeSceneImpl {
         this.cameraOriginalPosition.copy(this.camera.position);
         this.controlsOriginalTarget.copy(this.controls.target);
 
-        const screenPos = new THREE.Vector3();
+        const screenPos = new Vector3();
         this.schermoGrandeMesh.getWorldPosition(screenPos);
 
         this.camera.position.set(screenPos.x, screenPos.y, screenPos.z + THREE_CONFIG.ZOOM.SCREEN_DISTANCE);
@@ -869,7 +897,7 @@ export class ThreeSceneImpl {
             if (this.envMap) {
                 this.scene.background = this.envMap;
             } else {
-                this.scene.background = new THREE.Color(COLORS.DARK_BACKGROUND);
+                this.scene.background = new Color(COLORS.DARK_BACKGROUND);
             }
             this.scene.environment = null;
         } else {
@@ -909,8 +937,8 @@ export class ThreeSceneImpl {
         this.textureCache.forEach(texture => texture.dispose());
         this.textureCache.clear();
         this.model?.traverse((child) => {
-            if ((child as THREE.Mesh).isMesh) {
-                const mesh = child as THREE.Mesh;
+            if ((child as Mesh).isMesh) {
+                const mesh = child as Mesh;
                 mesh.geometry?.dispose();
                 if (mesh.material) {
                     const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material];

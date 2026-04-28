@@ -70,21 +70,24 @@
   <link rel="dns-prefetch" href="//www.googletagmanager.com">
 
   <!-- ── Critical Asset Preloads ────────────────────────────── -->
-  <!-- Only preload what's visible before Angular boots (LCP element) -->
+  <!-- LCP elements visible during BIOS boot screen -->
   <link rel="preload" href="assets/icons/start.webp" as="image" fetchpriority="high">
+  <!-- GLB preloaded early: by the time user clicks "Enter" and uses desktop,
+       the 3D model download is already complete in the browser cache. -->
+  <link rel="preload" href="assets/3d/room-space-3-final.glb" as="fetch" crossorigin>
 
   <!-- ── Non-blocking Google Fonts ──────────────────────────── -->
   <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Press+Start+2P&display=swap" onload="this.onload=null;this.rel='stylesheet'">
   <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Press+Start+2P&display=swap"></noscript>
 
-  <!-- ── Analytics (deferred) ───────────────────────────────── -->
-  <script defer src="https://www.googletagmanager.com/gtag/js?id=G-XE0CH7MY4Q"></script>
+  <!-- ── Analytics (deferred, non-blocking) ────────────────── -->
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag() { dataLayer.push(arguments); }
     gtag('js', new Date());
     gtag('config', 'G-XE0CH7MY4Q', { send_page_view: false });
   </script>
+  <script defer src="https://www.googletagmanager.com/gtag/js?id=G-XE0CH7MY4Q"></script>
 </head>
 
 <body>
