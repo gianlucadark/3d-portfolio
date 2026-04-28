@@ -71,9 +71,6 @@
   <!-- ── Critical Asset Preloads ────────────────────────────── -->
   <!-- Only preload what's visible before Angular boots (LCP element) -->
   <link rel="preload" href="assets/icons/start.webp" as="image" fetchpriority="high">
-  <!-- 3D assets (GLB, HDR, WASM) are fetched on-demand by Three.js after the
-       loading screen is visible — preloading them here only wastes bandwidth
-       that the main JS bundle needs to boot Angular faster. -->
 
   <!-- ── Non-blocking Google Fonts ──────────────────────────── -->
   <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Press+Start+2P&display=swap" onload="this.onload=null;this.rel='stylesheet'">

@@ -32,6 +32,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     showWelcome = false;
 
     private readonly destroy$ = new Subject<void>();
+    private biosTimerId: ReturnType<typeof setTimeout> | null = null;
 
     constructor(
         private readonly translationService: TranslationService,
@@ -59,14 +60,25 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
             .subscribe(complete => {
                 this.isLoadingComplete = complete;
                 if (complete) {
-                    setTimeout(() => {
-                        this.isBiosComplete = true;
-                        this.showWelcome = true;
-                        this.cdr.markForCheck();
-                    }, 400); // Optimized BIOS -> Welcome delay
+                    // Show welcome screen immediately — no artificial delay.
+                    // isBiosComplete may already be true from the 1.5s timer below.
+                    this.isBiosComplete = true;
+                    this.showWelcome = true;
+                    this.cdr.markForCheck();
                 }
                 this.cdr.markForCheck();
             });
+
+        // Transition to welcome screen after BIOS animation completes (~1.5s),
+        // regardless of Three.js loading status. This makes the LCP element
+        // (h1.welcome-title) visible much sooner for real users on slow connections.
+        // The enter button stays hidden until loadingComplete$ fires (showWelcome).
+        this.biosTimerId = setTimeout(() => {
+            if (!this.isBiosComplete) {
+                this.isBiosComplete = true;
+                this.cdr.markForCheck();
+            }
+        }, 1500);
 
         this.threeSceneService.screenClick$
             .pipe(takeUntil(this.destroy$))
@@ -101,14 +113,9 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     ngOnDestroy(): void {
         this.destroy$.next();
         this.destroy$.complete();
-        // Service handles its own cleanup via OnDestroy if provided in root, 
-        // but since we might want to destroy the scene when component is destroyed:
-        // Actually providedIn: 'root' means singleton. 
-        // If we want it to be destroyed with component, we should provide it in component providers.
-        // But for now, let's assume we want to keep it or we should manually call cleanup if needed.
-        // Given the providedIn: 'root', it won't be destroyed automatically.
-        // We should probably add a cleanup method to service and call it here if we want to free resources.
-        // However, the service implements OnDestroy, but that only triggers if the service itself is destroyed (e.g. if provided in component).
+        if (this.biosTimerId !== null) {
+            clearTimeout(this.biosTimerId);
+        }
     }
 
     enterPortfolio(): void {
