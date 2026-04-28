@@ -48,7 +48,8 @@ export const EN_TRANSLATIONS = {
         projects: 'Projects',
         curriculum: 'Curriculum',
         uxability: 'Uxability',
-        webExtension: 'Web Extension'
+        webExtension: 'Web Extension',
+        system32: '⚠ system32'
     },
 
     startMenu: {

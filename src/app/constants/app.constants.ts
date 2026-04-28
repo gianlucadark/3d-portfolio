@@ -131,7 +131,8 @@ export const ICON_KEY_MAP: Record<number, string> = {
     10: 'projects',
     11: 'uxability',
     12: 'webExtension',
-    13: 'curriculum'
+    13: 'curriculum',
+    99: 'system32'
 } as const;
 
 // ============================================

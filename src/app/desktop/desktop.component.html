@@ -146,4 +146,40 @@
     </ng-container>
 
   </div>
+
+  <!-- BSOD Easter Egg Overlay -->
+<div class="bsod-overlay" *ngIf="showBsod" role="alert">
+  <div class="bsod-content">
+    <p>A problem has been detected and your curiosity has caused a stack overflow in my patience.</p>
+    <br>
+    <p class="bsod-error-code">ERROR_TOO_MANY_QUESTIONS_FOR_A_BORED_DEVELOPER</p>
+    <br>
+    <p>If this is the first time you've tried to "hack" my portfolio, I'm impressed. 
+    If you are a judge from Awwwards, please ignore this and give me a 10/10.</p>
+    <br>
+    <p>The system is currently busy hiding my messy source code. If you keep looking 
+    into system32, I will be forced to send a faked "low battery" notification to your device.</p>
+    <br>
+    <p>Recommended actions:</p>
+    <ul>
+      <li>* Take a deep breath. It's just a website.</li>
+      <li>* Check if you left your coffee cold while exploring my 3D room.</li>
+      <li>* Hire me immediately to prevent further system instabilities.</li>
+    </ul>
+    <br>
+    <p>Technical information:</p>
+    <p>*** STOP: 0x00000069 (0xHIRE, 0xME, 0xPLZ, 0xTHX)</p>
+    <br>
+    <p class="bsod-collecting">Dumping my hopes and dreams to disk ........... 100%</p>
+    <p>Physical memory dump complete. My brain is now empty.</p>
+    <br>
+    <div *ngIf="bsodCountdown > 0" class="bsod-countdown">
+      Self-destruct sequence initiated in {{ bsodCountdown }}...
+    </div>
+    <div *ngIf="bsodCountdown <= 0" class="bsod-joke">
+      <p>> Just kidding! I'm a developer, I don't know how to self-destruct (yet).</p>
+      <p>> Rebooting your dignity... please wait.</p>
+    </div>
+  </div>
+</div>
 </div>

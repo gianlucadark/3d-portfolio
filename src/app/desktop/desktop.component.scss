@@ -56,6 +56,73 @@ $black: #000;
 }
 
 // ========================================
+// BSOD EASTER EGG
+// ========================================
+.bsod-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: #000084;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding: 48px 72px;
+  font-family: 'Courier New', Courier, monospace;
+  color: #ffffff;
+  font-size: 13px;
+  line-height: 1.65;
+  animation: bsod-appear 0.15s steps(2);
+  cursor: default;
+  user-select: none;
+
+  * { cursor: default; }
+}
+
+.bsod-content {
+  max-width: 720px;
+}
+
+.bsod-error-code {
+  font-size: 14px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  background: #aaaaaa;
+  color: #000084;
+  padding: 2px 6px;
+  display: inline-block;
+}
+
+.bsod-collecting {
+  color: #cccccc;
+}
+
+.bsod-countdown {
+  margin-top: 12px;
+  font-size: 14px;
+  font-weight: bold;
+  animation: bsod-blink 1s step-end infinite;
+}
+
+.bsod-joke {
+  margin-top: 12px;
+  font-size: 14px;
+  color: #aaffaa;
+  animation: bsod-blink 0.6s step-end infinite;
+  white-space: pre-line;
+}
+
+@keyframes bsod-appear {
+  0%   { background: #ffffff; }
+  50%  { background: #000000; }
+  100% { background: #000084; }
+}
+
+@keyframes bsod-blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+// ========================================
 // ICONS
 // ========================================
 .icon {

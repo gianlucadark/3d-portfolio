@@ -35,6 +35,7 @@ const DESKTOP_ICONS: Icon[] = [
   { id: 9, name: 'icons.email', image: 'assets/icons/email.png', position: { x: 0, y: 0 } },
   { id: 7, name: 'icons.trash', image: 'assets/icons/cestino.webp', position: { x: 0, y: 0 } },
   { id: 5, name: 'icons.readme', image: 'assets/icons/readme.ico', position: { x: 0, y: 0 } },
+  { id: 99, name: 'icons.system32', image: 'assets/icons/computer.ico', position: { x: 0, y: 0 } },
   {
     id: 11,
     name: 'icons.uxability',
@@ -69,6 +70,11 @@ export class DesktopComponent implements OnInit, OnDestroy {
   emailSubject = '';
   emailTo = 'gianlucadark1@gmail.com';
   currentLanguage = 'en';
+
+  // BSOD Easter Egg
+  showBsod = false;
+  bsodCountdown = 5;
+  private bsodTimer: ReturnType<typeof setInterval> | null = null;
 
   // Z-index management
   private highestZIndex = 1000;
@@ -139,6 +145,9 @@ export class DesktopComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+    if (this.bsodTimer !== null) {
+      clearInterval(this.bsodTimer);
+    }
   }
 
   // ============================================
@@ -177,11 +186,41 @@ export class DesktopComponent implements OnInit, OnDestroy {
 
   openIcon(event: MouseEvent | TouchEvent, id: number): void {
     event.stopPropagation();
+    if (id === 99) {
+      this.triggerBsod();
+      return;
+    }
     const icon = this.icons.find(i => i.id === id);
     if (icon) {
       this.openWindow(id, this.getWindowTitle(id), icon.image);
     }
   }
+triggerBsod(): void {
+  if (this.showBsod) return; // Evita trigger multipli se l'utente clicca come un pazzo
+
+  this.showBsod = true;
+  this.bsodCountdown = 5;
+  
+  this.cdr.markForCheck();
+
+  this.bsodTimer = setInterval(() => {
+    this.bsodCountdown--;
+    
+    this.cdr.markForCheck();
+
+    if (this.bsodCountdown <= 0) {
+      clearInterval(this.bsodTimer!);
+      this.bsodTimer = null;
+
+      // Aspettiamo che leggano l'ultima battuta "> just kidding"
+      setTimeout(() => {
+        this.showBsod = false;
+
+        this.cdr.markForCheck();
+      }, 2500); // Alzato a 2.5s per godersi il finale
+    }
+  }, 2000);
+}
 
   // ============================================
   // WINDOW MANAGEMENT
