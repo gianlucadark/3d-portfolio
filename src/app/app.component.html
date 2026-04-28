@@ -1,1 +1,89 @@
+<!-- Loading Screen — lives in AppComponent (initial bundle) so the LCP element
+     renders without waiting for the 290 KB HomeModule lazy chunk. -->
+<div class="loading-screen" *ngIf="isLoading" [class.ending]="isEndingLoading"
+     role="status" aria-live="polite" aria-label="Caricamento portfolio in corso">
+
+  <!-- CRT Scanline Overlay -->
+  <div class="crt-overlay"></div>
+
+  <!-- Windows XP Boot Screen -->
+  <div class="xp-boot-screen" *ngIf="!isBiosComplete">
+    <div class="xp-boot-content">
+      <img src="assets/icons/start.webp" alt="Windows XP Logo" class="xp-boot-logo"
+           fetchpriority="high" loading="eager" width="140" height="124">
+      <h1 class="xp-boot-title">
+        <span class="xp-boot-name">Gianluca's</span>
+        <span class="xp-boot-portfolio">XP<span class="xp-boot-highlight">orfolio</span></span>
+      </h1>
+      <div class="xp-boot-loader">
+        <div class="xp-boot-loader-track">
+          <div class="xp-boot-loader-blocks">
+            <div class="xp-boot-block"></div>
+            <div class="xp-boot-block"></div>
+            <div class="xp-boot-block"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="xp-boot-copyright">Copyright &copy; Gianluca. All rights reserved.</p>
+  </div>
+
+  <!-- XP Welcome Screen -->
+  <div class="xp-welcome-screen" *ngIf="isBiosComplete">
+    <div class="welcome-container">
+      <!-- Left Side -->
+      <div class="welcome-left">
+        <div class="welcome-presentation">
+          <h1 class="welcome-title">{{ t('loading.welcome') }}</h1>
+          <div class="welcome-separator"></div>
+          <h2 class="welcome-portfolio-title">{{ t('loading.welcome2') }}</h2>
+
+          <div class="welcome-status" *ngIf="!showWelcome">
+            <p class="status-text">{{ t('loading.loadingText') }}</p>
+            <div class="xp-progress-container">
+              <div class="xp-progress-blocks">
+                <div class="xp-block block-1"></div>
+                <div class="xp-block block-2"></div>
+                <div class="xp-block block-3"></div>
+                <div class="xp-block block-4"></div>
+                <div class="xp-block block-5"></div>
+                <div class="xp-block block-6"></div>
+                <div class="xp-block block-7"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Side -->
+      <div class="welcome-right">
+        <div class="welcome-login-area">
+          <button class="xp-login-button" *ngIf="showWelcome" (click)="enterPortfolio()">
+            <div class="login-icon">
+              <img src="assets/icons/user.webp" alt="User" class="user-avatar"
+                   fetchpriority="high" loading="eager" width="46" height="46">
+            </div>
+            <div class="login-text">
+              <span class="user-name">Gianluca</span>
+              <span class="login-action">{{ t('loading.enterButton') }}</span>
+            </div>
+          </button>
+
+          <div class="welcome-controls" *ngIf="showWelcome">
+            <button class="welcome-lang-toggle" (click)="toggleLanguage()">
+              <svg class="control-icon-svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="12" r="10" class="globe-outline" />
+                <path d="M12 2C12 2 16 6 16 12C16 18 12 22 12 22C12 22 8 18 8 12C8 6 12 2 12 2Z" class="globe-meridian" />
+                <line x1="2" y1="12" x2="22" y2="12" class="globe-equator" />
+                <path d="M12 2L12 22" class="globe-axis" />
+              </svg>
+              <span>{{ t('loading.switchLang') }}</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <router-outlet></router-outlet>

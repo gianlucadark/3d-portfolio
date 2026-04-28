@@ -1,0 +1,511 @@
+// ========================================
+// VARIABILI — Brand Identity v1.0
+// ========================================
+$lux:           #4AADDC;
+$violet:        #B07EFF;
+$lux-border: rgba(74, 173, 220, 0.40);
+$transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
+
+@mixin flex-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+@mixin glass-effect($bg-opacity: 0.1) {
+    background: rgba(255, 255, 255, $bg-opacity);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+// ========================================
+// LOADING SCREEN
+// ========================================
+.loading-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    background: #000;
+    @include flex-center;
+    flex-direction: column;
+    overflow: hidden;
+    transition: opacity 0.8s $transition-smooth, visibility 0.8s;
+    opacity: 1;
+    visibility: visible;
+    contain: layout style;
+    will-change: opacity;
+
+    &.ending {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+    }
+}
+
+.loading-language-toggle {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 10010;
+}
+
+.control-toggle {
+    width: 48px;
+    height: 48px;
+    @include glass-effect;
+    border-radius: 50%;
+    color: white;
+    cursor: pointer;
+    @include flex-center;
+    transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+
+    &:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: scale(1.1);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    svg { filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.5)); }
+}
+
+.language-toggle { position: relative; overflow: hidden; }
+
+.flag-svg {
+    width: 28px;
+    height: 20px;
+    border-radius: 3px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.language-text {
+    position: absolute;
+    font-size: 10px;
+    font-weight: 700;
+    bottom: 4px;
+    right: 6px;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 2px 4px;
+    border-radius: 3px;
+    text-shadow: 0 0 2px rgba(0, 0, 0, 0.8);
+}
+
+// ========================================
+// CRT EFFECT
+// ========================================
+.crt-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 10005;
+    pointer-events: none;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%,
+            rgba(0, 0, 0, 0.1) 50%), linear-gradient(90deg,
+            rgba(255, 0, 0, 0.03),
+            rgba(0, 255, 0, 0.01),
+            rgba(0, 0, 255, 0.03));
+    background-size: 100% 3px, 3px 100%;
+
+    &::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle, transparent 50%, rgba(0, 0, 0, 0.4) 100%);
+        pointer-events: none;
+    }
+
+    animation: crtFlicker 0.15s infinite;
+}
+
+// ========================================
+// XP BOOT SCREEN
+// ========================================
+.xp-boot-screen {
+    position: fixed;
+    inset: 0;
+    background: #000;
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    animation: xpBootFadeIn 0.5s ease-out;
+}
+
+.xp-boot-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+}
+
+.xp-boot-logo {
+    width: 200px;
+    height: auto;
+    margin-bottom: 20px;
+    filter: drop-shadow(0 0 30px rgba(255, 255, 255, 0.15));
+}
+
+.xp-boot-title {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    margin: 0 0 30px 0;
+}
+
+.xp-boot-name {
+    font-family: var(--font-legacy);
+    font-size: 24px;
+    font-weight: normal;
+    color: #ffffff;
+    letter-spacing: 8px;
+    text-transform: uppercase;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+.xp-boot-portfolio {
+    font-family: var(--font-legacy);
+    font-size: 42px;
+    font-weight: bold;
+    color: #ffffff;
+    letter-spacing: 3px;
+    text-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+    margin-top: -4px;
+
+    .xp-boot-highlight {
+        font-weight: normal;
+        color: rgba(255, 255, 255, 0.7);
+    }
+}
+
+.xp-boot-loader { margin-top: 10px; }
+
+.xp-boot-loader-track {
+    width: 220px;
+    height: 22px;
+    background: transparent;
+    border: 2px solid rgba(255, 255, 255, 0.6);
+    border-radius: 3px;
+    padding: 2px;
+    position: relative;
+    overflow: hidden;
+}
+
+.xp-boot-loader-blocks {
+    display: flex;
+    gap: 5px;
+    position: absolute;
+    left: -80px;
+    top: 0;
+    height: 100%;
+    animation: xpBootBlockSlide 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    will-change: transform;
+}
+
+.xp-boot-block {
+    width: 18px;
+    height: 100%;
+    border-radius: 3px;
+    background: linear-gradient(to bottom, #7cb5f5 0%, #3a7bd5 40%, #2a5fb0 100%);
+    box-shadow: 0 0 8px rgba(59, 130, 246, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.xp-boot-copyright {
+    position: absolute;
+    bottom: 40px;
+    color: rgba(255, 255, 255, 0.65);
+    font-family: var(--font-legacy);
+    font-size: 11px;
+    letter-spacing: 0.5px;
+}
+
+// ========================================
+// XP WELCOME SCREEN — LCP h1 lives here
+// ========================================
+.xp-welcome-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 10001;
+    background: linear-gradient(to bottom, #0031a5 0%, #5a7edc 15%, #5a7edc 85%, #0031a5 100%);
+    @include flex-center;
+    flex-direction: column;
+    overflow: hidden;
+
+    &::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: rgba(255, 255, 255, 0.3);
+        box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+    }
+}
+
+.welcome-container {
+    display: flex;
+    width: 100%;
+    max-width: 1000px;
+    height: 100%;
+    align-items: center;
+    position: relative;
+    z-index: 2;
+}
+
+.welcome-left {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    padding-right: 60px;
+    border-right: 2px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 2px 0 0 rgba(0, 0, 0, 0.1);
+}
+
+.welcome-presentation {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    text-align: right;
+    color: #fff;
+    width: 100%;
+}
+
+.welcome-right {
+    flex: 1;
+    padding-left: 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.welcome-login-area {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+}
+
+.welcome-title {
+    font-family: var(--font-legacy);
+    font-size: 38px;
+    font-weight: normal;
+    line-height: 1.2;
+    margin-bottom: 5px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.welcome-portfolio-title {
+    font-family: var(--font-legacy);
+    font-size: 16px;
+    font-weight: normal;
+    opacity: 0.8;
+    margin-top: 5px;
+}
+
+.welcome-separator {
+    width: 150px;
+    height: 2px;
+    background: linear-gradient(to left, #fff, transparent);
+    margin: 15px 0;
+    opacity: 0.5;
+}
+
+.welcome-status {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    margin-top: 10px;
+
+    .status-text {
+        font-family: var(--font-legacy);
+        font-size: 14px;
+        margin-bottom: 10px;
+        opacity: 0.9;
+    }
+}
+
+.xp-progress-container {
+    width: 200px;
+    height: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    padding: 2px;
+    position: relative;
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 2px;
+}
+
+.xp-progress-blocks {
+    display: flex;
+    gap: 3px;
+    height: 100%;
+    position: absolute;
+    left: -90px;
+    animation: xpProgressMove 1.8s infinite linear;
+    will-change: transform;
+}
+
+.xp-block {
+    width: 10px;
+    height: 100%;
+    border-radius: 1px;
+    flex-shrink: 0;
+
+    &.block-1 { background: linear-gradient(to bottom, #6fa8ff, #2d5fe0); }
+    &.block-2 { background: linear-gradient(to bottom, #a8c8ff, #5a90ff); }
+    &.block-3 { background: linear-gradient(to bottom, #6fa8ff, #2d5fe0); }
+    &.block-4 { background: linear-gradient(to bottom, #a8c8ff, #5a90ff); }
+    &.block-5 { background: linear-gradient(to bottom, #6fa8ff, #2d5fe0); }
+    &.block-6 { background: linear-gradient(to bottom, #a8c8ff, #5a90ff); }
+    &.block-7 { background: linear-gradient(to bottom, #6fa8ff, #2d5fe0); }
+}
+
+.xp-login-button {
+    margin-top: 30px;
+    background: none;
+    border: none;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.2s;
+    border-radius: 8px;
+    text-align: left;
+
+    &:hover {
+        background: rgba(255, 255, 255, 0.1);
+        transform: translateX(5px);
+        .user-avatar { border-color: #fff; transform: scale(1.05); }
+    }
+
+    .login-icon { margin-right: 15px; }
+
+    .user-avatar {
+        width: 50px;
+        height: 50px;
+        border: 2px solid rgba(255, 255, 255, 0.5);
+        border-radius: 4px;
+        background: #fff;
+        transition: border-color 0.2s, transform 0.2s;
+    }
+
+    .login-text { display: flex; flex-direction: column; }
+
+    .user-name {
+        font-family: var(--font-legacy);
+        font-size: 20px;
+        font-weight: bold;
+        color: #fff;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    }
+
+    .login-action {
+        font-family: var(--font-legacy);
+        font-size: 14px;
+        color: rgba(255, 255, 255, 0.92);
+    }
+}
+
+.welcome-controls { display: flex; padding-left: 10px; }
+
+.welcome-lang-toggle {
+    background: none;
+    border: none;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    color: #fff;
+    font-family: var(--font-legacy);
+    font-size: 14px;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+
+    &:hover { opacity: 1; text-decoration: underline; }
+
+    .control-icon-svg {
+        width: 32px;
+        height: 32px;
+        margin-right: 12px;
+        filter: drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.5));
+
+        .globe-outline  { fill: none; stroke: #fff; stroke-width: 1.5; opacity: 0.8; }
+        .globe-meridian { fill: none; stroke: #fff; stroke-width: 1.2; opacity: 0.6; }
+        .globe-equator,
+        .globe-axis     { stroke: #fff; stroke-width: 1; opacity: 0.6; }
+    }
+}
+
+// ========================================
+// KEYFRAMES
+// ========================================
+@keyframes crtFlicker {
+    0%   { opacity: 0.97; }
+    100% { opacity: 1; }
+}
+
+@keyframes xpBootFadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+@keyframes xpBootBlockSlide {
+    0%   { transform: translateX(0); }
+    100% { transform: translateX(300px); }
+}
+
+@keyframes xpProgressMove {
+    0%   { transform: translateX(0); }
+    100% { transform: translateX(290px); }
+}
+
+// ========================================
+// RESPONSIVE
+// ========================================
+@media (max-width: 768px) {
+    .xp-boot-logo      { width: 140px; }
+    .xp-boot-name      { font-size: 18px; letter-spacing: 5px; }
+    .xp-boot-portfolio { font-size: 30px; }
+    .xp-boot-copyright { bottom: 24px; font-size: 10px; }
+
+    .welcome-container {
+        flex-direction: column;
+        justify-content: center;
+        max-width: 100%;
+        padding: 40px 20px;
+    }
+
+    .welcome-left {
+        align-items: center;
+        padding-right: 0;
+        border-right: none;
+        box-shadow: none;
+        border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        padding-bottom: 40px;
+        width: 100%;
+    }
+
+    .welcome-presentation { align-items: center; text-align: center; }
+    .welcome-title        { font-size: 32px; }
+    .welcome-portfolio-title { font-size: 14px; max-width: 250px; }
+    .welcome-separator    { width: 80%; background: linear-gradient(to right, transparent, #fff, transparent); }
+    .welcome-status       { align-items: center; }
+
+    .welcome-right {
+        padding-left: 0;
+        padding-top: 40px;
+        width: 100%;
+        align-items: center;
+    }
+
+    .welcome-login-area { gap: 20px; align-items: center; }
+    .xp-login-button    { margin-top: 0; &:hover { transform: scale(1.02); } }
+    .welcome-controls   { padding-left: 0; }
+}
+
+@media (max-width: 480px) {
+    .welcome-title { font-size: 28px; }
+    .user-avatar   { width: 40px; height: 40px; }
+    .user-name     { font-size: 16px; }
+}

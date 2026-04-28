@@ -1,31 +1,17 @@
 // ========================================
 // VARIABILI — Brand Identity v1.0
 // ========================================
+$cosmos:        #080D14;
+$lux:           #4AADDC;
+$violet:        #B07EFF;
+$bg-card:       #0C1420;
 
-// -- Legacy palette (XP boot/welcome) --
-$ice-blue:       #ADD8E6;
-$ice-blue-light: #87CEEB;
-$ice-blue-dark:  #00CED1;
+$aurora-2: #8B7EFF;
 
-// -- Brand palette (3D room & modali) — da brand guide --
-$cosmos:        #080D14;   // base dark background
-$lux:           #4AADDC;   // primario — celeste  ← COLORE LUX CORRETTO
-$violet:        #B07EFF;   // accento — viola
-$dawn:          #D4EEF7;   // badge, accenti light
-$bg-card:       #0C1420;   // superfici card dark
-$border-subtle: rgba(255, 255, 255, 0.06); // bordi card dark (brand guide)
-
-// Aurora gradient: Lux → mid → Violet
-$aurora-1: $lux;           // #4AADDC
-$aurora-2: #8B7EFF;        // mid violet
-$aurora-3: $violet;        // #B07EFF
-
-// Lux tinted per bordi 0.5px (btn-ghost style per brand guide)
 $lux-border: rgba(74, 173, 220, 0.40);
 $lux-glow:   rgba(74, 173, 220, 0.12);
 
-// -- Shared --
-$backdrop-blur:    blur(24px);
+$backdrop-blur:     blur(24px);
 $transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
 
 // ========================================
@@ -44,12 +30,11 @@ $transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
     border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-// Glassmorphism brand — bg-card + bordo Lux 0.5px (btn-ghost pattern)
 @mixin lux-glass {
-    background: rgba(12, 20, 32, 0.96);         // ~bg-card con alfa
+    background: rgba(12, 20, 32, 0.96);
     backdrop-filter: $backdrop-blur saturate(180%);
     -webkit-backdrop-filter: $backdrop-blur saturate(180%);
-    border: 0.5px solid $lux-border;             // border LUX 0.5px
+    border: 0.5px solid $lux-border;
     box-shadow:
         0 0 0 0.5px rgba($lux, 0.08),
         0 24px 64px rgba(0, 0, 0, 0.65),
@@ -57,52 +42,11 @@ $transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
         inset 0 1px 0 rgba($lux, 0.06);
 }
 
-// Aurora gradient text — titoli modali brand
 @mixin aurora-text {
-    background: linear-gradient(135deg, $aurora-1 0%, $aurora-2 50%, $aurora-3 100%);
+    background: linear-gradient(135deg, $lux 0%, $aurora-2 50%, $violet 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-}
-
-@mixin gradient-text {
-    @include aurora-text;
-}
-
-// btn-primary brand: gradient LUX → VIOLET · r-full
-@mixin btn-primary {
-    background: linear-gradient(90deg, $lux 0%, $violet 100%);
-    border: none;
-    border-radius: var(--r-full);
-    color: #fff;
-    font-family: var(--font-sans);
-    font-weight: 600;
-    cursor: pointer;
-    transition: filter 0.2s ease, transform 0.2s ease;
-
-    &:hover {
-        filter: brightness(1.1);
-        transform: translateY(-1px);
-    }
-
-    &:active { transform: translateY(0); }
-}
-
-// btn-ghost brand: border LUX 0.5px · transparent
-@mixin btn-ghost {
-    background: transparent;
-    border: 0.5px solid $lux-border;
-    border-radius: var(--r-full);
-    color: $lux;
-    font-family: var(--font-sans);
-    font-weight: 500;
-    cursor: pointer;
-    transition: background 0.2s ease, border-color 0.2s ease;
-
-    &:hover {
-        background: rgba($lux, 0.08);
-        border-color: rgba($lux, 0.7);
-    }
 }
 
 @mixin glow-shadow($color: $lux, $intensity: 0.25) {
@@ -122,479 +66,6 @@ $transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
     inset: 0;
     z-index: 1;
     contain: strict;
-}
-
-.loading-screen {
-    position: fixed;
-    inset: 0;
-    z-index: 10000;
-    background: #000;
-    @include flex-center;
-    flex-direction: column;
-    overflow: hidden;
-    transition: opacity 0.8s $transition-smooth, visibility 0.8s;
-    opacity: 1;
-    visibility: visible;
-    contain: layout style;
-    will-change: opacity;
-
-    &.ending {
-        opacity: 0;
-        visibility: hidden;
-        pointer-events: none;
-    }
-}
-
-// ========================================
-// ICONIC XP BOOT EXPERIENCE
-// ========================================
-
-// CRT Effect Overlay
-.crt-overlay {
-    position: fixed;
-    inset: 0;
-    z-index: 10005;
-    pointer-events: none;
-    background: linear-gradient(rgba(18, 16, 16, 0) 50%,
-            rgba(0, 0, 0, 0.1) 50%), linear-gradient(90deg,
-            rgba(255, 0, 0, 0.03),
-            rgba(0, 255, 0, 0.01),
-            rgba(0, 0, 255, 0.03));
-    background-size: 100% 3px, 3px 100%;
-
-    &::after {
-        content: "";
-        position: absolute;
-        inset: 0;
-        background: radial-gradient(circle, transparent 50%, rgba(0, 0, 0, 0.4) 100%);
-        pointer-events: none;
-    }
-
-    animation: crtFlicker 0.15s infinite;
-}
-
-// Windows XP Boot Screen
-.xp-boot-screen {
-    position: fixed;
-    inset: 0;
-    background: #000;
-    z-index: 10000;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    animation: xpBootFadeIn 0.5s ease-out;
-}
-
-.xp-boot-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0;
-}
-
-.xp-boot-logo {
-    width: 200px;
-    height: auto;
-    margin-bottom: 20px;
-    filter: drop-shadow(0 0 30px rgba(255, 255, 255, 0.15));
-}
-
-.xp-boot-title {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0;
-    margin: 0 0 30px 0;
-}
-
-.xp-boot-name {
-    font-family: var(--font-legacy);
-    font-size: 24px;
-    font-weight: normal;
-    color: #ffffff;
-    letter-spacing: 8px;
-    text-transform: uppercase;
-    text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
-}
-
-.xp-boot-portfolio {
-    font-family: var(--font-legacy);
-    font-size: 42px;
-    font-weight: bold;
-    color: #ffffff;
-    letter-spacing: 3px;
-    text-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
-    margin-top: -4px;
-
-    .xp-boot-highlight {
-        font-weight: normal;
-        color: rgba(255, 255, 255, 0.7);
-    }
-}
-
-// Iconic XP 3-block loading animation
-.xp-boot-loader {
-    margin-top: 10px;
-}
-
-.xp-boot-loader-track {
-    width: 220px;
-    height: 22px;
-    background: transparent;
-    border: 2px solid rgba(255, 255, 255, 0.6);
-    border-radius: 3px;
-    padding: 2px;
-    position: relative;
-    overflow: hidden;
-}
-
-.xp-boot-loader-blocks {
-    display: flex;
-    gap: 5px;
-    position: absolute;
-    left: -80px;
-    top: 0;
-    height: 100%;
-    animation: xpBootBlockSlide 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-    will-change: transform;
-}
-
-.xp-boot-block {
-    width: 18px;
-    height: 100%;
-    border-radius: 3px;
-    background: linear-gradient(to bottom, #7cb5f5 0%, #3a7bd5 40%, #2a5fb0 100%);
-    box-shadow: 0 0 8px rgba(59, 130, 246, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3);
-}
-
-.xp-boot-copyright {
-    position: absolute;
-    bottom: 40px;
-    color: rgba(255, 255, 255, 0.65);  /* WCAG AA: contrasto sufficiente su sfondo nero */
-    font-family: var(--font-legacy);
-    font-size: 11px;
-    letter-spacing: 0.5px;
-}
-
-// XP Boot Animations
-@keyframes xpBootFadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
-@keyframes xpBootBlockSlide {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(300px); }
-}
-
-// XP Welcome Screen
-.xp-welcome-screen {
-    position: fixed;
-    inset: 0;
-    z-index: 10001;
-    background: #5a7edc; // Base XP Blue
-    background: linear-gradient(to bottom,
-            #0031a5 0%,
-            #5a7edc 15%,
-            #5a7edc 85%,
-            #0031a5 100%);
-    @include flex-center;
-    flex-direction: column;
-    overflow: hidden;
-
-    &::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 1px;
-        background: rgba(255, 255, 255, 0.3);
-        box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
-    }
-}
-
-.welcome-container {
-    display: flex;
-    width: 100%;
-    max-width: 1000px;
-    height: 100%;
-    align-items: center;
-    position: relative;
-    z-index: 2;
-}
-
-.welcome-left {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    padding-right: 60px;
-    border-right: 2px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 2px 0 0 rgba(0, 0, 0, 0.1);
-}
-
-.welcome-header {
-    margin-bottom: 30px;
-
-    .welcome-logo {
-        width: 180px;
-        height: auto;
-        opacity: 0.9;
-        filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.3));
-    }
-}
-
-.welcome-presentation {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    text-align: right;
-    color: #fff;
-    width: 100%;
-}
-
-.welcome-right {
-    flex: 1;
-    padding-left: 60px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-}
-
-.welcome-login-area {
-    display: flex;
-    flex-direction: column;
-    gap: 40px;
-}
-
-.welcome-title {
-    font-family: var(--font-legacy);
-    font-size: 38px;
-    font-weight: normal;
-    line-height: 1.2;
-    margin-bottom: 5px;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-}
-
-.welcome-portfolio-title {
-    font-family: var(--font-legacy);
-    font-size: 16px;
-    font-weight: normal;
-    opacity: 0.8;
-    margin-top: 5px;
-}
-
-.welcome-separator {
-    width: 150px;
-    height: 2px;
-    background: linear-gradient(to left, #fff, transparent);
-    margin: 15px 0;
-    opacity: 0.5;
-}
-
-.welcome-status {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    margin-top: 10px;
-
-    .status-text {
-        font-family: var(--font-legacy);
-        font-size: 14px;
-        margin-bottom: 10px;
-        opacity: 0.9;
-    }
-}
-
-// Custom Progress Bar for Welcome Screen
-.xp-progress-container {
-    width: 200px;
-    height: 14px;
-    border: 1px solid rgba(255,255,255,0.7);
-    padding: 2px;
-    position: relative;
-    overflow: hidden;
-    background: rgba(0, 0, 0, 0.3);
-    border-radius: 2px;
-}
-
-.xp-progress-blocks {
-    display: flex;
-    gap: 3px;
-    height: 100%;
-    position: absolute;
-    left: -90px;
-    animation: xpProgressMove 1.8s infinite linear;
-    will-change: transform;
-}
-
-.xp-block {
-    width: 10px;
-    height: 100%;
-    border-radius: 1px;
-    flex-shrink: 0;
-
-    &.block-1 { background: linear-gradient(to bottom, #6fa8ff, #2d5fe0); }
-    &.block-2 { background: linear-gradient(to bottom, #a8c8ff, #5a90ff); }
-    &.block-3 { background: linear-gradient(to bottom, #6fa8ff, #2d5fe0); }
-    &.block-4 { background: linear-gradient(to bottom, #a8c8ff, #5a90ff); }
-    &.block-5 { background: linear-gradient(to bottom, #6fa8ff, #2d5fe0); }
-    &.block-6 { background: linear-gradient(to bottom, #a8c8ff, #5a90ff); }
-    &.block-7 { background: linear-gradient(to bottom, #6fa8ff, #2d5fe0); }
-}
-
-// XP Login Style Button
-.xp-login-button {
-    margin-top: 30px;
-    background: none;
-    border: none;
-    padding: 10px;
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    transition: background-color 0.2s, transform 0.2s;
-    border-radius: 8px;
-    text-align: left;
-
-    &:hover {
-        background: rgba(255, 255, 255, 0.1);
-        transform: translateX(5px);
-
-        .user-avatar {
-            border-color: #fff;
-            transform: scale(1.05);
-        }
-    }
-
-    .login-icon {
-        margin-right: 15px;
-    }
-
-    .user-avatar {
-        width: 50px;
-        height: 50px;
-        border: 2px solid rgba(255, 255, 255, 0.5);
-        border-radius: 4px;
-        background: #fff;
-        transition: border-color 0.2s, transform 0.2s;
-    }
-
-    .login-text {
-        display: flex;
-        flex-direction: column;
-    }
-
-    .user-name {
-        font-family: var(--font-legacy);
-        font-size: 20px;
-        font-weight: bold;
-        color: #fff;
-        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
-    }
-
-    .login-action {
-        font-family: var(--font-legacy);
-        font-size: 14px;
-        color: rgba(255, 255, 255, 0.92);  /* WCAG AA fix: contrasto >4.5:1 su sfondo hover */
-    }
-}
-
-// XP Welcome Controls
-.welcome-controls {
-    display: flex;
-    padding-left: 10px;
-}
-
-.welcome-lang-toggle {
-    background: none;
-    border: none;
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    color: #fff;
-    font-family: var(--font-legacy);
-    font-size: 14px;
-    opacity: 0.8;
-    transition: opacity 0.2s;
-
-    &:hover {
-        opacity: 1;
-        text-decoration: underline;
-    }
-
-    .control-icon-svg {
-        width: 32px;
-        height: 32px;
-        margin-right: 12px;
-        filter: drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.5));
-
-        .globe-outline {
-            fill: none;
-            stroke: #fff;
-            stroke-width: 1.5;
-            opacity: 0.8;
-        }
-
-        .globe-meridian {
-            fill: none;
-            stroke: #fff;
-            stroke-width: 1.2;
-            opacity: 0.6;
-        }
-
-        .globe-equator,
-        .globe-axis {
-            stroke: #fff;
-            stroke-width: 1;
-            opacity: 0.6;
-        }
-    }
-}
-
-// Animations
-@keyframes crtFlicker {
-    0% {
-        opacity: 0.97;
-    }
-
-    100% {
-        opacity: 1;
-    }
-}
-
-
-
-@keyframes xpProgressMove {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(290px); }
-}
-
-.enter-text {
-    position: relative;
-    z-index: 1;
-}
-
-.enter-arrow {
-    position: relative;
-    z-index: 1;
-    transition: transform 0.3s ease;
-    filter: drop-shadow(0 0 4px rgba($lux, 0.5));
-}
-
-/* duplicate removed */
-
-@keyframes enterButtonAppear {
-    0% {
-        opacity: 0;
-        transform: translateY(20px) scale(0.9);
-    }
-
-    100% {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
 }
 
 // ========================================
@@ -626,15 +97,10 @@ $transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
         box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
     }
 
-    svg {
-        filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.5));
-    }
+    svg { filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.5)); }
 }
 
-.language-toggle {
-    position: relative;
-    overflow: hidden;
-}
+.language-toggle { position: relative; overflow: hidden; }
 
 .flag-icon {
     font-size: 24px;
@@ -703,9 +169,7 @@ $transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
     &::before {
         content: '';
         position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
+        top: 0; left: 0; right: 0;
         height: 1px;
         background: linear-gradient(90deg, transparent, $lux, $aurora-2, $violet, transparent);
         animation: headerGlow 3s ease-in-out infinite;
@@ -723,7 +187,6 @@ $transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
     filter: drop-shadow(0 0 24px rgba($lux, 0.35));
 }
 
-// btn-ghost pattern (brand guide: border LUX 0.5px · transparent)
 .pdf-modal-close {
     @include flex-center;
     width: 44px;
@@ -734,7 +197,8 @@ $transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
     border-radius: var(--r-md);
     color: $lux;
     cursor: pointer;
-    transition: background-color 0.25s $transition-smooth, border-color 0.25s $transition-smooth, transform 0.25s $transition-smooth, box-shadow 0.25s $transition-smooth;
+    transition: background-color 0.25s $transition-smooth, border-color 0.25s $transition-smooth,
+                transform 0.25s $transition-smooth, box-shadow 0.25s $transition-smooth;
     position: relative;
     overflow: hidden;
 
@@ -744,16 +208,8 @@ $transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
         @include glow-shadow;
         transform: scale(1.05);
     }
-
-    &:active {
-        transform: scale(0.95);
-    }
-
-    svg {
-        position: relative;
-        z-index: 1;
-        filter: drop-shadow(0 0 4px rgba($lux, 0.4));
-    }
+    &:active { transform: scale(0.95); }
+    svg { position: relative; z-index: 1; filter: drop-shadow(0 0 4px rgba($lux, 0.4)); }
 }
 
 .pdf-modal-body {
@@ -763,8 +219,7 @@ $transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
     background: linear-gradient(180deg, rgba($cosmos, 0.5) 0%, rgba(12, 20, 34, 0.3) 100%);
     position: relative;
 
-    &::before,
-    &::after {
+    &::before, &::after {
         content: '';
         position: absolute;
         width: 100px;
@@ -772,20 +227,8 @@ $transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
         border: 0.5px solid $lux;
         pointer-events: none;
     }
-
-    &::before {
-        top: 0;
-        left: 0;
-        border-right: none;
-        border-bottom: none;
-    }
-
-    &::after {
-        bottom: 0;
-        right: 0;
-        border-left: none;
-        border-top: none;
-    }
+    &::before { top: 0; left: 0; border-right: none; border-bottom: none; }
+    &::after  { bottom: 0; right: 0; border-left: none; border-top: none; }
 }
 
 .pdf-viewer {
@@ -801,185 +244,34 @@ $transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
 // ANIMATIONS
 // ========================================
 @keyframes fadeIn {
-    from {
-        opacity: 0;
-        backdrop-filter: blur(0);
-    }
-
-    to {
-        opacity: 1;
-        backdrop-filter: $backdrop-blur;
-    }
+    from { opacity: 0; backdrop-filter: blur(0); }
+    to   { opacity: 1; backdrop-filter: $backdrop-blur; }
 }
 
 @keyframes modalSlideIn {
-    from {
-        opacity: 0;
-        transform: scale(0.95) translateY(-20px);
-        filter: blur(10px);
-    }
-
-    to {
-        opacity: 1;
-        transform: scale(1) translateY(0);
-        filter: blur(0);
-    }
+    from { opacity: 0; transform: scale(0.95) translateY(-20px); filter: blur(10px); }
+    to   { opacity: 1; transform: scale(1) translateY(0);        filter: blur(0); }
 }
 
 @keyframes headerGlow {
-
-    0%,
-    100% {
-        opacity: 0.3;
-    }
-
-    50% {
-        opacity: 1;
-    }
+    0%, 100% { opacity: 0.3; }
+    50%       { opacity: 1; }
 }
 
 // ========================================
-// RESPONSIVE
+// RESPONSIVE — modal overrides only
 // ========================================
 @media (max-width: 768px) {
-    .xp-boot-logo {
-        width: 140px;
-    }
-
-    .xp-boot-name {
-        font-size: 18px;
-        letter-spacing: 5px;
-    }
-
-    .xp-boot-portfolio {
-        font-size: 30px;
-    }
-
-    .xp-boot-copyright {
-        bottom: 24px;
-        font-size: 10px;
-    }
-
-    .welcome-container {
-        flex-direction: column;
-        justify-content: center;
-        max-width: 100%;
-        padding: 40px 20px;
-    }
-
-    .welcome-left {
-        align-items: center;
-        padding-right: 0;
-        border-right: none;
-        box-shadow: none;
-        border-bottom: 2px solid rgba(255, 255, 255, 0.1);
-        padding-bottom: 40px;
-        width: 100%;
-    }
-
-    .welcome-presentation {
-        align-items: center;
-        text-align: center;
-    }
-
-    .welcome-title {
-        font-size: 32px;
-    }
-
-    .welcome-portfolio-title {
-        font-size: 14px;
-        max-width: 250px;
-    }
-
-    .welcome-separator {
-        width: 80%;
-        background: linear-gradient(to right, transparent, #fff, transparent);
-    }
-
-    .welcome-status {
-        align-items: center;
-    }
-
-    .welcome-right {
-        padding-left: 0;
-        padding-top: 40px;
-        width: 100%;
-        align-items: center;
-    }
-
-    .welcome-login-area {
-        gap: 20px;
-        align-items: center;
-    }
-
-    .xp-login-button {
-        margin-top: 0;
-
-        &:hover {
-            transform: scale(1.02);
-        }
-    }
-
-    .welcome-controls {
-        padding-left: 0;
-    }
-
-    .pdf-modal-container {
-        width: 95%;
-        height: 95vh;
-        border-radius: 16px;
-    }
-
-    .pdf-modal-header {
-        padding: 20px 24px;
-    }
-
-    .pdf-modal-title {
-        font-size: 20px;
-    }
-
-    .pdf-modal-close {
-        width: 44px;
-        height: 44px;
-    }
+    .pdf-modal-container { width: 95%; height: 95vh; border-radius: 16px; }
+    .pdf-modal-header    { padding: 20px 24px; }
+    .pdf-modal-title     { font-size: 20px; }
 }
 
 @media (max-width: 480px) {
-    .pdf-modal-container {
-        width: 100%;
-        height: 100vh;
-        border-radius: 0;
-    }
-
-    .pdf-modal-overlay {
-        padding: 0;
-    }
-
-    .pdf-modal-title {
-        font-size: 18px;
-    }
-
-    .pdf-modal-header {
-        padding: 16px 20px;
-    }
-
-    .welcome-title {
-        font-size: 28px;
-    }
-
-    .welcome-header .welcome-logo {
-        width: 140px;
-    }
-
-    .user-avatar {
-        width: 40px;
-        height: 40px;
-    }
-
-    .user-name {
-        font-size: 16px;
-    }
-
+    .pdf-modal-overlay   { padding: 0; }
+    .pdf-modal-container { width: 100%; height: 100vh; border-radius: 0; }
+    .pdf-modal-title     { font-size: 18px; }
+    .pdf-modal-header    { padding: 16px 20px; }
 }
 
 // ========================================
@@ -997,9 +289,7 @@ $transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
     animation: fadeIn 0.3s $transition-smooth;
     contain: layout style;
 
-    @media (max-width: 480px) {
-        padding: 0;
-    }
+    @media (max-width: 480px) { padding: 0; }
 }
 
 .cat-modal-container {
@@ -1034,24 +324,16 @@ $transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
     &::before {
         content: '';
         position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
+        top: 0; left: 0; right: 0;
         height: 1px;
         background: linear-gradient(90deg, transparent, $lux, $aurora-2, $violet, transparent);
         animation: headerGlow 3s ease-in-out infinite;
     }
 
-    @media (max-width: 480px) {
-        padding: 16px 20px;
-    }
+    @media (max-width: 480px) { padding: 16px 20px; }
 }
 
-.cat-title-group {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
+.cat-title-group { display: flex; align-items: center; gap: 12px; }
 
 .cat-emoji {
     font-size: 24px;
@@ -1067,9 +349,7 @@ $transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
     @include aurora-text;
     filter: drop-shadow(0 0 16px rgba($lux, 0.35));
 
-    @media (max-width: 480px) {
-        font-size: 20px;
-    }
+    @media (max-width: 480px) { font-size: 20px; }
 }
 
 .cat-modal-body {
@@ -1078,22 +358,11 @@ $transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
     gap: 40px;
     padding: 40px;
 
-    @media (max-width: 768px) {
-        grid-template-columns: 1fr;
-        padding: 30px;
-        gap: 24px;
-    }
-
-    @media (max-width: 480px) {
-        padding: 20px;
-        gap: 20px;
-    }
+    @media (max-width: 768px) { grid-template-columns: 1fr; padding: 30px; gap: 24px; }
+    @media (max-width: 480px) { padding: 20px; gap: 20px; }
 }
 
-.cat-image-container {
-    position: relative;
-    width: 100%;
-}
+.cat-image-container { position: relative; width: 100%; }
 
 .cat-image-wrapper {
     width: 100%;
@@ -1107,22 +376,13 @@ $transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
         width: 100%;
         height: 100%;
         object-fit: cover;
-        object-position: center 10%; // Show more of the top (the head)
+        object-position: center 10%;
         transition: transform 0.5s ease;
-
-        &:hover {
-            transform: scale(1.05);
-        }
+        &:hover { transform: scale(1.05); }
     }
 
-    @media (max-width: 768px) {
-        max-height: 400px;
-    }
-
-    @media (max-width: 480px) {
-        max-height: 300px;
-        aspect-ratio: 16 / 9; // Wider on small mobile to take less vertical space
-    }
+    @media (max-width: 768px) { max-height: 400px; }
+    @media (max-width: 480px) { max-height: 300px; aspect-ratio: 16 / 9; }
 }
 
 .cat-badge {
@@ -1140,11 +400,7 @@ $transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
     z-index: 2;
 }
 
-.cat-content {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
+.cat-content { display: flex; flex-direction: column; gap: 20px; }
 
 .cat-intro {
     font-size: 24px;
@@ -1155,9 +411,7 @@ $transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
     line-height: 1.3;
     margin: 0;
 
-    @media (max-width: 480px) {
-        font-size: 20px;
-    }
+    @media (max-width: 480px) { font-size: 20px; }
 }
 
 .cat-description-box {
@@ -1174,14 +428,8 @@ $transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
         font-weight: 400;
         margin-bottom: 16px;
 
-        @media (max-width: 480px) {
-            font-size: 14px;
-            margin-bottom: 12px;
-        }
-
-        &:last-child {
-            margin-bottom: 0;
-        }
+        @media (max-width: 480px) { font-size: 14px; margin-bottom: 12px; }
+        &:last-child { margin-bottom: 0; }
     }
 }
 
@@ -1193,34 +441,7 @@ $transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
     margin-top: 15px;
 }
 
-.cat-close-btn {
-    margin-top: auto;
-    background: linear-gradient(90deg, #ffb6c1 0%, #ff69b4 100%);
-    border: none;
-    padding: 14px 24px;
-    border-radius: var(--r-full);   // brand guide: btn → r-full
-    color: #fff;
-    font-family: var(--font-sans);
-    font-weight: 600;
-    font-size: 15px;
-    cursor: pointer;
-    transition: filter 0.2s ease, transform 0.2s ease;
-
-    &:hover {
-        transform: translateY(-2px);
-        filter: brightness(1.1);
-        box-shadow: 0 8px 20px rgba(255, 105, 180, 0.35);
-    }
-
-    &:active {
-        transform: translateY(0);
-    }
-}
-
 .mobile-only {
     display: none;
-
-    @media (max-width: 768px) {
-        display: block;
-    }
+    @media (max-width: 768px) { display: block; }
 }
