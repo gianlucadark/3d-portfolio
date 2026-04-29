@@ -6,7 +6,10 @@ import {
   Output,
   EventEmitter,
   ChangeDetectionStrategy,
-  ChangeDetectorRef
+  ChangeDetectorRef,
+  ElementRef,
+  ViewChild,
+  Renderer2
 } from '@angular/core';
 import { CdkDragEnd } from '@angular/cdk/drag-drop';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
@@ -60,6 +63,7 @@ const DESKTOP_ICONS: Icon[] = [
 })
 export class DesktopComponent implements OnInit, OnDestroy {
   @Output() readonly closeDesktop = new EventEmitter<void>();
+  @ViewChild('selectionRectEl') private selectionRectEl!: ElementRef<HTMLDivElement>;
 
   // Desktop state
   isStartMenuOpen = false;
@@ -82,13 +86,21 @@ export class DesktopComponent implements OnInit, OnDestroy {
   // Touch events
   private lastTouchTime = 0;
 
+  // Selection rect (rubber-band)
+  private isSelecting = false;
+  private selStartX = 0;
+  private selStartY = 0;
+  private unlistenSelMove: (() => void) | null = null;
+  private unlistenSelUp: (() => void) | null = null;
+
   // Cleanup
   private readonly destroy$ = new Subject<void>();
 
   constructor(
     private readonly sanitizer: DomSanitizer,
     private readonly cdr: ChangeDetectorRef,
-    private readonly translationService: TranslationService
+    private readonly translationService: TranslationService,
+    private readonly renderer: Renderer2
   ) {
     this.icons = [...DESKTOP_ICONS];
   }
@@ -148,6 +160,46 @@ export class DesktopComponent implements OnInit, OnDestroy {
     if (this.bsodTimer !== null) {
       clearInterval(this.bsodTimer);
     }
+    this.unlistenSelMove?.();
+    this.unlistenSelUp?.();
+  }
+
+  // ============================================
+  // RUBBER-BAND SELECTION
+  // ============================================
+
+  onDesktopMouseDown(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    if (!target.classList.contains('desktop')) return;
+
+    this.isSelecting = true;
+    this.selStartX = event.clientX;
+    this.selStartY = event.clientY;
+
+    const el = this.selectionRectEl.nativeElement;
+    this.renderer.setStyle(el, 'left', `${event.clientX}px`);
+    this.renderer.setStyle(el, 'top', `${event.clientY}px`);
+    this.renderer.setStyle(el, 'width', '0px');
+    this.renderer.setStyle(el, 'height', '0px');
+    this.renderer.setStyle(el, 'display', 'block');
+
+    this.unlistenSelMove = this.renderer.listen('document', 'mousemove', (e: MouseEvent) => {
+      const x = Math.min(e.clientX, this.selStartX);
+      const y = Math.min(e.clientY, this.selStartY);
+      this.renderer.setStyle(el, 'left', `${x}px`);
+      this.renderer.setStyle(el, 'top', `${y}px`);
+      this.renderer.setStyle(el, 'width', `${Math.abs(e.clientX - this.selStartX)}px`);
+      this.renderer.setStyle(el, 'height', `${Math.abs(e.clientY - this.selStartY)}px`);
+    });
+
+    this.unlistenSelUp = this.renderer.listen('document', 'mouseup', () => {
+      this.isSelecting = false;
+      this.renderer.setStyle(el, 'display', 'none');
+      this.unlistenSelMove?.();
+      this.unlistenSelUp?.();
+      this.unlistenSelMove = null;
+      this.unlistenSelUp = null;
+    });
   }
 
   // ============================================

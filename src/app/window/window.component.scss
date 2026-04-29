@@ -930,6 +930,32 @@ $black: #000;
   }
 }
 
+// ========================================
+// MOBILE — touch drag, target size, resize handles
+// ========================================
+.title-bar {
+  // Permette il drag touch senza che il browser intercetti lo scroll
+  touch-action: none;
+}
+
+@media (max-width: 768px) {
+  // Nascondi i resize handles: impossibili da usare su touch
+  .resize-handle,
+  [class*="resize-handle"] {
+    display: none !important;
+  }
+
+  .title-bar {
+    height: 40px; // Più alto per dito → target touch adeguato
+    padding: 4px 8px 4px 12px;
+
+    &-controls button {
+      width: 32px;
+      height: 32px;
+    }
+  }
+}
+
 // Mobile responsive for project pages
 @media (max-width: 600px) {
   .features-grid {

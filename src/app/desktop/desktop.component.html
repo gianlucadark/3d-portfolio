@@ -1,5 +1,5 @@
 <div class="desktop-overlay">
-  <div class="desktop" (click)="selectedIconId = null">
+  <div class="desktop" (click)="selectedIconId = null" (mousedown)="onDesktopMouseDown($event)">
     <!-- Pulsante in alto a destra per tornare alla vista 3D -->
     <div class="desktop-top-actions">
       <button class="see-world-btn" (click)="onClose()" [attr.title]="'desktop.seeWorldTooltip' | translate">
@@ -17,6 +17,8 @@
       <img [src]="icon.image" [alt]="'icons.' + getIconKey(icon.id) | translate">
       <span>{{ 'icons.' + getIconKey(icon.id) | translate }}</span>
     </div>
+
+    <div class="selection-rect" #selectionRectEl></div>
 
     <app-taskbar [openWindows]="openWindows" (startClick)="toggleStartMenu()" (windowClick)="onWindowClick($event)"
       (openWindow)="onOpenWindow($event)">

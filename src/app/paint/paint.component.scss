@@ -27,7 +27,7 @@ $xp-shadow: inset 1px 1px 0 $xp-white, inset -1px -1px 0 $xp-border;
   &:focus-visible {
     border-color: $xp-blue;
     box-shadow: 0 0 5px $xp-blue;
-    outline: none;  // sostituito da border-color highlight (stile XP autentico)
+    outline: none;
   }
 }
 
@@ -38,6 +38,8 @@ $xp-shadow: inset 1px 1px 0 $xp-white, inset -1px -1px 0 $xp-border;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  width: 100%;
+  height: 100%;
 }
 
 // ========================================
@@ -51,12 +53,23 @@ $xp-shadow: inset 1px 1px 0 $xp-white, inset -1px -1px 0 $xp-border;
   padding: 8px 12px;
   margin-bottom: 0;
   font-family: var(--font-legacy);
+  overflow-x: auto;
+  flex-wrap: nowrap;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
 
   button {
     @include xp-button;
     margin-right: 6px;
     padding: 2px 4px;
     border-radius: 2px;
+    flex-shrink: 0;
+    min-width: 36px;
+    min-height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   img {
@@ -77,6 +90,11 @@ $xp-shadow: inset 1px 1px 0 $xp-white, inset -1px -1px 0 $xp-border;
   box-shadow: $xp-shadow;
   padding: 4px 8px;
   margin-bottom: 8px;
+  overflow-x: auto;
+  flex-wrap: nowrap;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
 }
 
 .color-swatch {
@@ -87,6 +105,7 @@ $xp-shadow: inset 1px 1px 0 $xp-white, inset -1px -1px 0 $xp-border;
   cursor: pointer;
   box-shadow: 1px 1px 0 $xp-white, -1px -1px 0 $xp-border;
   transition: border 0.1s;
+  flex-shrink: 0;
 
   &:hover {
     border: 2px solid $xp-blue;
@@ -100,14 +119,23 @@ $xp-shadow: inset 1px 1px 0 $xp-white, inset -1px -1px 0 $xp-border;
 }
 
 // ========================================
-// CANVAS & BUTTON
+// CANVAS
 // ========================================
 canvas {
   border: 2px solid $xp-border;
   background-color: $xp-white;
   box-shadow: $xp-shadow;
+  // Responsive: scala via CSS mantenendo la risoluzione interna 800x600
+  max-width: 100%;
+  height: auto;
+  display: block;
+  // Fondamentale per mobile: blocca scroll/pan durante il disegno
+  touch-action: none;
 }
 
+// ========================================
+// BUTTON
+// ========================================
 .xp-button {
   @include xp-container;
   box-shadow: $xp-shadow, 1px 1px 0 $xp-white, -1px -1px 0 $xp-border;
@@ -117,6 +145,8 @@ canvas {
   color: #000;
   cursor: pointer;
   margin-left: 10px;
+  white-space: nowrap;
+  flex-shrink: 0;
 
   &:active {
     box-shadow: inset -1px -1px 0 $xp-white, inset 1px 1px 0 $xp-border,
@@ -126,5 +156,32 @@ canvas {
   &:focus-visible {
     outline: 2px solid $xp-blue;
     outline-offset: 2px;
+  }
+}
+
+// ========================================
+// MOBILE — target touch 44px, swatches più grandi
+// ========================================
+@media (max-width: 768px) {
+  .toolbar-xp button {
+    min-width: 44px;
+    min-height: 44px;
+    padding: 6px;
+  }
+
+  .toolbar-xp img {
+    width: 26px;
+    height: 26px;
+  }
+
+  .color-swatch {
+    width: 32px;
+    height: 32px;
+    margin-right: 6px;
+  }
+
+  .xp-button {
+    padding: 8px 14px;
+    font-size: 13px;
   }
 }

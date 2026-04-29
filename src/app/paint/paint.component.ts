@@ -1,6 +1,5 @@
 import { Component, ViewChild, ElementRef, AfterViewInit, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 
-/** Strumenti di disegno disponibili */
 type DrawingTool = 'pencil' | 'eraser' | 'line' | 'rect' | 'ellipse';
 
 @Component({
@@ -18,7 +17,6 @@ export class PaintComponent implements AfterViewInit, OnDestroy {
     private startY = 0;
     private previewImage: ImageData | null = null;
 
-    // Public state
     color = '#000000';
     selectedTool: DrawingTool = 'pencil';
     lineWidth = 5;
@@ -26,7 +24,6 @@ export class PaintComponent implements AfterViewInit, OnDestroy {
     isErasing = false;
     isPencilSizeActive = false;
 
-    // Color palette
     readonly paletteColors = [
         '#000000', '#808080', '#C0C0C0', '#FFFFFF',
         '#800000', '#FF0000', '#808000', '#FFFF00',
@@ -35,13 +32,14 @@ export class PaintComponent implements AfterViewInit, OnDestroy {
         '#FFA500', '#A52A2A', '#F5DEB3', '#FFD700'
     ];
 
-    // Tools that use preview mode
     private readonly shapeTools: DrawingTool[] = ['line', 'rect', 'ellipse'];
 
-    // Bound event handlers for cleanup
     private readonly boundStartDrawing = this.startDrawing.bind(this);
     private readonly boundStopDrawing = this.stopDrawing.bind(this);
     private readonly boundDraw = this.draw.bind(this);
+    private readonly boundTouchStart = this.onTouchStart.bind(this);
+    private readonly boundTouchMove = this.onTouchMove.bind(this);
+    private readonly boundTouchEnd = this.onTouchEnd.bind(this);
 
     ngAfterViewInit(): void {
         const canvas = this.canvasRef.nativeElement;
@@ -52,6 +50,12 @@ export class PaintComponent implements AfterViewInit, OnDestroy {
         canvas.addEventListener('mousedown', this.boundStartDrawing);
         canvas.addEventListener('mouseup', this.boundStopDrawing);
         canvas.addEventListener('mousemove', this.boundDraw);
+        canvas.addEventListener('mouseleave', this.boundStopDrawing);
+
+        // passive: false è necessario per poter chiamare preventDefault() e bloccare lo scroll
+        canvas.addEventListener('touchstart', this.boundTouchStart, { passive: false });
+        canvas.addEventListener('touchmove', this.boundTouchMove, { passive: false });
+        canvas.addEventListener('touchend', this.boundTouchEnd, { passive: false });
     }
 
     ngOnDestroy(): void {
@@ -61,33 +65,42 @@ export class PaintComponent implements AfterViewInit, OnDestroy {
         canvas.removeEventListener('mousedown', this.boundStartDrawing);
         canvas.removeEventListener('mouseup', this.boundStopDrawing);
         canvas.removeEventListener('mousemove', this.boundDraw);
+        canvas.removeEventListener('mouseleave', this.boundStopDrawing);
+        canvas.removeEventListener('touchstart', this.boundTouchStart);
+        canvas.removeEventListener('touchmove', this.boundTouchMove);
+        canvas.removeEventListener('touchend', this.boundTouchEnd);
     }
 
     // ============================================
-    // DRAWING EVENTS
+    // COORDINATE HELPER — gestisce il scaling CSS vs canvas interno
+    // ============================================
+
+    private getCanvasCoords(clientX: number, clientY: number): { x: number; y: number } {
+        const canvas = this.canvasRef.nativeElement;
+        const rect = canvas.getBoundingClientRect();
+        return {
+            x: (clientX - rect.left) * (canvas.width / rect.width),
+            y: (clientY - rect.top) * (canvas.height / rect.height)
+        };
+    }
+
+    // ============================================
+    // MOUSE EVENTS
     // ============================================
 
     private startDrawing(event: MouseEvent): void {
-        this.isDrawing = true;
-        this.startX = event.offsetX;
-        this.startY = event.offsetY;
-
-        if (this.isShapeTool()) {
-            this.saveCanvas();
-        } else {
-            this.ctx.beginPath();
-            this.ctx.moveTo(event.offsetX, event.offsetY);
-        }
+        const { x, y } = this.getCanvasCoords(event.clientX, event.clientY);
+        this.beginStroke(x, y);
     }
 
     private stopDrawing(event: MouseEvent): void {
         if (!this.isDrawing) return;
-
         this.isDrawing = false;
 
         if (this.isShapeTool()) {
+            const { x, y } = this.getCanvasCoords(event.clientX, event.clientY);
             this.restoreCanvas();
-            this.drawShape(event.offsetX, event.offsetY);
+            this.drawShape(x, y);
             this.previewImage = null;
         } else {
             this.ctx.closePath();
@@ -96,11 +109,72 @@ export class PaintComponent implements AfterViewInit, OnDestroy {
 
     private draw(event: MouseEvent): void {
         if (!this.isDrawing) return;
+        const { x, y } = this.getCanvasCoords(event.clientX, event.clientY);
+        this.continueStroke(x, y);
+    }
 
+    // ============================================
+    // TOUCH EVENTS — blocca scroll durante il disegno
+    // ============================================
+
+    private onTouchStart(event: TouchEvent): void {
+        event.preventDefault();
+        const touch = event.touches[0];
+        if (!touch) return;
+        const { x, y } = this.getCanvasCoords(touch.clientX, touch.clientY);
+        this.beginStroke(x, y);
+    }
+
+    private onTouchMove(event: TouchEvent): void {
+        event.preventDefault();
+        if (!this.isDrawing) return;
+        const touch = event.touches[0];
+        if (!touch) return;
+        const { x, y } = this.getCanvasCoords(touch.clientX, touch.clientY);
+        this.continueStroke(x, y);
+    }
+
+    private onTouchEnd(event: TouchEvent): void {
+        event.preventDefault();
+        if (!this.isDrawing) return;
+        this.isDrawing = false;
+
+        if (this.isShapeTool()) {
+            const touch = event.changedTouches[0];
+            if (touch) {
+                const { x, y } = this.getCanvasCoords(touch.clientX, touch.clientY);
+                this.restoreCanvas();
+                this.drawShape(x, y);
+            }
+            this.previewImage = null;
+        } else {
+            this.ctx.closePath();
+        }
+    }
+
+    // ============================================
+    // STROKE HELPERS — condivisi tra mouse e touch
+    // ============================================
+
+    private beginStroke(x: number, y: number): void {
+        this.isDrawing = true;
+        this.startX = x;
+        this.startY = y;
+
+        if (this.isShapeTool()) {
+            this.saveCanvas();
+        } else {
+            this.ctx.beginPath();
+            this.ctx.moveTo(x, y);
+        }
+    }
+
+    private continueStroke(x: number, y: number): void {
         if (this.selectedTool === 'pencil' || this.selectedTool === 'eraser') {
-            this.drawFreehand(event);
+            this.drawFreehandAt(x, y);
         } else if (this.isShapeTool()) {
-            this.drawShapePreview(event);
+            this.restoreCanvas();
+            this.drawShape(x, y);
         }
     }
 
@@ -108,18 +182,13 @@ export class PaintComponent implements AfterViewInit, OnDestroy {
     // DRAWING METHODS
     // ============================================
 
-    private drawFreehand(event: MouseEvent): void {
-        this.ctx.lineTo(event.offsetX, event.offsetY);
+    private drawFreehandAt(x: number, y: number): void {
+        this.ctx.lineTo(x, y);
         this.ctx.lineWidth = this.isErasing ? this.eraserSize : this.lineWidth;
         this.ctx.strokeStyle = this.isErasing ? 'white' : this.color;
         this.ctx.lineCap = 'round';
         this.ctx.lineJoin = 'round';
         this.ctx.stroke();
-    }
-
-    private drawShapePreview(event: MouseEvent): void {
-        this.restoreCanvas();
-        this.drawShape(event.offsetX, event.offsetY);
     }
 
     private drawShape(x: number, y: number): void {
@@ -130,15 +199,9 @@ export class PaintComponent implements AfterViewInit, OnDestroy {
         this.ctx.lineJoin = 'round';
 
         switch (this.selectedTool) {
-            case 'line':
-                this.drawLine(x, y);
-                break;
-            case 'rect':
-                this.drawRectangle(x, y);
-                break;
-            case 'ellipse':
-                this.drawEllipse(x, y);
-                break;
+            case 'line':    this.drawLine(x, y);      break;
+            case 'rect':    this.drawRectangle(x, y); break;
+            case 'ellipse': this.drawEllipse(x, y);   break;
         }
 
         this.ctx.restore();

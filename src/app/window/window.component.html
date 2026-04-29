@@ -6,7 +6,7 @@
   aria-modal="true"
   [attr.aria-label]="title">
 
-  <div class="title-bar" (mousedown)="onDragStart($event)" [ngClass]="{'prompt-title-bar': windowType === 'prompt'}">
+  <div class="title-bar" (mousedown)="onDragStart($event)" (touchstart)="onTouchDragStart($event)" [ngClass]="{'prompt-title-bar': windowType === 'prompt'}">
     <div class="title-bar-text">
       <img [src]="icon" alt="Icon" class="title-icon">
       {{ title }}

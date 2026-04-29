@@ -10,7 +10,9 @@ import {
   OnDestroy,
   SimpleChanges,
   ChangeDetectionStrategy,
-  ChangeDetectorRef
+  ChangeDetectorRef,
+  NgZone,
+  Renderer2
 } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { Subject } from 'rxjs';
@@ -79,6 +81,12 @@ export class WindowComponent implements OnInit, OnChanges, OnDestroy {
   private previousSize: Size | null = null;
   private previousPosition: Position | null = null;
 
+  // Touch drag state
+  private touchStartY = 0;
+  private touchStartTime = 0;
+  private unlistenTouchMove: (() => void) | null = null;
+  private unlistenTouchEnd: (() => void) | null = null;
+
   // File explorer
   folderPath: string[] = [];
 
@@ -97,7 +105,9 @@ export class WindowComponent implements OnInit, OnChanges, OnDestroy {
     private readonly el: ElementRef,
     private readonly sanitizer: DomSanitizer,
     private readonly cdr: ChangeDetectorRef,
-    private readonly translationService: TranslationService
+    private readonly translationService: TranslationService,
+    private readonly ngZone: NgZone,
+    private readonly renderer: Renderer2
   ) {
     this.position = this.calculateInitialPosition();
   }
@@ -125,6 +135,8 @@ export class WindowComponent implements OnInit, OnChanges, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+    this.unlistenTouchMove?.();
+    this.unlistenTouchEnd?.();
   }
 
   // ============================================
@@ -154,12 +166,10 @@ export class WindowComponent implements OnInit, OnChanges, OnDestroy {
 
   private adaptSizeForMobile(): void {
     if (window.innerWidth >= WINDOW_CONFIG.MOBILE_BREAKPOINT) return;
-
-    this.size = {
-      width: window.innerWidth * WINDOW_CONFIG.MOBILE_WIDTH_RATIO,
-      height: window.innerHeight * WINDOW_CONFIG.MOBILE_HEIGHT_RATIO
-    };
-    this.position = this.calculateInitialPosition();
+    // Su mobile le finestre aprono sempre a schermo intero per massima usabilità
+    this.isFullscreen = true;
+    this.size = { width: window.innerWidth, height: window.innerHeight };
+    this.position = { x: 0, y: 0 };
     this.cdr.markForCheck();
   }
 
@@ -167,7 +177,8 @@ export class WindowComponent implements OnInit, OnChanges, OnDestroy {
     const shouldFullscreen = this.windowType === 'cv' ||
       (this.windowType === 'default' && FULLSCREEN_WINDOWS.includes(this.id as typeof FULLSCREEN_WINDOWS[number]));
 
-    if (shouldFullscreen) {
+    // Non doppio-toggling se già fullscreen (impostato da adaptSizeForMobile)
+    if (shouldFullscreen && !this.isFullscreen) {
       this.toggleFullscreen();
     }
   }
@@ -197,17 +208,12 @@ export class WindowComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   private handleDrag(event: MouseEvent): void {
-    const newX = this.clamp(
-      event.clientX - this.dragStart.x,
-      0,
-      window.innerWidth - this.size.width
-    );
-    const newY = this.clamp(
-      event.clientY - this.dragStart.y,
-      0,
-      window.innerHeight - this.size.height - WINDOW_CONFIG.TASKBAR_HEIGHT
-    );
+    this.handleDragAt(event.clientX, event.clientY);
+  }
 
+  private handleDragAt(clientX: number, clientY: number): void {
+    const newX = this.clamp(clientX - this.dragStart.x, 0, window.innerWidth - this.size.width);
+    const newY = this.clamp(clientY - this.dragStart.y, 0, window.innerHeight - this.size.height - WINDOW_CONFIG.TASKBAR_HEIGHT);
     this.position = { x: newX, y: newY };
     this.cdr.markForCheck();
   }
@@ -266,6 +272,54 @@ export class WindowComponent implements OnInit, OnChanges, OnDestroy {
       x: event.clientX - this.position.x,
       y: event.clientY - this.position.y
     };
+  }
+
+  onTouchDragStart(event: TouchEvent): void {
+    if (this.isFullscreen) return;
+    const touch = event.touches[0];
+    if (!touch) return;
+
+    this.isDragging = true;
+    this.touchStartY = touch.clientY;
+    this.touchStartTime = Date.now();
+    this.dragStart = {
+      x: touch.clientX - this.position.x,
+      y: touch.clientY - this.position.y
+    };
+
+    // Listener fuori NgZone: nessuna change detection su ogni frame di drag
+    this.ngZone.runOutsideAngular(() => {
+      const onMove = (e: TouchEvent) => {
+        const t = e.touches[0];
+        if (!t) return;
+        // Rientra in zona solo per aggiornare la view
+        this.ngZone.run(() => this.handleDragAt(t.clientX, t.clientY));
+      };
+
+      const onEnd = (e: TouchEvent) => {
+        const t = e.changedTouches[0];
+        if (t) {
+          const deltaY = t.clientY - this.touchStartY;
+          const elapsed = Date.now() - this.touchStartTime;
+          // Swipe veloce verso il basso → minimize (gesto nativo iOS/Android)
+          if (deltaY > 80 && elapsed < 400) {
+            this.ngZone.run(() => this.onMinimize());
+          }
+        }
+        this.isDragging = false;
+        document.removeEventListener('touchmove', onMove);
+        document.removeEventListener('touchend', onEnd);
+        this.unlistenTouchMove = null;
+        this.unlistenTouchEnd = null;
+      };
+
+      document.addEventListener('touchmove', onMove, { passive: true });
+      document.addEventListener('touchend', onEnd, { passive: true });
+
+      // Salva riferimenti per cleanup in ngOnDestroy
+      this.unlistenTouchMove = () => document.removeEventListener('touchmove', onMove);
+      this.unlistenTouchEnd = () => document.removeEventListener('touchend', onEnd);
+    });
   }
 
   onResizeStart(event: MouseEvent, edge: string): void {
