@@ -952,6 +952,11 @@ $black: #000;
     &-controls button {
       width: 32px;
       height: 32px;
+
+      &.close-btn {
+        width: 32px;
+        height: 32px;
+      }
     }
   }
 }
