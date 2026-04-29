@@ -12,6 +12,7 @@ export const WINDOW_CONFIG = {
     DEFAULT_WIDTH: 700,
     DEFAULT_HEIGHT: 550, // Reduced from 700 to fit better on standard screens
     TASKBAR_HEIGHT: 30,
+    MOBILE_TASKBAR_HEIGHT: 44,
     MOBILE_BREAKPOINT: 768,
     MOBILE_WIDTH_RATIO: 0.9,
     MOBILE_HEIGHT_RATIO: 0.8,

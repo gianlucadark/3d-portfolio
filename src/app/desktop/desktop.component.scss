@@ -33,7 +33,7 @@ $black: #000;
 
 .desktop {
   width: 100%;
-  height: 100vh;
+  height: 100dvh;
   background: #000 url('/assets/icons/wallpaper.webp') center/cover;
   position: relative;
   overflow: hidden;
@@ -218,7 +218,7 @@ $black: #000;
 // ========================================
 .start-menu {
   position: fixed;
-  bottom: $taskbar-height;
+  bottom: var(--taskbar-height);
   left: 0;
   width: 330px;
   color: $white;

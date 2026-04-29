@@ -1,4 +1,7 @@
 :root {
+    /* ── Layout ───────────────────────────────────────────────── */
+    --taskbar-height: 30px;
+
     /* ── Brand Identity v1.0 — Palette ────────────────────────── */
     --color-cosmos:  #080D14;
     --color-lux:     #4AADDC;
@@ -43,6 +46,12 @@ body {
     background: #000 !important;
     font-family: var(--font-legacy);
     overflow: hidden;
+}
+
+@media (max-width: 768px) {
+    :root {
+        --taskbar-height: 44px;
+    }
 }
 
 /* ── Screen-reader only utility ────────────────────────────── */

@@ -168,7 +168,7 @@ export class WindowComponent implements OnInit, OnChanges, OnDestroy {
     if (window.innerWidth >= WINDOW_CONFIG.MOBILE_BREAKPOINT) return;
     // Su mobile le finestre aprono sempre a schermo intero per massima usabilità
     this.isFullscreen = true;
-    this.size = { width: window.innerWidth, height: window.innerHeight };
+    this.size = { width: window.innerWidth, height: window.innerHeight - WINDOW_CONFIG.MOBILE_TASKBAR_HEIGHT };
     this.position = { x: 0, y: 0 };
     this.cdr.markForCheck();
   }
