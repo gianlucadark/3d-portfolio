@@ -115,8 +115,8 @@
     </div>
 </div>
 
-<!-- Desktop Component Overlay -->
-<app-desktop *ngIf="showDesktop" (closeDesktop)="returnFromDesktop()"></app-desktop>
+<!-- Desktop overlay — loaded lazily after "Enter Portfolio" click -->
+<ng-container #desktopContainer></ng-container>
 
 <!-- Game Component Overlay — loaded lazily on first open -->
 <ng-container #gameContainer></ng-container>

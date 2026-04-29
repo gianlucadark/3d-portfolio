@@ -4,7 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build",
+    "build": "ng build --stats-json",
     "postbuild": "node scripts/inject-preload.js",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
