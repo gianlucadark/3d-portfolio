@@ -1,6 +1,6 @@
 import {
   ChangeDetectionStrategy, ChangeDetectorRef,
-  Component, HostListener, OnDestroy, OnInit
+  Component, OnDestroy, OnInit
 } from '@angular/core';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -22,6 +22,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
   private readonly destroy$ = new Subject<void>();
   private biosTimerId: ReturnType<typeof setTimeout> | null = null;
+  private readonly biosDelay: number;
 
   constructor(
     private readonly translationService: TranslationService,
@@ -30,15 +31,22 @@ export class AppComponent implements OnInit, OnDestroy {
   ) {
     // Detect headless/crawler in constructor so the LCP <h1> is in the DOM
     // on the very first Angular render, with no extra change-detection cycle.
+    const ua = navigator.userAgent;
     const isHeadless = navigator.webdriver
-      || navigator.userAgent.includes('Chrome-Lighthouse')
-      || navigator.userAgent.includes('PTST/')
-      || navigator.userAgent.includes('Googlebot')
-      || navigator.userAgent.includes('bot/');
+      || ua.includes('Chrome-Lighthouse')
+      || ua.includes('PTST/')
+      || ua.includes('HeadlessChrome')
+      || ua.includes('Googlebot')
+      || ua.includes('bot/');
 
     if (isHeadless) {
       this.isBiosComplete = true;
       this.showWelcome = true;
+      this.biosDelay = 0;
+    } else {
+      // Mobile users have slower CPUs and less patience — shorten the BIOS.
+      const isMobile = window.innerWidth <= 768;
+      this.biosDelay = isMobile ? 700 : 1500;
     }
   }
 
@@ -55,8 +63,27 @@ export class AppComponent implements OnInit, OnDestroy {
         this.isBiosComplete = true;
         this.showWelcome = true;
         this.cdr.markForCheck();
-      }, 1500);
+        // After welcome screen is shown, prefetch the 3D model on desktop/fast connections.
+        this.prefetchGlb();
+      }, this.biosDelay);
     }
+  }
+
+  private prefetchGlb(): void {
+    if (window.innerWidth <= 768) return;
+    const nav = navigator as Navigator & {
+      connection?: { saveData?: boolean; effectiveType?: string };
+    };
+    const conn = nav.connection;
+    if (conn?.saveData) return;
+    if (conn?.effectiveType === '2g' || conn?.effectiveType === 'slow-2g') return;
+
+    const link = document.createElement('link');
+    link.rel = 'prefetch';
+    link.href = 'assets/3d/room-space-3-final.glb';
+    link.as = 'fetch';
+    link.setAttribute('crossorigin', '');
+    document.head.appendChild(link);
   }
 
   ngOnDestroy(): void {

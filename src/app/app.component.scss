@@ -105,6 +105,8 @@ $transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
             rgba(0, 255, 0, 0.01),
             rgba(0, 0, 255, 0.03));
     background-size: 100% 3px, 3px 100%;
+    will-change: opacity;
+    contain: paint;
 
     &::after {
         content: "";
@@ -115,6 +117,13 @@ $transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     animation: crtFlicker 0.15s infinite;
+
+    // Disable continuous repaint on mobile — the effect is barely visible
+    // on small screens and adds measurable paint overhead on throttled CPUs.
+    @media (max-width: 768px) {
+        animation: none;
+        opacity: 0.98;
+    }
 }
 
 // ========================================
