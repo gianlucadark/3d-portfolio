@@ -71,7 +71,9 @@
 
   <!-- ── Critical Asset Preloads ────────────────────────────── -->
   <!-- LCP elements visible during BIOS boot screen -->
-  <link rel="preload" href="assets/icons/start.webp" as="image" fetchpriority="high">
+  <link rel="preload" href="assets/icons/start@1x.webp" as="image" fetchpriority="high"
+        imagesrcset="assets/icons/start@1x.webp 1x, assets/icons/start.webp 2x"
+        imagesizes="140px">
   <!-- GLB preloaded early: by the time user clicks "Enter" and uses desktop,
        the 3D model download is already complete in the browser cache. -->
   <link rel="prefetch" href="assets/3d/room-space-3-final.glb" as="fetch" crossorigin>

@@ -118,5 +118,5 @@
 <!-- Desktop Component Overlay -->
 <app-desktop *ngIf="showDesktop" (closeDesktop)="returnFromDesktop()"></app-desktop>
 
-<!-- Game Component Overlay -->
-<app-game *ngIf="showGame" (closeGame)="returnFromGame()"></app-game>
+<!-- Game Component Overlay — loaded lazily on first open -->
+<ng-container #gameContainer></ng-container>

@@ -1,6 +1,7 @@
 import {
-  ChangeDetectionStrategy, ChangeDetectorRef,
-  Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild
+  ChangeDetectionStrategy, ChangeDetectorRef, ComponentRef,
+  Component, ElementRef, HostListener, Injector,
+  OnDestroy, OnInit, ViewChild, ViewContainerRef, createNgModuleRef
 } from '@angular/core';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -16,6 +17,7 @@ import { ThreeSceneService } from './three-scene.service';
 })
 export class HomeComponent implements OnInit, OnDestroy {
   @ViewChild('rendererContainer') rendererContainer!: ElementRef;
+  @ViewChild('gameContainer', { read: ViewContainerRef }) gameContainer!: ViewContainerRef;
 
   isDarkMode = false;
   showPdfModal = false;
@@ -27,12 +29,15 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   private readonly destroy$ = new Subject<void>();
   private threeInitialized = false;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private gameCompRef: ComponentRef<any> | null = null;
 
   constructor(
     private readonly translationService: TranslationService,
     private readonly threeSceneService: ThreeSceneService,
     private readonly bootService: BootService,
-    private readonly cdr: ChangeDetectorRef
+    private readonly cdr: ChangeDetectorRef,
+    private readonly injector: Injector
   ) {}
 
   ngOnInit(): void {
@@ -43,13 +48,11 @@ export class HomeComponent implements OnInit, OnDestroy {
         this.cdr.markForCheck();
       });
 
-    // Show 3D controls once user has entered the portfolio.
     this.bootService.enter$
       .pipe(takeUntil(this.destroy$))
       .subscribe(() => {
         this.showDesktop = true;
         this.initThreeIfNeeded();
-        // Reveal controls after the loading screen fade-out (800 ms).
         setTimeout(() => {
           this.isLoading = false;
           this.cdr.markForCheck();
@@ -57,8 +60,6 @@ export class HomeComponent implements OnInit, OnDestroy {
         this.cdr.markForCheck();
       });
 
-    // Keep Three.js screen-position in sync when it finishes loading while the
-    // desktop is already open (so returnFromDesktop gets a proper zoom-out start).
     this.threeSceneService.loadingComplete$
       .pipe(takeUntil(this.destroy$))
       .subscribe(complete => {
@@ -74,7 +75,7 @@ export class HomeComponent implements OnInit, OnDestroy {
         if (screen === 'desktop') {
           this.showDesktop = true;
         } else {
-          this.showGame = true;
+          this.openGame();
         }
         this.cdr.markForCheck();
       });
@@ -97,12 +98,28 @@ export class HomeComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+    this.gameCompRef?.destroy();
   }
 
   private initThreeIfNeeded(): void {
     if (this.threeInitialized) return;
     this.threeInitialized = true;
     this.threeSceneService.initialize(this.rendererContainer);
+  }
+
+  /** Lazily loads GameModule on first open, then reuses the chunk. */
+  private async openGame(): Promise<void> {
+    this.showGame = true;
+    this.cdr.markForCheck();
+
+    if (this.gameCompRef) return;
+
+    const { GameModule } = await import('../game/game.module');
+    const moduleRef = createNgModuleRef(GameModule, this.injector);
+    const compRef = this.gameContainer.createComponent(GameModule.rootComponent, { ngModuleRef: moduleRef });
+    compRef.instance.closeGame.subscribe(() => this.returnFromGame());
+    this.gameCompRef = compRef;
+    this.cdr.markForCheck();
   }
 
   returnFromDesktop(): void {
@@ -115,6 +132,9 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   returnFromGame(): void {
     this.showGame = false;
+    this.gameCompRef?.destroy();
+    this.gameCompRef = null;
+    this.gameContainer?.clear();
     this.initThreeIfNeeded();
     this.threeSceneService.setSceneVisible(true);
     this.threeSceneService.returnFromZoom();

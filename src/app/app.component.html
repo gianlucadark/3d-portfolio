@@ -9,7 +9,9 @@
   <!-- Windows XP Boot Screen -->
   <div class="xp-boot-screen" *ngIf="!isBiosComplete">
     <div class="xp-boot-content">
-      <img src="assets/icons/start.webp" alt="Windows XP Logo" class="xp-boot-logo"
+      <img src="assets/icons/start.webp"
+           srcset="assets/icons/start@1x.webp 1x, assets/icons/start.webp 2x"
+           alt="Windows XP Logo" class="xp-boot-logo"
            fetchpriority="high" loading="eager" width="140" height="124">
       <h1 class="xp-boot-title">
         <span class="xp-boot-name">Gianluca's</span>
