@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { IT_TRANSLATIONS } from '../i18n/it.translations';
+import { EN_TRANSLATIONS } from '../i18n/en.translations';
 
 /** Lingue supportate dall'applicazione */
 export type Language = 'it' | 'en';
@@ -7,18 +9,14 @@ export type Language = 'it' | 'en';
 /** Chiave per localStorage */
 const STORAGE_KEY = 'portfolio-language';
 
-/**
- * Servizio per la gestione delle traduzioni
- * Gestisce il caricamento, la memorizzazione e il cambio di lingua
- */
 @Injectable({
     providedIn: 'root'
 })
 export class TranslationService {
     private readonly currentLanguage$ = new BehaviorSubject<Language>(this.loadSavedLanguage());
     private readonly translations: Record<Language, Record<string, unknown>> = {
-        it: {},
-        en: {}
+        it: IT_TRANSLATIONS as Record<string, unknown>,
+        en: EN_TRANSLATIONS as Record<string, unknown>
     };
 
     /** Observable della lingua corrente */
@@ -29,9 +27,6 @@ export class TranslationService {
         return this.currentLanguage$.value;
     }
 
-    /**
-     * Carica la lingua salvata da localStorage o usa italiano come default
-     */
     private loadSavedLanguage(): Language {
         try {
             const saved = localStorage.getItem(STORAGE_KEY) as Language | null;
@@ -41,9 +36,6 @@ export class TranslationService {
         }
     }
 
-    /**
-     * Imposta la lingua corrente e la salva in localStorage
-     */
     setLanguage(lang: Language): void {
         if (lang === this.currentLanguage) return;
 
@@ -56,26 +48,10 @@ export class TranslationService {
         }
     }
 
-    /**
-     * Alterna tra le lingue disponibili
-     */
     toggleLanguage(): void {
         this.setLanguage(this.currentLanguage === 'it' ? 'en' : 'it');
     }
 
-    /**
-     * Registra le traduzioni per una lingua
-     */
-    registerTranslations(lang: Language, translations: Record<string, unknown>): void {
-        this.translations[lang] = translations;
-    }
-
-    /**
-     * Ottiene una traduzione per chiave usando dot notation
-     * @param key Chiave della traduzione (es: 'common.close')
-     * @param lang Lingua target (opzionale, default: lingua corrente)
-     * @returns La traduzione o la chiave se non trovata
-     */
     translate(key: string, lang?: Language): string {
         const targetLang = lang ?? this.currentLanguage;
         const keys = key.split('.');
@@ -93,9 +69,6 @@ export class TranslationService {
         return typeof value === 'string' ? value : key;
     }
 
-    /**
-     * Ottiene tutte le traduzioni per una lingua
-     */
     getTranslations(lang?: Language): Record<string, unknown> {
         return this.translations[lang ?? this.currentLanguage];
     }

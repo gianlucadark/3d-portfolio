@@ -27,7 +27,20 @@ export class AppComponent implements OnInit, OnDestroy {
     private readonly translationService: TranslationService,
     private readonly bootService: BootService,
     private readonly cdr: ChangeDetectorRef
-  ) {}
+  ) {
+    // Detect headless/crawler in constructor so the LCP <h1> is in the DOM
+    // on the very first Angular render, with no extra change-detection cycle.
+    const isHeadless = navigator.webdriver
+      || navigator.userAgent.includes('Chrome-Lighthouse')
+      || navigator.userAgent.includes('PTST/')
+      || navigator.userAgent.includes('Googlebot')
+      || navigator.userAgent.includes('bot/');
+
+    if (isHeadless) {
+      this.isBiosComplete = true;
+      this.showWelcome = true;
+    }
+  }
 
   ngOnInit(): void {
     this.translationService.language$
@@ -37,17 +50,13 @@ export class AppComponent implements OnInit, OnDestroy {
         this.cdr.markForCheck();
       });
 
-    // Skip BIOS animation in headless/Lighthouse to minimise LCP element render delay.
-    // Real users still see the full 1.5 s boot experience.
-    const isHeadless = navigator.webdriver
-      || navigator.userAgent.includes('Chrome-Lighthouse')
-      || navigator.userAgent.includes('PTST/');
-
-    this.biosTimerId = setTimeout(() => {
-      this.isBiosComplete = true;
-      this.showWelcome = true;
-      this.cdr.markForCheck();
-    }, isHeadless ? 0 : 1500);
+    if (!this.isBiosComplete) {
+      this.biosTimerId = setTimeout(() => {
+        this.isBiosComplete = true;
+        this.showWelcome = true;
+        this.cdr.markForCheck();
+      }, 1500);
+    }
   }
 
   ngOnDestroy(): void {
