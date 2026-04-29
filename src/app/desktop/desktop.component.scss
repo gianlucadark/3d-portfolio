@@ -182,35 +182,89 @@ $black: #000;
 // ========================================
 .desktop-top-actions {
   position: absolute;
-  top: 20px;
-  left: 50%;
+  top: 12px;
+  right: 16px;
   z-index: 10000;
 }
 
 .see-world-btn {
-  background: linear-gradient(180deg, #ff9800, #e65100);
-  border: 2px solid #bf360c;
-  border-radius: 6px;
-  padding: 10px 20px;
+  // Luna Blue — same gradient as window title bars
+  background: linear-gradient(to bottom,
+    #1664d8 0%,
+    #1664d8 1px,
+    #1e83fa 1px,
+    #1e83fa 3px,
+    #1158c7 3px,
+    #1158c7 45%,
+    #0d49b0 45%,
+    #0d49b0 88%,
+    #0a3995 100%
+  );
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-bottom-color: #082e7a;
+  border-right-color: #0d3e96;
+  border-radius: 4px;
+  padding: 6px 16px 6px 12px;
   cursor: pointer;
   @include flex-center;
-  gap: 8px;
+  gap: 7px;
   font-family: var(--font-legacy);
+  font-size: 12px;
   font-weight: bold;
   color: $white;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.65);
   text-transform: uppercase;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-  transition: filter 0.2s, transform 0.2s, box-shadow 0.2s;
+  letter-spacing: 0.5px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    inset 0 2px 0 rgba(255, 255, 255, 0.15),
+    0 2px 8px rgba(0, 0, 0, 0.5),
+    0 0 0 transparent;
+  transition: filter 0.15s ease, transform 0.15s ease, box-shadow 0.2s ease;
+  animation: see-world-glow 3s ease-in-out infinite;
+
+  .world-svg {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.4));
+  }
 
   &:hover {
-    transform: translateY(-2px);
-    filter: brightness(1.1);
+    filter: brightness(1.18);
+    transform: translateY(-1px);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.35),
+      inset 0 2px 0 rgba(255, 255, 255, 0.15),
+      0 4px 14px rgba(0, 0, 0, 0.55),
+      0 0 18px rgba(30, 131, 250, 0.45);
+    animation: none;
+  }
+
+  &:active {
+    transform: translateY(0);
+    filter: brightness(0.9);
+    box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.45);
+    animation: none;
   }
 
   &:focus-visible {
     outline: 2px solid #fff;
     outline-offset: 3px;
   }
+}
+
+@keyframes see-world-glow {
+  0%, 100% { box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    inset 0 2px 0 rgba(255, 255, 255, 0.15),
+    0 2px 8px rgba(0, 0, 0, 0.5),
+    0 0 0px rgba(30, 131, 250, 0); }
+  50% { box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    inset 0 2px 0 rgba(255, 255, 255, 0.15),
+    0 2px 8px rgba(0, 0, 0, 0.5),
+    0 0 12px rgba(30, 131, 250, 0.55); }
 }
 
 // ========================================
@@ -375,9 +429,21 @@ $black: #000;
     }
   }
 
+  .desktop-top-actions {
+    top: auto;
+    right: 10px;
+    bottom: calc(var(--taskbar-height) + 8px);
+  }
+
   .see-world-btn {
-    padding: 6px 12px;
+    padding: 5px 10px 5px 8px;
     font-size: 10px;
+    gap: 5px;
+
+    .world-svg {
+      width: 13px;
+      height: 13px;
+    }
   }
 }
 
