@@ -69,8 +69,8 @@ export class ThreeSceneImpl {
     private ambientLight!: AmbientLight;
     private directionalLight!: DirectionalLight;
     private rectLight!: RectAreaLight;
-    private marbleSpot1!: SpotLight;
-    private marbleSpot2!: SpotLight;
+    private marbleSpot1: SpotLight | null = null;
+    private marbleSpot2: SpotLight | null = null;
     private envMap: Texture | null = null;
 
     private isZooming = false;
@@ -107,6 +107,10 @@ export class ThreeSceneImpl {
 
     private isEnvLoaded = false;
     private isModelLoaded = false;
+
+    private get isHighEndDevice(): boolean {
+        return window.innerWidth > 768 && !(/Android|iPhone|iPad|iPod/i.test(navigator.userAgent));
+    }
 
     constructor(
         private readonly ngZone: NgZone,
@@ -240,19 +244,19 @@ export class ThreeSceneImpl {
         this.rectLight.lookAt(0, 0, 0);
         this.scene.add(this.rectLight);
 
-        // SpotLight caldi da destra per riflessi principali sul marmo
-        this.marbleSpot1 = new SpotLight(0xfff5e8, 12, 30, Math.PI * 0.18, 0.45, 1.2);
-        this.marbleSpot1.position.set(4, 11, 4);
-        this.marbleSpot1.target.position.set(0, 0, 0);
-        this.scene.add(this.marbleSpot1);
-        this.scene.add(this.marbleSpot1.target);
+        if (this.isHighEndDevice) {
+            this.marbleSpot1 = new SpotLight(0xfff5e8, 12, 30, Math.PI * 0.18, 0.45, 1.2);
+            this.marbleSpot1.position.set(4, 11, 4);
+            this.marbleSpot1.target.position.set(0, 0, 0);
+            this.scene.add(this.marbleSpot1);
+            this.scene.add(this.marbleSpot1.target);
 
-        // SpotLight freddo da sinistra per contrasto e profondità
-        this.marbleSpot2 = new SpotLight(0xd0e8ff, 6, 25, Math.PI * 0.22, 0.6, 1.2);
-        this.marbleSpot2.position.set(-5, 9, -3);
-        this.marbleSpot2.target.position.set(0, 0, 0);
-        this.scene.add(this.marbleSpot2);
-        this.scene.add(this.marbleSpot2.target);
+            this.marbleSpot2 = new SpotLight(0xd0e8ff, 6, 25, Math.PI * 0.22, 0.6, 1.2);
+            this.marbleSpot2.position.set(-5, 9, -3);
+            this.marbleSpot2.target.position.set(0, 0, 0);
+            this.scene.add(this.marbleSpot2);
+            this.scene.add(this.marbleSpot2.target);
+        }
     }
 
     private configureDirectionalLight(): void {
@@ -343,11 +347,9 @@ export class ThreeSceneImpl {
         this.renderer.shadowMap.enabled = true;
         this.renderer.shadowMap.type = PCFSoftShadowMap;
 
-        const isHighEnd = window.innerWidth > 768 && !(/Android|iPhone|iPad|iPod/i.test(navigator.userAgent));
-        this.marbleSpot1.visible = isHighEnd;
-        this.marbleSpot2.visible = isHighEnd;
-
-        this.warmMarbleTextures();
+        if (this.isHighEndDevice) {
+            this.warmMarbleTextures();
+        }
         this.renderer.compile(this.scene, this.camera);
     }
 
@@ -536,14 +538,12 @@ export class ThreeSceneImpl {
 
     private applyWallMaterial(mesh: Mesh, material: MeshStandardMaterial): void {
         const { WALL } = MATERIAL_CONFIG;
-        const isHighEnd = window.innerWidth > 768 && !(/Android|iPhone|iPad|iPod/i.test(navigator.userAgent));
-
         const glass = new MeshPhysicalMaterial({
             color: new Color(0xe8f4ff),
             roughness: WALL.ROUGHNESS,
             metalness: WALL.METALNESS,
             transparent: true,
-            ...(isHighEnd ? {
+            ...(this.isHighEndDevice ? {
                 transmission: WALL.TRANSMISSION,
                 ior: WALL.IOR,
                 thickness: WALL.THICKNESS,
@@ -945,8 +945,8 @@ export class ThreeSceneImpl {
             this.ambientLight.intensity = LIGHTS.AMBIENT.INTENSITY_DARK;
             this.directionalLight.intensity = LIGHTS.DIRECTIONAL.INTENSITY_DARK;
             this.rectLight.intensity = LIGHTS.RECT.INTENSITY_DARK;
-            this.marbleSpot1.intensity = 3;
-            this.marbleSpot2.intensity = 1.5;
+            if (this.marbleSpot1) this.marbleSpot1.intensity = 3;
+            if (this.marbleSpot2) this.marbleSpot2.intensity = 1.5;
             if (this.envMap) {
                 this.scene.background = this.envMap;
             } else {
@@ -957,8 +957,8 @@ export class ThreeSceneImpl {
             this.ambientLight.intensity = LIGHTS.AMBIENT.INTENSITY_LIGHT;
             this.directionalLight.intensity = LIGHTS.DIRECTIONAL.INTENSITY_LIGHT;
             this.rectLight.intensity = LIGHTS.RECT.INTENSITY_LIGHT;
-            this.marbleSpot1.intensity = 12;
-            this.marbleSpot2.intensity = 6;
+            if (this.marbleSpot1) this.marbleSpot1.intensity = 12;
+            if (this.marbleSpot2) this.marbleSpot2.intensity = 6;
             if (this.envMap) {
                 this.scene.background = this.envMap;
                 this.scene.environment = this.envMap;
