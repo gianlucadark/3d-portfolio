@@ -83,9 +83,11 @@ export const THREE_CONFIG = {
     SHADOW_MAP_SIZE: 1024,
     MAX_PIXEL_RATIO: 2,
     ENV_ROTATION: {
-        X: -Math.PI / 3,
-        Y: 0
+        X: -Math.PI / 2,
+        Y: 0,
+        SPEED: 0.00001
     }
+
 } as const;
 
 // ============================================

@@ -697,6 +697,12 @@ export class ThreeSceneImpl {
 
         this.frameCount++;
         this.controls?.update();
+
+        const bgRot = (this.scene as any).backgroundRotation;
+        if (bgRot) {
+            bgRot.set(THREE_CONFIG.ENV_ROTATION.X, now * THREE_CONFIG.ENV_ROTATION.SPEED, 0);
+        }
+
         this.renderer.render(this.scene, this.camera);
     }
 
