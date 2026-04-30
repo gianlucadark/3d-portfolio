@@ -56,19 +56,19 @@ export const THREE_CONFIG = {
     },
     LIGHTS: {
         AMBIENT: {
-            INTENSITY_LIGHT: 0.5,
+            INTENSITY_LIGHT: 0.35,
             INTENSITY_DARK: 0.05
         },
         DIRECTIONAL: {
-            INTENSITY_LIGHT: 1.0,
+            INTENSITY_LIGHT: 1.4,
             INTENSITY_DARK: 0
         },
         RECT: {
-            INTENSITY_LIGHT: 2,
+            INTENSITY_LIGHT: 3,
             INTENSITY_DARK: 0
         },
-        EXPOSURE: 0.8,
-        ENVIRONMENT_INTENSITY: 0.3
+        EXPOSURE: 0.55,
+        ENVIRONMENT_INTENSITY: 0.2
     },
     ZOOM: {
         SCREEN_DISTANCE: 1.5,
@@ -81,7 +81,11 @@ export const THREE_CONFIG = {
         POSITION_X_OFFSET: 0.5
     },
     SHADOW_MAP_SIZE: 1024,
-    MAX_PIXEL_RATIO: 2
+    MAX_PIXEL_RATIO: 2,
+    ENV_ROTATION: {
+        X: -Math.PI / 3,
+        Y: 0
+    }
 } as const;
 
 // ============================================
@@ -152,9 +156,11 @@ export const MATERIAL_CONFIG = {
         METALNESS: 0.3
     },
     MARBLE: {
-        ROUGHNESS: 0.05,
+        ROUGHNESS: 0.02,
         METALNESS: 0,
-        CLEARCOAT: 1.0
+        CLEARCOAT: 1.0,
+        CLEARCOAT_ROUGHNESS: 0.015,
+        ENV_MAP_INTENSITY: 5.0
     },
     WALL: {
         ROUGHNESS: 0.0,
@@ -168,10 +174,14 @@ export const MATERIAL_CONFIG = {
         ENV_MAP_INTENSITY: 2.5,
     },
     GLASS: {
-        TRANSMISSION: 0,
-        ROUGHNESS: 0.8,
-        METALNESS: 0.8,
-        IOR: 1.5
+        TRANSMISSION: 0.88,
+        ROUGHNESS: 0.04,
+        METALNESS: 0,
+        IOR: 1.52,
+        CLEARCOAT: 0.9,
+        CLEARCOAT_ROUGHNESS: 0.03,
+        ENV_MAP_INTENSITY: 3.5,
+        COLOR: 0xD0CCFF
     },
     CEILING: {
         EMISSIVE_INTENSITY: 3
@@ -186,6 +196,7 @@ export const COLORS = {
     WHITE: 0xffffff,
     BLACK: 0x000000,
     DARK_BACKGROUND: 0x050505,
+    COSMOS: 0x080D14,
     YELLOW: 0xebeb00
 } as const;
 

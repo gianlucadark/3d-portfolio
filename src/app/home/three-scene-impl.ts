@@ -208,7 +208,7 @@ export class ThreeSceneImpl {
         this.renderer.outputColorSpace = SRGBColorSpace;
         this.renderer.shadowMap.enabled = false;
         this.renderer.toneMapping = ACESFilmicToneMapping;
-        this.renderer.toneMappingExposure = 0.4;
+        this.renderer.toneMappingExposure = THREE_CONFIG.LIGHTS.EXPOSURE;
         this.renderer.sortObjects = false;
 
         container.appendChild(this.renderer.domElement);
@@ -239,20 +239,20 @@ export class ThreeSceneImpl {
         this.scene.add(this.directionalLight.target);
 
         RectAreaLightUniformsLib.init();
-        this.rectLight = new RectAreaLight(0xDDEEFF, LIGHTS.RECT.INTENSITY_LIGHT, 8, 8);
-        this.rectLight.position.set(5, 5, 5);
+        this.rectLight = new RectAreaLight(0xC8E8FF, LIGHTS.RECT.INTENSITY_LIGHT, 10, 10);
+        this.rectLight.position.set(5, 7, 5);
         this.rectLight.lookAt(0, 0, 0);
         this.scene.add(this.rectLight);
 
         if (this.isHighEndDevice) {
-            this.marbleSpot1 = new SpotLight(0xfff5e8, 12, 30, Math.PI * 0.18, 0.45, 1.2);
-            this.marbleSpot1.position.set(4, 11, 4);
+            this.marbleSpot1 = new SpotLight(0xfff8f0, 20, 35, Math.PI * 0.15, 0.35, 1.2);
+            this.marbleSpot1.position.set(3, 14, 5);
             this.marbleSpot1.target.position.set(0, 0, 0);
             this.scene.add(this.marbleSpot1);
             this.scene.add(this.marbleSpot1.target);
 
-            this.marbleSpot2 = new SpotLight(0xd0e8ff, 6, 25, Math.PI * 0.22, 0.6, 1.2);
-            this.marbleSpot2.position.set(-5, 9, -3);
+            this.marbleSpot2 = new SpotLight(0xb8d8ff, 10, 30, Math.PI * 0.20, 0.5, 1.2);
+            this.marbleSpot2.position.set(-6, 10, -4);
             this.marbleSpot2.target.position.set(0, 0, 0);
             this.scene.add(this.marbleSpot2);
             this.scene.add(this.marbleSpot2.target);
@@ -285,7 +285,7 @@ export class ThreeSceneImpl {
     }
 
     private loadEnvironment(): void {
-        this.scene.background = new Color(COLORS.ICE_BLUE).multiplyScalar(0.2);
+        this.scene.background = new Color(COLORS.COSMOS);
 
         this.rgbeLoader.load(
             'assets/cielo1.hdr',
@@ -303,6 +303,8 @@ export class ThreeSceneImpl {
 
                 (this.scene as any).backgroundIntensity = THREE_CONFIG.LIGHTS.ENVIRONMENT_INTENSITY;
                 (this.scene as any).environmentIntensity = THREE_CONFIG.LIGHTS.ENVIRONMENT_INTENSITY;
+                (this.scene as any).backgroundRotation?.set(THREE_CONFIG.ENV_ROTATION.X, THREE_CONFIG.ENV_ROTATION.Y, 0);
+                (this.scene as any).environmentRotation?.set(THREE_CONFIG.ENV_ROTATION.X, THREE_CONFIG.ENV_ROTATION.Y, 0);
 
                 texture.dispose();
                 pmremGenerator.dispose();
@@ -490,21 +492,24 @@ export class ThreeSceneImpl {
         setTimeout(() => this.startCatGlow(), 0);
     }
 
-    private applyGlassMaterial(_mesh: Mesh, material: MeshStandardMaterial): void {
+    private applyGlassMaterial(mesh: Mesh, material: MeshStandardMaterial): void {
         const { GLASS } = MATERIAL_CONFIG;
-        material.color = (material.color || new Color(0xffffff)).clone();
-        material.transparent = true;
-        material.opacity = 1;
-        material.roughness = GLASS.ROUGHNESS;
-        material.metalness = GLASS.METALNESS;
-        material.side = DoubleSide;
-
-        if ((material as any).isMeshPhysicalMaterial) {
-            (material as any).transmission = GLASS.TRANSMISSION;
-            (material as any).ior = GLASS.IOR;
-            (material as any).thickness = 0.05;
-        }
-        material.needsUpdate = true;
+        const glassMat = new MeshPhysicalMaterial({
+            color: new Color(GLASS.COLOR),
+            transmission: GLASS.TRANSMISSION,
+            roughness: GLASS.ROUGHNESS,
+            metalness: GLASS.METALNESS,
+            ior: GLASS.IOR,
+            thickness: 0.3,
+            clearcoat: GLASS.CLEARCOAT,
+            clearcoatRoughness: GLASS.CLEARCOAT_ROUGHNESS,
+            envMapIntensity: GLASS.ENV_MAP_INTENSITY,
+            transparent: true,
+            side: DoubleSide,
+        });
+        glassMat.name = material.name || 'glass';
+        mesh.material = glassMat;
+        try { material.dispose(); } catch (_) { /* ignore */ }
     }
 
     private applyMarbleMaterial(mesh: Mesh, material: MeshStandardMaterial): void {
@@ -519,16 +524,16 @@ export class ThreeSceneImpl {
         const marbleMat = new MeshPhysicalMaterial({
             map: basecolor,
             normalMap: normal,
-            normalScale: new Vector2(0.6, 0.6),
+            normalScale: new Vector2(0.5, 0.5),
             roughnessMap: roughness,
             roughness: MARBLE.ROUGHNESS,
             bumpMap: height,
-            bumpScale: 0.04,
+            bumpScale: 0.02,
             metalness: MARBLE.METALNESS,
             clearcoat: MARBLE.CLEARCOAT,
-            clearcoatRoughness: 0.05,
+            clearcoatRoughness: MARBLE.CLEARCOAT_ROUGHNESS,
             reflectivity: 1.0,
-            envMapIntensity: 3.5,
+            envMapIntensity: MARBLE.ENV_MAP_INTENSITY,
             side: DoubleSide,
         });
         mesh.material = marbleMat;
@@ -945,8 +950,8 @@ export class ThreeSceneImpl {
             this.ambientLight.intensity = LIGHTS.AMBIENT.INTENSITY_DARK;
             this.directionalLight.intensity = LIGHTS.DIRECTIONAL.INTENSITY_DARK;
             this.rectLight.intensity = LIGHTS.RECT.INTENSITY_DARK;
-            if (this.marbleSpot1) this.marbleSpot1.intensity = 3;
-            if (this.marbleSpot2) this.marbleSpot2.intensity = 1.5;
+            if (this.marbleSpot1) this.marbleSpot1.intensity = 5;
+            if (this.marbleSpot2) this.marbleSpot2.intensity = 2.5;
             if (this.envMap) {
                 this.scene.background = this.envMap;
             } else {
@@ -957,8 +962,8 @@ export class ThreeSceneImpl {
             this.ambientLight.intensity = LIGHTS.AMBIENT.INTENSITY_LIGHT;
             this.directionalLight.intensity = LIGHTS.DIRECTIONAL.INTENSITY_LIGHT;
             this.rectLight.intensity = LIGHTS.RECT.INTENSITY_LIGHT;
-            if (this.marbleSpot1) this.marbleSpot1.intensity = 12;
-            if (this.marbleSpot2) this.marbleSpot2.intensity = 6;
+            if (this.marbleSpot1) this.marbleSpot1.intensity = 20;
+            if (this.marbleSpot2) this.marbleSpot2.intensity = 10;
             if (this.envMap) {
                 this.scene.background = this.envMap;
                 this.scene.environment = this.envMap;
