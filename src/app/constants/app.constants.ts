@@ -152,17 +152,20 @@ export const MATERIAL_CONFIG = {
         METALNESS: 0.3
     },
     MARBLE: {
-        ROUGHNESS: 1,
-        METALNESS: 0.05,
-        CLEARCOAT: 0.8
+        ROUGHNESS: 0.05,
+        METALNESS: 0,
+        CLEARCOAT: 1.0
     },
     WALL: {
-        ROUGHNESS: 0.05,
-        METALNESS: 0.1,
-        TRANSMISSION: 0.5,
-        IOR: 1.1,
-        THICKNESS: 0,
-        SPECULAR_INTENSITY: 1
+        ROUGHNESS: 0.0,
+        METALNESS: 0,
+        TRANSMISSION: 1.0,
+        IOR: 1.52,
+        THICKNESS: 0.4,
+        CLEARCOAT: 1.0,
+        CLEARCOAT_ROUGHNESS: 0.02,
+        REFLECTIVITY: 0.5,
+        ENV_MAP_INTENSITY: 2.5,
     },
     GLASS: {
         TRANSMISSION: 0,

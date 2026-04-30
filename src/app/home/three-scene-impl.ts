@@ -11,6 +11,7 @@ import {
     DirectionalLight,
     RectAreaLight,
     PointLight,
+    SpotLight,
     BoxGeometry,
     MeshBasicMaterial,
     MeshStandardMaterial,
@@ -24,10 +25,11 @@ import {
     OrthographicCamera,
     HalfFloatType,
     SRGBColorSpace,
+    LinearSRGBColorSpace,
+    RepeatWrapping,
     ACESFilmicToneMapping,
     PCFSoftShadowMap,
     DoubleSide,
-    LinearFilter,
     LinearMipmapLinearFilter,
 } from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
@@ -67,6 +69,8 @@ export class ThreeSceneImpl {
     private ambientLight!: AmbientLight;
     private directionalLight!: DirectionalLight;
     private rectLight!: RectAreaLight;
+    private marbleSpot1!: SpotLight;
+    private marbleSpot2!: SpotLight;
     private envMap: Texture | null = null;
 
     private isZooming = false;
@@ -98,6 +102,7 @@ export class ThreeSceneImpl {
     private readonly dracoLoader: DRACOLoader;
     private readonly gltfLoader: GLTFLoader;
     private readonly textureLoader: TextureLoader;
+    private readonly untrackedTextureLoader: TextureLoader;
     private readonly rgbeLoader: RGBELoader;
 
     private isEnvLoaded = false;
@@ -122,6 +127,7 @@ export class ThreeSceneImpl {
         this.gltfLoader.setDRACOLoader(this.dracoLoader);
 
         this.textureLoader = new TextureLoader(this.loadingManager);
+        this.untrackedTextureLoader = new TextureLoader();
         this.rgbeLoader = new RGBELoader(this.loadingManager);
         this.rgbeLoader.setDataType(HalfFloatType);
 
@@ -153,6 +159,14 @@ export class ThreeSceneImpl {
             'assets/opt_cvfoto1.webp'
         ];
         textures.forEach(path => this.loadTexture(path, { flipY: true }));
+    }
+
+    private warmMarbleTextures(): void {
+        const r = 3;
+        this.loadTexture('assets/marble/marble_basecolor.webp', { flipY: false, repeat: r, untracked: true });
+        this.loadTexture('assets/marble/marble_normal.webp',    { flipY: false, repeat: r, linear: true, untracked: true });
+        this.loadTexture('assets/marble/marble_roughness.webp', { flipY: false, repeat: r, linear: true, untracked: true });
+        this.loadTexture('assets/marble/marble_height.webp',    { flipY: false, repeat: r, linear: true, untracked: true });
     }
 
     private initScene(container: ElementRef): void {
@@ -225,6 +239,20 @@ export class ThreeSceneImpl {
         this.rectLight.position.set(5, 5, 5);
         this.rectLight.lookAt(0, 0, 0);
         this.scene.add(this.rectLight);
+
+        // SpotLight caldi da destra per riflessi principali sul marmo
+        this.marbleSpot1 = new SpotLight(0xfff5e8, 12, 30, Math.PI * 0.18, 0.45, 1.2);
+        this.marbleSpot1.position.set(4, 11, 4);
+        this.marbleSpot1.target.position.set(0, 0, 0);
+        this.scene.add(this.marbleSpot1);
+        this.scene.add(this.marbleSpot1.target);
+
+        // SpotLight freddo da sinistra per contrasto e profondità
+        this.marbleSpot2 = new SpotLight(0xd0e8ff, 6, 25, Math.PI * 0.22, 0.6, 1.2);
+        this.marbleSpot2.position.set(-5, 9, -3);
+        this.marbleSpot2.target.position.set(0, 0, 0);
+        this.scene.add(this.marbleSpot2);
+        this.scene.add(this.marbleSpot2.target);
     }
 
     private configureDirectionalLight(): void {
@@ -314,6 +342,12 @@ export class ThreeSceneImpl {
 
         this.renderer.shadowMap.enabled = true;
         this.renderer.shadowMap.type = PCFSoftShadowMap;
+
+        const isHighEnd = window.innerWidth > 768 && !(/Android|iPhone|iPad|iPod/i.test(navigator.userAgent));
+        this.marbleSpot1.visible = isHighEnd;
+        this.marbleSpot2.visible = isHighEnd;
+
+        this.warmMarbleTextures();
         this.renderer.compile(this.scene, this.camera);
     }
 
@@ -471,49 +505,60 @@ export class ThreeSceneImpl {
         material.needsUpdate = true;
     }
 
-    private applyMarbleMaterial(_mesh: Mesh, material: MeshStandardMaterial): void {
+    private applyMarbleMaterial(mesh: Mesh, material: MeshStandardMaterial): void {
         const { MARBLE } = MATERIAL_CONFIG;
-        material.color = (material.color || new Color(0xffffff)).clone();
-        material.roughness = MARBLE.ROUGHNESS;
-        material.metalness = MARBLE.METALNESS;
-        material.side = DoubleSide;
+        const r = 3;
+        const o = { flipY: false, repeat: r, untracked: true };
+        const basecolor = this.loadTexture('assets/marble/marble_basecolor.webp', o);
+        const normal    = this.loadTexture('assets/marble/marble_normal.webp',    { ...o, linear: true });
+        const roughness = this.loadTexture('assets/marble/marble_roughness.webp', { ...o, linear: true });
+        const height    = this.loadTexture('assets/marble/marble_height.webp',    { ...o, linear: true });
 
-        if ((material as any).isMeshPhysicalMaterial) {
-            (material as any).clearcoat = MARBLE.CLEARCOAT;
-            (material as any).clearcoatRoughness = 0.1;
-        }
-        material.needsUpdate = true;
+        const marbleMat = new MeshPhysicalMaterial({
+            map: basecolor,
+            normalMap: normal,
+            normalScale: new Vector2(0.6, 0.6),
+            roughnessMap: roughness,
+            roughness: MARBLE.ROUGHNESS,
+            bumpMap: height,
+            bumpScale: 0.04,
+            metalness: MARBLE.METALNESS,
+            clearcoat: MARBLE.CLEARCOAT,
+            clearcoatRoughness: 0.05,
+            reflectivity: 1.0,
+            envMapIntensity: 3.5,
+            side: DoubleSide,
+        });
+        mesh.material = marbleMat;
+        mesh.receiveShadow = true;
+        try { material.dispose(); } catch (_) { /* ignore */ }
     }
 
     private applyWallMaterial(mesh: Mesh, material: MeshStandardMaterial): void {
-        const oldMap = material.map || null;
-        const oldNormal = material.normalMap || undefined;
-        const color = (material.color || new Color(0xffffff)).clone();
-
-        if ((material as any).isMeshPhysicalMaterial) {
-            material.transparent = true;
-            material.opacity = 1;
-            material.roughness = 0.02;
-            material.metalness = 0;
-            (material as any).transmission = 0.9;
-            (material as any).ior = 1.45;
-            (material as any).thickness = 0.05;
-            material.side = DoubleSide;
-            material.needsUpdate = true;
-            return;
-        }
+        const { WALL } = MATERIAL_CONFIG;
+        const isHighEnd = window.innerWidth > 768 && !(/Android|iPhone|iPad|iPod/i.test(navigator.userAgent));
 
         const glass = new MeshPhysicalMaterial({
-            map: oldMap, normalMap: oldNormal, color,
-            transparent: true, opacity: 0.2,
-            roughness: 0.02, metalness: 0,
-            transmission: 0.9, ior: 1.1, thickness: 0,
-            side: DoubleSide
+            color: new Color(0xe8f4ff),
+            roughness: WALL.ROUGHNESS,
+            metalness: WALL.METALNESS,
+            transparent: true,
+            ...(isHighEnd ? {
+                transmission: WALL.TRANSMISSION,
+                ior: WALL.IOR,
+                thickness: WALL.THICKNESS,
+                clearcoat: WALL.CLEARCOAT,
+                clearcoatRoughness: WALL.CLEARCOAT_ROUGHNESS,
+                envMapIntensity: WALL.ENV_MAP_INTENSITY,
+            } : {
+                opacity: 0.12,
+            }),
+            reflectivity: WALL.REFLECTIVITY,
+            side: DoubleSide,
         });
         glass.name = material.name || 'stanza-glass';
         mesh.material = glass;
         try { material.dispose(); } catch (e) { /* ignore */ }
-        glass.needsUpdate = true;
     }
 
     private applyCeilingMaterial(material: MeshStandardMaterial): void {
@@ -575,16 +620,22 @@ export class ThreeSceneImpl {
         material.emissiveIntensity = MATERIAL_CONFIG.SCREEN.EMISSIVE_INTENSITY;
     }
 
-    private loadTexture(path: string, opts?: { flipY?: boolean; generateMipmaps?: boolean }): Texture {
-        const key = `${path}::f:${String(opts?.flipY ?? false)}::m:${String(opts?.generateMipmaps ?? false)}`;
+    private loadTexture(path: string, opts?: { flipY?: boolean; generateMipmaps?: boolean; linear?: boolean; repeat?: number; untracked?: boolean }): Texture {
+        const key = `${path}::f:${String(opts?.flipY ?? false)}::m:${String(opts?.generateMipmaps ?? false)}::l:${String(opts?.linear ?? false)}::r:${String(opts?.repeat ?? 1)}`;
         if (!this.textureCache.has(key)) {
-            const texture = this.textureLoader.load(path);
+            const loader = opts?.untracked ? this.untrackedTextureLoader : this.textureLoader;
+            const texture = loader.load(path);
             texture.flipY = opts?.flipY ?? false;
-            try { texture.colorSpace = SRGBColorSpace; } catch (e) { }
+            try { texture.colorSpace = opts?.linear ? LinearSRGBColorSpace : SRGBColorSpace; } catch (e) { }
             const maxAnisotropy = this.renderer?.capabilities.getMaxAnisotropy() || 1;
-            texture.anisotropy = Math.min(maxAnisotropy, 8);
-            texture.generateMipmaps = opts?.generateMipmaps ?? false;
-            texture.minFilter = texture.generateMipmaps ? LinearMipmapLinearFilter : LinearFilter;
+            texture.anisotropy = Math.min(maxAnisotropy, 16);
+            texture.generateMipmaps = opts?.generateMipmaps ?? true;
+            texture.minFilter = LinearMipmapLinearFilter;
+            if (opts?.repeat && opts.repeat !== 1) {
+                texture.wrapS = RepeatWrapping;
+                texture.wrapT = RepeatWrapping;
+                texture.repeat.set(opts.repeat, opts.repeat);
+            }
             this.textureCache.set(key, texture);
         }
         return this.textureCache.get(key)!;
@@ -894,6 +945,8 @@ export class ThreeSceneImpl {
             this.ambientLight.intensity = LIGHTS.AMBIENT.INTENSITY_DARK;
             this.directionalLight.intensity = LIGHTS.DIRECTIONAL.INTENSITY_DARK;
             this.rectLight.intensity = LIGHTS.RECT.INTENSITY_DARK;
+            this.marbleSpot1.intensity = 3;
+            this.marbleSpot2.intensity = 1.5;
             if (this.envMap) {
                 this.scene.background = this.envMap;
             } else {
@@ -904,6 +957,8 @@ export class ThreeSceneImpl {
             this.ambientLight.intensity = LIGHTS.AMBIENT.INTENSITY_LIGHT;
             this.directionalLight.intensity = LIGHTS.DIRECTIONAL.INTENSITY_LIGHT;
             this.rectLight.intensity = LIGHTS.RECT.INTENSITY_LIGHT;
+            this.marbleSpot1.intensity = 12;
+            this.marbleSpot2.intensity = 6;
             if (this.envMap) {
                 this.scene.background = this.envMap;
                 this.scene.environment = this.envMap;
