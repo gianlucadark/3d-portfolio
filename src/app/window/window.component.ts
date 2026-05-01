@@ -3,7 +3,6 @@ import {
   Input,
   Output,
   EventEmitter,
-  HostListener,
   ElementRef,
   OnInit,
   OnChanges,
@@ -11,8 +10,7 @@ import {
   SimpleChanges,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
-  NgZone,
-  Renderer2
+  NgZone
 } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { Subject } from 'rxjs';
@@ -87,6 +85,13 @@ export class WindowComponent implements OnInit, OnChanges, OnDestroy {
   private unlistenTouchMove: (() => void) | null = null;
   private unlistenTouchEnd: (() => void) | null = null;
 
+  // Mouse drag/resize state (zone-less listeners attached only while active)
+  private unlistenMouseMove: (() => void) | null = null;
+  private unlistenMouseUp: (() => void) | null = null;
+  private rafPending = false;
+  private pendingX = 0;
+  private pendingY = 0;
+
   // File explorer
   folderPath: string[] = [];
 
@@ -106,8 +111,7 @@ export class WindowComponent implements OnInit, OnChanges, OnDestroy {
     private readonly sanitizer: DomSanitizer,
     private readonly cdr: ChangeDetectorRef,
     private readonly translationService: TranslationService,
-    private readonly ngZone: NgZone,
-    private readonly renderer: Renderer2
+    private readonly ngZone: NgZone
   ) {
     this.position = this.calculateInitialPosition();
   }
@@ -137,6 +141,8 @@ export class WindowComponent implements OnInit, OnChanges, OnDestroy {
     this.destroy$.complete();
     this.unlistenTouchMove?.();
     this.unlistenTouchEnd?.();
+    this.unlistenMouseMove?.();
+    this.unlistenMouseUp?.();
   }
 
   // ============================================
@@ -191,31 +197,27 @@ export class WindowComponent implements OnInit, OnChanges, OnDestroy {
   // ============================================
   // MOUSE EVENTS
   // ============================================
-
-  @HostListener('document:mousemove', ['$event'])
-  onMouseMove(event: MouseEvent): void {
-    if (this.isDragging) {
-      this.handleDrag(event);
-    } else if (this.isResizing) {
-      this.handleResize(event);
-    }
-  }
-
-  @HostListener('document:mouseup')
-  onMouseUp(): void {
-    this.isDragging = false;
-    this.isResizing = false;
-  }
-
-  private handleDrag(event: MouseEvent): void {
-    this.handleDragAt(event.clientX, event.clientY);
-  }
+  // Drag/resize listeners are attached only while active (in onDragStart /
+  // onResizeStart) and run outside the Angular zone — so a mousemove
+  // anywhere in the document does NOT trigger global change detection.
 
   private handleDragAt(clientX: number, clientY: number): void {
-    const newX = this.clamp(clientX - this.dragStart.x, 0, window.innerWidth - this.size.width);
-    const newY = this.clamp(clientY - this.dragStart.y, 0, window.innerHeight - this.size.height - WINDOW_CONFIG.TASKBAR_HEIGHT);
-    this.position = { x: newX, y: newY };
-    this.cdr.markForCheck();
+    this.pendingX = this.clamp(clientX - this.dragStart.x, 0, window.innerWidth - this.size.width);
+    this.pendingY = this.clamp(clientY - this.dragStart.y, 0, window.innerHeight - this.size.height - WINDOW_CONFIG.TASKBAR_HEIGHT);
+
+    if (this.rafPending) return;
+    this.rafPending = true;
+    requestAnimationFrame(() => {
+      this.rafPending = false;
+      // Write straight to the DOM — bypasses ngStyle re-evaluation and
+      // Angular CD on every frame. The component state is reconciled on
+      // mouseup so subsequent renders stay correct.
+      const node = this.el.nativeElement.querySelector('.window') as HTMLElement | null;
+      if (node) {
+        node.style.left = `${this.pendingX}px`;
+        node.style.top = `${this.pendingY}px`;
+      }
+    });
   }
 
   private handleResize(event: MouseEvent): void {
@@ -226,7 +228,19 @@ export class WindowComponent implements OnInit, OnChanges, OnDestroy {
     this.constrainHeight();
 
     this.resizeStart = { x: event.clientX, y: event.clientY };
-    this.cdr.markForCheck();
+
+    if (this.rafPending) return;
+    this.rafPending = true;
+    requestAnimationFrame(() => {
+      this.rafPending = false;
+      const node = this.el.nativeElement.querySelector('.window') as HTMLElement | null;
+      if (node) {
+        node.style.left = `${this.position.x}px`;
+        node.style.top = `${this.position.y}px`;
+        node.style.width = `${this.size.width}px`;
+        node.style.height = `${this.size.height}px`;
+      }
+    });
   }
 
   private applyResizeDeltas(dx: number, dy: number): void {
@@ -272,6 +286,9 @@ export class WindowComponent implements OnInit, OnChanges, OnDestroy {
       x: event.clientX - this.position.x,
       y: event.clientY - this.position.y
     };
+    this.pendingX = this.position.x;
+    this.pendingY = this.position.y;
+    this.attachMouseDragListeners(/* isResize */ false);
   }
 
   onTouchDragStart(event: TouchEvent): void {
@@ -336,6 +353,57 @@ export class WindowComponent implements OnInit, OnChanges, OnDestroy {
       bottom: edge.includes('bottom'),
       left: edge.includes('left')
     };
+    this.attachMouseDragListeners(/* isResize */ true);
+  }
+
+  /**
+   * Attach mousemove/mouseup outside the Angular zone — drag/resize updates
+   * the DOM directly per frame without firing global change detection.
+   * Listeners self-detach on mouseup; a single markForCheck() syncs state.
+   */
+  private attachMouseDragListeners(isResize: boolean): void {
+    this.unlistenMouseMove?.();
+    this.unlistenMouseUp?.();
+
+    this.ngZone.runOutsideAngular(() => {
+      const onMove = (e: MouseEvent) => {
+        if (this.isDragging) {
+          this.handleDragAt(e.clientX, e.clientY);
+        } else if (this.isResizing) {
+          this.handleResize(e);
+        }
+      };
+
+      const onUp = () => {
+        const wasDragging = this.isDragging;
+        const wasResizing = this.isResizing;
+        this.isDragging = false;
+        this.isResizing = false;
+
+        document.removeEventListener('mousemove', onMove);
+        document.removeEventListener('mouseup', onUp);
+        this.unlistenMouseMove = null;
+        this.unlistenMouseUp = null;
+
+        if (wasDragging) {
+          // Reconcile component state with the DOM on release.
+          this.ngZone.run(() => {
+            this.position = { x: this.pendingX, y: this.pendingY };
+            this.cdr.markForCheck();
+          });
+        } else if (wasResizing) {
+          this.ngZone.run(() => this.cdr.markForCheck());
+        }
+      };
+
+      document.addEventListener('mousemove', onMove);
+      document.addEventListener('mouseup', onUp);
+
+      this.unlistenMouseMove = () => document.removeEventListener('mousemove', onMove);
+      this.unlistenMouseUp = () => document.removeEventListener('mouseup', onUp);
+    });
+
+    void isResize;
   }
 
   onClose(): void {

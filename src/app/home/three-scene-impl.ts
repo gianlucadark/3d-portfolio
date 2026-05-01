@@ -12,8 +12,6 @@ import {
     RectAreaLight,
     PointLight,
     SpotLight,
-    BoxGeometry,
-    MeshBasicMaterial,
     MeshStandardMaterial,
     MeshPhysicalMaterial,
     Mesh,
@@ -46,6 +44,7 @@ const FPS_ACTIVE = 1000 / 60;
 const FPS_IDLE = 1000 / 30;
 const FPS_LOADING = 1000 / 5;
 const INTERACTION_COOLDOWN_MS = 2000;
+const HOVER_RAYCAST_INTERVAL_MS = 50;
 
 export class ThreeSceneImpl {
     private scene!: Scene;
@@ -81,12 +80,11 @@ export class ThreeSceneImpl {
     private catGlowTween: gsap.core.Tween | null = null;
     private pacmanGlowTween: gsap.core.Tween | null = null;
     private catMeshes: Mesh[] = [];
-    private placeholder: Mesh | null = null;
     private isFullQualityEnabled = false;
 
     private lastFrameTime = 0;
     private lastInteractionTime = 0;
-    private frameCount = 0;
+    private lastHoverRaycastTime = 0;
     private sceneVisible = false;
 
     private resizeListener!: () => void;
@@ -139,7 +137,6 @@ export class ThreeSceneImpl {
             this.dracoLoader.preload();
             this.preloadTextures();
             this.initScene(container);
-            this.createPlaceholder();
             this.loadModel();
             this.startAnimation();
             this.setupEventListeners(container.nativeElement);
@@ -314,24 +311,6 @@ export class ThreeSceneImpl {
         );
     }
 
-    private createPlaceholder(): void {
-        const geometry = new BoxGeometry(10, 6, 10);
-        const material = new MeshBasicMaterial({
-            color: 0x4a9eff,
-            wireframe: true,
-            transparent: true,
-            opacity: 0.2
-        });
-        this.placeholder = new Mesh(geometry, material);
-        this.placeholder.position.y = 0;
-        this.scene.add(this.placeholder);
-
-        gsap.to(this.placeholder.scale, {
-            x: 1.05, y: 1.05, z: 1.05,
-            duration: 1.5, repeat: -1, yoyo: true, ease: 'power1.inOut'
-        });
-    }
-
     private enableProgressiveFeatures(): void {
         if (this.isFullQualityEnabled) return;
         this.isFullQualityEnabled = true;
@@ -374,18 +353,6 @@ export class ThreeSceneImpl {
 
         this.processModel();
         this.frameModel();
-
-        if (this.placeholder) {
-            gsap.to(this.placeholder.material, {
-                opacity: 0, duration: 0.5,
-                onComplete: () => {
-                    this.scene.remove(this.placeholder!);
-                    this.placeholder?.geometry.dispose();
-                    (this.placeholder?.material as MeshBasicMaterial).dispose();
-                    this.placeholder = null;
-                }
-            });
-        }
 
         this.scene.add(this.model);
         this.renderer.compile(this.scene, this.camera);
@@ -695,7 +662,6 @@ export class ThreeSceneImpl {
         if (elapsed < targetFps) return;
         this.lastFrameTime = now - (elapsed % targetFps);
 
-        this.frameCount++;
         this.controls?.update();
 
         const bgRot = (this.scene as any).backgroundRotation;
@@ -770,7 +736,9 @@ export class ThreeSceneImpl {
 
         this.updateMouseCoordinates(event, canvas);
 
-        if (this.frameCount % 2 !== 0) return;
+        const now = performance.now();
+        if (now - this.lastHoverRaycastTime < HOVER_RAYCAST_INTERVAL_MS) return;
+        this.lastHoverRaycastTime = now;
 
         this.raycaster.setFromCamera(this.mouse, this.camera);
 

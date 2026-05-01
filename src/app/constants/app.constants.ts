@@ -247,15 +247,15 @@ export const WINDOW_IDS = {
 // ============================================
 export const ASSET_PATHS = {
     ICONS: {
-        COMPUTER: 'assets/icons/computer.ico',
+        COMPUTER: 'assets/icons/computer-xp.webp',
         CV: 'assets/icons/cv.webp',
         PROMPT: 'assets/icons/prompt.webp',
-        README: 'assets/icons/readme.ico',
+        README: 'assets/icons/readme.webp',
         PAINT: 'assets/icons/paint.webp',
         TRASH: 'assets/icons/cestino.webp',
-        PAPER: 'assets/icons/paper.ico',
-        EMAIL: 'assets/icons/email.png',
-        FOLDER: 'assets/icons/folder.ico'
+        PAPER: 'assets/icons/paper.webp',
+        EMAIL: 'assets/icons/email.webp',
+        FOLDER: 'assets/icons/folder.webp'
     }
 } as const;
 

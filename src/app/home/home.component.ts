@@ -82,6 +82,7 @@ export class HomeComponent implements OnInit, OnDestroy {
         } else {
           this.openGame();
         }
+        this.threeSceneService.setSceneVisible(false);
         this.cdr.markForCheck();
       });
 

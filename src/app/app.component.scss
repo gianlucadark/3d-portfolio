@@ -1,22 +1,12 @@
 // ========================================
 // VARIABILI — Brand Identity v1.0
 // ========================================
-$lux:           #4AADDC;
-$violet:        #B07EFF;
-$lux-border: rgba(74, 173, 220, 0.40);
 $transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
 
 @mixin flex-center {
     display: flex;
     align-items: center;
     justify-content: center;
-}
-
-@mixin glass-effect($bg-opacity: 0.1) {
-    background: rgba(255, 255, 255, $bg-opacity);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 // ========================================
@@ -41,54 +31,6 @@ $transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
         visibility: hidden;
         pointer-events: none;
     }
-}
-
-.loading-language-toggle {
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    z-index: 10010;
-}
-
-.control-toggle {
-    width: 48px;
-    height: 48px;
-    @include glass-effect;
-    border-radius: 50%;
-    color: white;
-    cursor: pointer;
-    @include flex-center;
-    transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-
-    &:hover {
-        background: rgba(255, 255, 255, 0.2);
-        transform: scale(1.1);
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
-    }
-
-    svg { filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.5)); }
-}
-
-.language-toggle { position: relative; overflow: hidden; }
-
-.flag-svg {
-    width: 28px;
-    height: 20px;
-    border-radius: 3px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-}
-
-.language-text {
-    position: absolute;
-    font-size: 10px;
-    font-weight: 700;
-    bottom: 4px;
-    right: 6px;
-    background: rgba(0, 0, 0, 0.5);
-    padding: 2px 4px;
-    border-radius: 3px;
-    text-shadow: 0 0 2px rgba(0, 0, 0, 0.8);
 }
 
 // ========================================

@@ -29,27 +29,27 @@ import {
 
 /** Configurazione delle icone del desktop */
 const DESKTOP_ICONS: Icon[] = [
-  { id: 1, name: 'icons.computer', image: 'assets/icons/computer.ico', position: { x: 0, y: 0 } },
-  { id: 13, name: 'icons.curriculum', image: 'assets/icons/folder.ico', position: { x: 0, y: 0 } },
+  { id: 1, name: 'icons.computer', image: 'assets/icons/computer-xp.webp', position: { x: 0, y: 0 } },
+  { id: 13, name: 'icons.curriculum', image: 'assets/icons/folder.webp', position: { x: 0, y: 0 } },
   { id: 4, name: 'icons.prompt', image: 'assets/icons/prompt.webp', position: { x: 0, y: 0 } },
   { id: 10, name: 'icons.projects', image: 'assets/icons/gd.webp', position: { x: 0, y: 0 } },
   { id: 6, name: 'icons.paint', image: 'assets/icons/paint.webp', position: { x: 0, y: 0 } },
-  { id: 8, name: 'icons.notepad', image: 'assets/icons/paper.ico', position: { x: 0, y: 0 } },
-  { id: 9, name: 'icons.email', image: 'assets/icons/email.png', position: { x: 0, y: 0 } },
+  { id: 8, name: 'icons.notepad', image: 'assets/icons/paper.webp', position: { x: 0, y: 0 } },
+  { id: 9, name: 'icons.email', image: 'assets/icons/email.webp', position: { x: 0, y: 0 } },
   { id: 7, name: 'icons.trash', image: 'assets/icons/cestino.webp', position: { x: 0, y: 0 } },
-  { id: 5, name: 'icons.readme', image: 'assets/icons/readme.ico', position: { x: 0, y: 0 } },
-  { id: 99, name: 'icons.system32', image: 'assets/icons/computer.ico', position: { x: 0, y: 0 } },
+  { id: 5, name: 'icons.readme', image: 'assets/icons/readme.webp', position: { x: 0, y: 0 } },
+  { id: 99, name: 'icons.system32', image: 'assets/icons/computer-xp.webp', position: { x: 0, y: 0 } },
   {
     id: 11,
     name: 'icons.uxability',
-    image: 'assets/icons/folder.ico',
+    image: 'assets/icons/folder.webp',
     position: { x: 0, y: 0 },
     parentId: 10
   },
   {
     id: 12,
     name: 'icons.webExtension',
-    image: 'assets/icons/folder.ico',
+    image: 'assets/icons/folder.webp',
     position: { x: 0, y: 0 },
     parentId: 10
   }
@@ -107,7 +107,7 @@ export class DesktopComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.calculateIconPositions();
-    this.openWindow(5, this.getWindowTitle(5), 'assets/icons/readme.ico');
+    this.openWindow(5, this.getWindowTitle(5), 'assets/icons/readme.webp');
 
     this.translationService.language$
       .pipe(takeUntil(this.destroy$))

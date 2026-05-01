@@ -42,22 +42,22 @@
     </div>
     <div class="nav-separator"></div>
     <button class="nav-button main">
-      <img src="assets/icons/folder.ico" alt="Up" class="nav-icon">
+      <img src="assets/icons/folder.webp" alt="Up" class="nav-icon">
     </button>
     <div class="nav-separator"></div>
     <div class="toolbar-group">
       <button class="nav-button main">
-        <img src="assets/icons/cerca.ico" alt="Search" class="nav-icon">
+        <img src="assets/icons/cerca.webp" alt="Search" class="nav-icon">
         <span class="nav-text">{{ 'common.search' | translate }}</span>
       </button>
       <button class="nav-button main">
-        <img src="assets/icons/folder.ico" alt="Folders" class="nav-icon">
+        <img src="assets/icons/folder.webp" alt="Folders" class="nav-icon">
         <span class="nav-text">{{ 'common.folders' | translate }}</span>
       </button>
     </div>
     <div class="nav-separator"></div>
     <button class="nav-button main">
-      <img src="assets/icons/computer.ico" alt="View" class="nav-icon">
+      <img src="assets/icons/computer-xp.webp" alt="View" class="nav-icon">
     </button>
   </div>
 
@@ -65,7 +65,7 @@
   <div class="address-bar-container" *ngIf="windowType !== 'cv' && windowType !== 'prompt'">
     <div class="address-label">{{ 'common.address' | translate }}</div>
     <div class="address-input-wrapper">
-      <img src="assets/icons/folder.ico" alt="Folder" class="address-icon">
+      <img src="assets/icons/folder.webp" alt="Folder" class="address-icon">
       <div class="address-text">{{ folderPath.join('\\') }}</div>
       <div class="address-dropdown"></div>
     </div>
@@ -123,7 +123,7 @@
     </ng-container>
     <ng-container *ngIf="windowType === 'computer'">
       <div class="icon" (click)="selectIcon($event)">
-        <img src="assets/icons/disco.ico" [alt]="'diskInfo.localDisk' | translate">
+        <img src="assets/icons/disco.webp" [alt]="'diskInfo.localDisk' | translate">
         <span>{{ 'diskInfo.localDisk' | translate }}</span>
       </div>
     </ng-container>

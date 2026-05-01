@@ -136,12 +136,19 @@ $black: #000;
   width: 100px;
   border: 1px solid transparent;
   transition: background-color 0.1s;
+  // Promote to its own GPU layer so cdkDrag transforms don't repaint
+  // the whole desktop on every mousemove. Fixes drag-lag.
+  will-change: transform;
+  transform: translateZ(0);
 
   img {
     width: 48px;
     height: 48px;
     margin-bottom: 4px;
-    filter: drop-shadow(2px 2px 2px rgba(0, 0, 0, 0.3));
+    // Tahoma-style soft shadow — kept light so icons stay crisp
+    // and don't read as semi-transparent.
+    filter: drop-shadow(1px 1px 1px rgba(0, 0, 0, 0.45));
+    image-rendering: -webkit-optimize-contrast;
   }
 
   span {

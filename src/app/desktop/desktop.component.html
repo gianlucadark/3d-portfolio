@@ -37,12 +37,12 @@
         </div>
         <div class="start-menu-right-content">
           <div class="start-menu-header">
-            <img src="assets/icons/profile.ico" alt="User" class="user-profile-img">
+            <img src="assets/icons/profile-xp.webp" alt="User" class="user-profile-img">
             <span>{{ 'startMenu.user' | translate }}</span>
           </div>
           <div class="start-menu-items">
-            <div class="start-menu-item" (click)="openWindow(1, getWindowTitle(1), 'assets/icons/computer.ico')">
-              <img src="assets/icons/computer.ico" [alt]="'icons.computer' | translate">
+            <div class="start-menu-item" (click)="openWindow(1, getWindowTitle(1), 'assets/icons/computer-xp.webp')">
+              <img src="assets/icons/computer-xp.webp" [alt]="'icons.computer' | translate">
               <span>{{ 'icons.computer' | translate }}</span>
             </div>
             <div class="start-menu-item" (click)="openWindow(6, getWindowTitle(6), 'assets/icons/paint.webp')">
@@ -57,12 +57,12 @@
               <img src="assets/icons/prompt.webp" [alt]="'startMenu.commandPrompt' | translate">
               <span>{{ 'startMenu.commandPrompt' | translate }}</span>
             </div>
-            <div class="start-menu-item" (click)="openWindow(5, getWindowTitle(5), 'assets/icons/readme.ico')">
-              <img src="assets/icons/readme.ico" [alt]="'icons.readme' | translate">
+            <div class="start-menu-item" (click)="openWindow(5, getWindowTitle(5), 'assets/icons/readme.webp')">
+              <img src="assets/icons/readme.webp" [alt]="'icons.readme' | translate">
               <span>{{ 'icons.readme' | translate }}</span>
             </div>
-            <div class="start-menu-item" (click)="openWindow(8, getWindowTitle(8), 'assets/icons/paper.ico')">
-              <img src="assets/icons/paper.ico" [alt]="'icons.notepad' | translate">
+            <div class="start-menu-item" (click)="openWindow(8, getWindowTitle(8), 'assets/icons/paper.webp')">
+              <img src="assets/icons/paper.webp" [alt]="'icons.notepad' | translate">
               <span>{{ 'icons.notepad' | translate }}</span>
             </div>
             <div class="start-menu-item" (click)="openWindow(7, getWindowTitle(7), 'assets/icons/cestino.webp')">
@@ -90,7 +90,7 @@
           <div class="email-window">
             <div class="email-toolbar">
               <button class="email-tool-btn" (click)="sendEmail()">
-                <img src="assets/icons/spegni.ico" style="filter: hue-rotate(90deg);"
+                <img src="assets/icons/spegni.webp" style="filter: hue-rotate(90deg);"
                   [alt]="'email.sendBtn' | translate">
                 <span>{{ 'email.sendBtn' | translate }}</span>
               </button>
@@ -100,7 +100,7 @@
                 <span>{{ 'email.cut' | translate }}</span>
               </button>
               <button class="email-tool-btn">
-                <img src="assets/icons/computer.ico" style="width: 20px; height: 20px;"
+                <img src="assets/icons/computer-xp.webp" style="width: 20px; height: 20px;"
                   [alt]="'email.copy' | translate">
                 <span>{{ 'email.copy' | translate }}</span>
               </button>
@@ -110,7 +110,7 @@
               </button>
               <div class="email-tool-sep"></div>
               <button class="email-tool-btn">
-                <img src="assets/icons/readme.ico" style="width: 20px; height: 20px;" [alt]="'email.undo' | translate">
+                <img src="assets/icons/readme.webp" style="width: 20px; height: 20px;" [alt]="'email.undo' | translate">
                 <span>{{ 'email.undo' | translate }}</span>
               </button>
             </div>
