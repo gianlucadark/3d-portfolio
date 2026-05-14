@@ -13,6 +13,8 @@ export type WindowType =
   | 'curriculum'
   | 'uxability'
   | 'web-extension'
+  | 'awards-folder'
+  | 'award-image'
   | 'default';
 
 /**
@@ -47,6 +49,9 @@ export interface Window {
 
   /** Sorgente PDF per finestre di tipo documento */
   pdfSrc?: string;
+
+  /** Sorgente immagine per finestre di tipo visualizzatore */
+  imageSrc?: string;
 
   /** Indica se la finestra è minimizzata */
   isMinimized: boolean;

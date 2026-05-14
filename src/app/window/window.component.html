@@ -138,6 +138,14 @@
     <ng-container *ngIf="windowType === 'paint'">
       <app-paint></app-paint>
     </ng-container>
+    <ng-container *ngIf="windowType === 'award-image'">
+      <div class="award-image-viewer">
+        <img *ngIf="imageSrc; else noImage" [src]="imageSrc" [alt]="title" loading="eager" decoding="async">
+        <ng-template #noImage>
+          <p>{{ 'common.error' | translate }}: {{ imageSrc }}</p>
+        </ng-template>
+      </div>
+    </ng-container>
     <ng-container *ngIf="windowType === 'notepad'">
       <div class="notepad-content">
         <textarea [(ngModel)]="notepadText" class="notepad-textarea"></textarea>
@@ -343,7 +351,7 @@
     </ng-container>
 
     <ng-container
-      *ngIf="windowType !== 'cv' && windowType !== 'readme' && windowType !== 'prompt' && windowType !== 'computer' && windowType !== 'recycle-bin' && windowType !== 'paint' && windowType !== 'uxability' && windowType !== 'web-extension'">
+      *ngIf="windowType !== 'cv' && windowType !== 'readme' && windowType !== 'prompt' && windowType !== 'computer' && windowType !== 'recycle-bin' && windowType !== 'paint' && windowType !== 'award-image' && windowType !== 'uxability' && windowType !== 'web-extension'">
       <ng-content></ng-content>
     </ng-container>
   </div>

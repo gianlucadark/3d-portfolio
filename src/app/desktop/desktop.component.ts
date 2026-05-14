@@ -33,6 +33,7 @@ const DESKTOP_ICONS: Icon[] = [
   { id: 13, name: 'icons.curriculum', image: 'assets/icons/folder.webp', position: { x: 0, y: 0 } },
   { id: 4, name: 'icons.prompt', image: 'assets/icons/prompt.webp', position: { x: 0, y: 0 } },
   { id: 10, name: 'icons.projects', image: 'assets/icons/gd.webp', position: { x: 0, y: 0 } },
+  { id: 14, name: 'icons.awards', image: 'assets/icons/folder.webp', position: { x: 0, y: 0 } },
   { id: 6, name: 'icons.paint', image: 'assets/icons/paint.webp', position: { x: 0, y: 0 } },
   { id: 8, name: 'icons.notepad', image: 'assets/icons/paper.webp', position: { x: 0, y: 0 } },
   { id: 9, name: 'icons.email', image: 'assets/icons/email.webp', position: { x: 0, y: 0 } },
@@ -52,6 +53,20 @@ const DESKTOP_ICONS: Icon[] = [
     image: 'assets/icons/folder.webp',
     position: { x: 0, y: 0 },
     parentId: 10
+  },
+  {
+    id: 15,
+    name: 'icons.wdAwards',
+    image: 'assets/nomine/wdawards.webp',
+    position: { x: 0, y: 0 },
+    parentId: 14
+  },
+  {
+    id: 16,
+    name: 'icons.wdAwardsNominee',
+    image: 'assets/nomine/wdawardsnominee.webp',
+    position: { x: 0, y: 0 },
+    parentId: 14
   }
 ];
 
@@ -305,9 +320,16 @@ triggerBsod(): void {
       zIndex: this.highestZIndex,
       windowType: (WINDOW_TYPE_MAP[id] || 'default') as WindowType,
       pdfSrc: (id === 3 || id === 13) ? this.getCvPdfUrl() : undefined,
+      imageSrc: this.getAwardImageUrl(id),
       isMinimized: false,
       size: this.getWindowSize(id)
     };
+  }
+
+  private getAwardImageUrl(id: number): string | undefined {
+    if (id === 15) return 'assets/nomine/wdawards.webp';
+    if (id === 16) return 'assets/nomine/wdawardsnominee.webp';
+    return undefined;
   }
 
   private getWindowSize(id: number): { width: number; height: number } {

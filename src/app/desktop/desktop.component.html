@@ -83,7 +83,7 @@
     <ng-container *ngFor="let window of openWindows">
       <app-window *ngIf="window.isOpen" [id]="window.id" [title]="getWindowTitle(window.id)" [icon]="window.icon"
         [zIndex]="window.zIndex" [windowType]="window.windowType ?? ''" [pdfSrc]="window.pdfSrc"
-        [isMinimized]="window.isMinimized" (closeWindow)="closeWindow(window.id)"
+        [imageSrc]="window.imageSrc" [isMinimized]="window.isMinimized" (closeWindow)="closeWindow(window.id)"
         (minimizeWindow)="minimizeWindow(window.id)" (focusWindow)="onWindowFocus(window.id)"
         (openOtherWindow)="onOpenWindow($event)">
         <ng-container *ngIf="window.windowType === 'email'">
@@ -137,9 +137,10 @@
           <!-- Redundant iframe removed. Handled by app-window component. -->
         </ng-container>
         <ng-container
-          *ngIf="(window.windowType === 'default' && window.id === 10) || window.windowType === 'curriculum'">
+          *ngIf="(window.windowType === 'default' && window.id === 10) || window.windowType === 'curriculum' || window.windowType === 'awards-folder'">
           <div style="display: flex; gap: 30px; align-items: flex-start; padding: 20px 0 0 20px;">
             <div *ngFor="let sub of getSubIcons(window.id)" style="text-align: center; cursor: pointer;"
+              (click)="window.windowType === 'awards-folder' && openIcon($event, sub.id)"
               (dblclick)="openIcon($event, sub.id)">
               <img [src]="sub.image" [alt]="sub.name | translate" style="width:64px; height:64px;">
               <div style="font-family: Tahoma; font-size: 11px; margin-top: 4px; color: #333;">{{ sub.name | translate }}</div>
@@ -147,7 +148,7 @@
           </div>
         </ng-container>
         <ng-container
-          *ngIf="window.windowType !== 'cv' && window.windowType !== 'prompt' && window.windowType !== 'email' && !(window.windowType === 'default' && window.id === 10) && window.windowType !== 'uxability' && window.windowType !== 'web-extension'">
+          *ngIf="window.windowType !== 'cv' && window.windowType !== 'prompt' && window.windowType !== 'email' && !(window.windowType === 'default' && window.id === 10) && window.windowType !== 'awards-folder' && window.windowType !== 'award-image' && window.windowType !== 'uxability' && window.windowType !== 'web-extension'">
           <!-- Nessun testo di default -->
         </ng-container>
       </app-window>

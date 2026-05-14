@@ -52,6 +52,7 @@ export class WindowComponent implements OnInit, OnChanges, OnDestroy {
   @Input() zIndex = 0;
   @Input() windowType = 'default';
   @Input() pdfSrc: string | undefined;
+  @Input() imageSrc: string | undefined;
   @Input() id!: number;
   @Input() isMinimized = false;
 
