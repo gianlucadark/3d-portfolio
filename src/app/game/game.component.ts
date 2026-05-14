@@ -45,6 +45,15 @@ interface FlappyBird {
   vy: number;
 }
 
+interface FlappyParticle {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  life: number;
+  color: string;
+}
+
 @Component({
   selector: 'app-game',
   templateUrl: './game.component.html',
@@ -115,13 +124,17 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
   private readonly FB_GAP = 130;
   private readonly FB_PIPE_SPEED = 2.4;
   private readonly FB_PIPE_INTERVAL = 170; // frames
+  private readonly FB_FRAME_MS = 1000 / 60;
+  private readonly FB_MAX_FRAME_STEP = 2.5;
 
   private flappyBird: FlappyBird = { y: 240, vy: 0 };
   private flappyPipes: FlappyPipe[] = [];
   private flappyFrame = 0;
+  private flappyLastTime = 0;
+  private flappyPipeTimer = 0;
   private flappyBirdAngle = 0;
   private flappyStarted = false; // waiting for tap
-  private flappyParticles: Array<{ x: number; y: number; vx: number; vy: number; life: number; color: string }> = [];
+  private flappyParticles: FlappyParticle[] = [];
 
   constructor(private readonly ngZone: NgZone, private readonly cdr: ChangeDetectorRef) { }
 
@@ -224,10 +237,17 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
     this.spawnFlappyParticles(this.FB_BIRD_X, this.flappyBird.y);
   }
 
+  onFlappyPointer(event: PointerEvent): void {
+    event.preventDefault();
+    this.onFlappyTap();
+  }
+
   private resetFlappy(): void {
     this.flappyBird = { y: this.FB_HEIGHT / 2, vy: 0 };
     this.flappyPipes = [];
     this.flappyFrame = 0;
+    this.flappyLastTime = 0;
+    this.flappyPipeTimer = 0;
     this.flappyBirdAngle = 0;
     this.flappyStarted = false;
     this.flappyParticles = [];
@@ -245,26 +265,32 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  private flappyLoop = (): void => {
-    this.updateFlappy();
+  private flappyLoop = (timestamp = performance.now()): void => {
+    const elapsed = this.flappyLastTime ? timestamp - this.flappyLastTime : this.FB_FRAME_MS;
+    this.flappyLastTime = timestamp;
+    const frameStep = Math.min(Math.max(elapsed / this.FB_FRAME_MS, 0.5), this.FB_MAX_FRAME_STEP);
+
+    this.updateFlappy(frameStep);
     this.drawFlappy();
     this.flappyAnimationId = requestAnimationFrame(this.flappyLoop);
   };
 
-  private updateFlappy(): void {
+  private updateFlappy(frameStep: number): void {
     if (!this.flappyStarted || this.flappyOver) return;
 
-    this.flappyFrame++;
+    this.flappyFrame += frameStep;
 
     // Gravity
-    this.flappyBird.vy += this.FB_GRAVITY;
-    this.flappyBird.y += this.flappyBird.vy;
+    this.flappyBird.vy += this.FB_GRAVITY * frameStep;
+    this.flappyBird.y += this.flappyBird.vy * frameStep;
 
     // Bird angle
     this.flappyBirdAngle = Math.max(-30, Math.min(90, this.flappyBird.vy * 4));
 
     // Spawn pipes
-    if (this.flappyFrame % this.FB_PIPE_INTERVAL === 0) {
+    this.flappyPipeTimer += frameStep;
+    while (this.flappyPipeTimer >= this.FB_PIPE_INTERVAL) {
+      this.flappyPipeTimer -= this.FB_PIPE_INTERVAL;
       const gapY = 80 + Math.random() * (this.FB_HEIGHT - 200);
       this.flappyPipes.push({ x: this.FB_WIDTH, gapY, scored: false });
     }
@@ -272,7 +298,7 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
     // Move pipes
     const birdR = 14;
     for (const pipe of this.flappyPipes) {
-      pipe.x -= this.FB_PIPE_SPEED;
+      pipe.x -= this.FB_PIPE_SPEED * frameStep;
 
       // Score
       if (!pipe.scored && pipe.x + this.FB_PIPE_W < this.FB_BIRD_X) {
@@ -312,10 +338,10 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
 
     // Particles
     for (const p of this.flappyParticles) {
-      p.x += p.vx;
-      p.y += p.vy;
-      p.vy += 0.2;
-      p.life--;
+      p.x += p.vx * frameStep;
+      p.y += p.vy * frameStep;
+      p.vy += 0.2 * frameStep;
+      p.life -= frameStep;
     }
     this.flappyParticles = this.flappyParticles.filter(p => p.life > 0);
   }

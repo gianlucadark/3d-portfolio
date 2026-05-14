@@ -120,8 +120,7 @@
         </div>
 
         <!-- ======= FLAPPY BIRD (MOBILE) ======= -->
-        <div class="game-screen flappy-screen" *ngIf="isMobile" (click)="onFlappyTap()"
-            (touchstart)="onFlappyTap(); $event.preventDefault()">
+        <div class="game-screen flappy-screen" *ngIf="isMobile" (pointerdown)="onFlappyPointer($event)">
             <canvas #flappyCanvas width="320" height="480"
                 role="img"
                 aria-label="Flappy Bird mobile game — tocca lo schermo per far volare il personaggio"></canvas>
