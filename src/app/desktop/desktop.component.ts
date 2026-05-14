@@ -67,6 +67,13 @@ const DESKTOP_ICONS: Icon[] = [
     image: 'assets/nomine/wdawardsnominee.webp',
     position: { x: 0, y: 0 },
     parentId: 14
+  },
+  {
+    id: 17,
+    name: 'icons.wdFavourite',
+    image: 'assets/nomine/wdfavourite.webp',
+    position: { x: 0, y: 0 },
+    parentId: 14
   }
 ];
 
@@ -329,6 +336,7 @@ triggerBsod(): void {
   private getAwardImageUrl(id: number): string | undefined {
     if (id === 15) return 'assets/nomine/wdawards.webp';
     if (id === 16) return 'assets/nomine/wdawardsnominee.webp';
+    if (id === 17) return 'assets/nomine/wdfavourite.webp';
     return undefined;
   }
 

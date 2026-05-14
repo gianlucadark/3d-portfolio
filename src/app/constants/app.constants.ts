@@ -118,7 +118,8 @@ export const WINDOW_TYPE_MAP: Record<number, string> = {
     13: 'cv',
     14: 'awards-folder',
     15: 'award-image',
-    16: 'award-image'
+    16: 'award-image',
+    17: 'award-image'
 } as const;
 
 // ============================================
@@ -145,6 +146,7 @@ export const ICON_KEY_MAP: Record<number, string> = {
     14: 'awards',
     15: 'wdAwards',
     16: 'wdAwardsNominee',
+    17: 'wdFavourite',
     99: 'system32'
 } as const;
 
@@ -248,7 +250,8 @@ export const WINDOW_IDS = {
     CURRICULUM: 13,
     AWARDS: 14,
     WD_AWARDS: 15,
-    WD_AWARDS_NOMINEE: 16
+    WD_AWARDS_NOMINEE: 16,
+    WD_FAVOURITE: 17
 } as const;
 
 // ============================================

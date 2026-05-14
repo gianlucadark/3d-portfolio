@@ -49,6 +49,7 @@ export const EN_TRANSLATIONS = {
         awards: 'Awards',
         wdAwards: 'WD Awards',
         wdAwardsNominee: 'WD Awards Nominee',
+        wdFavourite: 'WD Favourite',
         curriculum: 'Curriculum',
         uxability: 'Uxability',
         webExtension: 'Web Extension',
