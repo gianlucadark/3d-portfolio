@@ -45,11 +45,16 @@ export class AnalyticsService {
   }
 
   private enable(): void {
-    if (this.initialized || !environment.production) return;
+    if (this.initialized || !environment.analyticsEnabled) return;
 
     this.initialized = true;
     window.dataLayer = window.dataLayer || [];
-    window.gtag = window.gtag || ((...args: unknown[]) => window.dataLayer?.push(args));
+
+    // GA4 requires the Arguments object (not a plain array) — must use a regular function
+    if (!window.gtag) {
+      // eslint-disable-next-line prefer-rest-params
+      window.gtag = function() { window.dataLayer!.push(arguments as unknown); } as (...args: unknown[]) => void;
+    }
 
     window.gtag('consent', 'default', {
       analytics_storage: 'granted',
@@ -70,9 +75,9 @@ export class AnalyticsService {
 
   private trackPageView(path: string): void {
     window.gtag?.('event', 'page_view', {
-      page_path: path,
+      page_title: document.title,
       page_location: window.location.origin + path,
-      page_title: document.title
+      page_path: path
     });
   }
 
