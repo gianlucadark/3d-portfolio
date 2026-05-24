@@ -4,6 +4,7 @@ import {
 } from '@angular/core';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { AnalyticsService } from './services/analytics.service';
 import { BootService } from './services/boot.service';
 import { Language, TranslationService } from './services/translation.service';
 
@@ -18,6 +19,7 @@ export class AppComponent implements OnInit, OnDestroy {
   isEndingLoading = false;
   isBiosComplete = false;
   showWelcome = false;
+  showAnalyticsBanner = false;
   currentLanguage: Language = 'en';
 
   private readonly destroy$ = new Subject<void>();
@@ -27,6 +29,7 @@ export class AppComponent implements OnInit, OnDestroy {
   constructor(
     private readonly translationService: TranslationService,
     private readonly bootService: BootService,
+    private readonly analyticsService: AnalyticsService,
     private readonly cdr: ChangeDetectorRef
   ) {
     // Detect headless/crawler in constructor so the LCP <h1> is in the DOM
@@ -51,6 +54,9 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.showAnalyticsBanner = this.analyticsService.getConsent() === null;
+    this.analyticsService.enableIfConsented();
+
     this.translationService.language$
       .pipe(takeUntil(this.destroy$))
       .subscribe(lang => {
@@ -118,5 +124,17 @@ export class AppComponent implements OnInit, OnDestroy {
 
   toggleLanguage(): void {
     this.translationService.toggleLanguage();
+  }
+
+  acceptAnalytics(): void {
+    this.analyticsService.accept();
+    this.showAnalyticsBanner = false;
+    this.cdr.markForCheck();
+  }
+
+  rejectAnalytics(): void {
+    this.analyticsService.reject();
+    this.showAnalyticsBanner = false;
+    this.cdr.markForCheck();
   }
 }

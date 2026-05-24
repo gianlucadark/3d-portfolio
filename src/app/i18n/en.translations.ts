@@ -27,6 +27,13 @@ export const EN_TRANSLATIONS = {
         switchLang: 'Switch to Italian'
     },
 
+    analytics: {
+        ariaLabel: 'Analytics consent',
+        message: 'I use Google Analytics only with your consent to understand, in aggregate, how the portfolio is visited. You can refuse without limitations.',
+        reject: 'Reject',
+        accept: 'Accept'
+    },
+
     menu: {
         file: 'File',
         edit: 'Edit',

@@ -89,3 +89,11 @@
 </div>
 
 <router-outlet></router-outlet>
+
+<aside class="analytics-consent" *ngIf="showAnalyticsBanner" [attr.aria-label]="t('analytics.ariaLabel')">
+  <p>{{ t('analytics.message') }}</p>
+  <div class="analytics-consent__actions">
+    <button type="button" class="analytics-consent__button" (click)="rejectAnalytics()">{{ t('analytics.reject') }}</button>
+    <button type="button" class="analytics-consent__button analytics-consent__button--primary" (click)="acceptAnalytics()">{{ t('analytics.accept') }}</button>
+  </div>
+</aside>
